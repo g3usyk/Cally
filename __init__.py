@@ -24,12 +24,12 @@
 #                      .@@          .&@
 
 bl_info = {
-    "name": "Cal3D Mesh (XMF) format",
+    "name": "Cal3D Toolkit",
     "author": "hsoju",
-    "version": (1, 0, 0),
+    "version": (1, 0, 1),
     "blender": (2, 80, 0),
     "location": "File > Import-Export",
-    "description": "Import-Export Cal3D Mesh objects",
+    "description": "Import-Export Cal3D objects",
     "warning": "",
     "doc_url": "",
     "category": "Import-Export",
@@ -170,17 +170,14 @@ class CAL_MESH_exporter(Operator, ExportHelper):
     bl_label = "Export XMF"
     bl_options = {'REGISTER', 'PRESET'}
 
-    # ExportHelper mixin class uses this
     filename_ext = ".xmf"
 
     filter_glob: StringProperty(
         default="*.xmf",
         options={'HIDDEN'},
-        maxlen=255,  # Max internal buffer length, longer would be clamped.
+        maxlen=255,
     )
 
-    # List of operator properties, the attributes will be assigned
-    # to the class instance from the operator settings before calling.
     pretty: BoolProperty(
         name="Pretty-Print",
         description="For debugging only",
@@ -311,12 +308,10 @@ class CAL_MESH_exporter(Operator, ExportHelper):
         return {'FINISHED'}
 
 
-# Only needed if you want to add into a dynamic menu
 def menu_export_button(self, context):
     self.layout.operator(CAL_MESH_exporter.bl_idname, text="Cal3D Mesh (.xmf)")
 
 
-# This allows you to right click on a button and link to documentation
 def export_xmf_manual_map():
     url_manual_prefix = "https://docs.blender.org/manual/en/latest/"
     url_manual_mapping = (
