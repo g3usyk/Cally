@@ -51,7 +51,7 @@ class XVertex():
         self.color = []
         self.bone = 0
 
-    def parse(self, idx):
+    def parse(self, idx, u_idx):
         xvert = et.Element('vertex')
         xvert.attrib['numinfluences'] = '1'
         xvert.attrib['id'] = str(idx)
@@ -63,7 +63,7 @@ class XVertex():
         xcol = et.Element('color')
         xcol.text = ''.join([(str(c) + ' ') for c in self.color])[:-1]
         xuv = et.Element('texcoord')
-        xuv.text = str(self.uv[0]) + ' ' + str(abs(1 - self.uv[1]))
+        xuv.text = str(self.uv[u_idx][0]) + ' ' + str(abs(1 - self.uv[u_idx][1]))
         xinf = et.Element('influence')
         xinf.attrib['id'] = self.bone
         xinf.text = '1'
@@ -81,9 +81,9 @@ class XFace():
     def __init__(self):
         self.ix = []
 
-    def parse(self):
+    def parse(self, idxs):
         xfac = et.Element('face')
-        xfac.attrib['vertexid'] = ''.join([(str(i) + ' ') for i in self.ix])[:-1]
+        xfac.attrib['vertexid'] = ''.join([(str(idxs[i[0]][i[1]]) + ' ') for i in self.ix])[:-1]
         return xfac
 
 
@@ -112,21 +112,20 @@ def export_xmf(context, filepath, pretty, mtl, bone):
             xverts.append(next_vert)
 
         xfaces = []
-        seen = []
 
         for face in obj.data.polygons:
             next_face = XFace()
             for v_idx, l_idx in zip(face.vertices, face.loop_indices):
-                next_face.ix.append(v_idx)
-                if v_idx not in seen:
-                    seen.append(v_idx)
-                    uv_coords = obj.data.uv_layers.active.data[l_idx].uv
-                    xverts[v_idx].uv.append(uv_coords[0])
-                    xverts[v_idx].uv.append(uv_coords[1])
+                uv_coords = obj.data.uv_layers.active.data[l_idx].uv
+                next_uv = [uv_coords[0], uv_coords[1]]
+                if next_uv in xverts[v_idx].uv:
+                    next_face.ix.append([v_idx, xverts[v_idx].uv.index(next_uv)])
+                else:
+                    next_face.ix.append([v_idx, len(xverts[v_idx].uv)])
+                    xverts[v_idx].uv.append(next_uv)
             xfaces.append(next_face)
 
         sub = et.Element('submesh')
-        sub.attrib['numvertices'] = str(len(xverts))
         sub.attrib['numfaces'] = str(len(xfaces))
         sub.attrib['numlodsteps'] = '0'
         sub.attrib['numsprings'] = '0'
@@ -137,12 +136,20 @@ def export_xmf(context, filepath, pretty, mtl, bone):
         else:
             sub.attrib['material'] = mtls.pop(0)
 
+        v_id = 0
+        v_ids = []
         for y in range(0, len(xverts)):
-            elemvert = xverts[y].parse(y)
-            sub.append(elemvert)
+            v_ids.append([])
+            for z in range(0, len(xverts[y].uv)):
+                elemvert = xverts[y].parse(v_id, z)
+                sub.append(elemvert)
+                v_ids[y].append(v_id)
+                v_id += 1
+
+        sub.attrib['numvertices'] = str(v_id)
 
         for face in xfaces:
-            elemface = face.parse()
+            elemface = face.parse(v_ids)
             sub.append(elemface)
 
         root.append(sub)
@@ -300,7 +307,7 @@ class CAL_MESH_exporter(Operator, ExportHelper):
 
     def execute(self, context):
         export_xmf(context, self.filepath,
-                   self.pretty, self.mtl, self.bone)
+                    self.pretty, self.mtl, self.bone)
         return {'FINISHED'}
 
 
