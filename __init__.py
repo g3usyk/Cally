@@ -154,10 +154,11 @@ def export_xmf(context, filepath, pretty, scale):
 
     xtext = et.tostring(root).decode('utf8')
     if pretty:
+        xtext = xtext.upper()
         xtext = xtext.replace('<', '\n<')
         xtext = xtext.replace('\n</', '</')
     f = open(filepath, 'w', encoding='utf-8')
-    f.write("<header magic=\"xmf\" version=\"919\"/>")
+    f.write("<HEADER MAGIC=\"XMF\" VERSION=\"919\"/>")
     f.write("%s" % xtext)
     f.close()
 
