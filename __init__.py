@@ -45,6 +45,7 @@ from xml.etree import cElementTree as et
 
 sub_map = {}
 sub_prev = ""
+active_sub = ""
 
 class XVertex():
     def __init__(self):
@@ -196,27 +197,35 @@ class CalMeshExporter(Operator, ExportHelper):
     )
 
     def update_subs(self, context):
-        global sub_map
-        global sub_prev
-        sub_map[sub_prev][0] = self.body
-        sub_map[sub_prev][1] = self.bone
-        sub_map[sub_prev][2] = self.mtl
         self.body = sub_map[self.subs][0]
         self.bone = sub_map[self.subs][1]
         self.mtl = sub_map[self.subs][2]
-        sub_prev = self.subs
 
     def sub_items(self, context):
         global sub_map
-        global sub_prev
         sub_names = [obj.name for obj in context.selected_objects if obj.type == 'MESH']
         items = []
+        # Add submeshes to drop-down menu
         for x in range(0, len(sub_names)):
             next_sub = (sub_names[x], sub_names[x], "")
             items.append(next_sub)
+            # Add submeshes to bone lookup dictionary
             if sub_names[x] not in sub_map:
                 sub_map[sub_names[x]] = ['OPT_A', '0', 0]
-                sub_prev = sub_names[x]
+        sub_keys = sub_map.keys()
+        prev_sub = None
+        # Remove submeshes from bone lookup dictionary if deleted
+        for sub in sub_keys:
+            if sub not in sub_names:
+                sub_map.pop(sub, 'None')
+                if prev_sub is None:
+                    self.body = 'OPT_A'
+                    self.bone = '0'
+                    self.mtl = 0
+                else:
+                    self.subs = prev_sub
+            else:
+                prev_sub = sub
         return items
 
     subs: EnumProperty(
@@ -225,6 +234,10 @@ class CalMeshExporter(Operator, ExportHelper):
         items=sub_items,
         update=update_subs
     )
+
+    def update_body(self, context):
+        global sub_map
+        sub_map[self.subs][0] = self.body
 
     body: EnumProperty(
         name="Body Part",
@@ -242,7 +255,12 @@ class CalMeshExporter(Operator, ExportHelper):
             ('OPT_J', "Right Leg", "Used for right leg from avatar's perspective")
         ),
         default='OPT_A',
+        update=update_body
     )
+
+    def update_bone(self, context):
+        global sub_map
+        sub_map[self.subs][1] = self.bone
 
     def bone_items(self, context):
         items = []
@@ -324,15 +342,21 @@ class CalMeshExporter(Operator, ExportHelper):
     bone: EnumProperty(
         name="Bone",
         description="Specifies imvu's skeleton",
-        items=bone_items
+        items=bone_items,
+        update=update_bone
     )
+
+    def update_mtl(self, context):
+        global sub_map
+        sub_map[self.subs][2] = self.mtl
 
     mtl: IntProperty(
         name="Material ID",
         description="Assigns meshes to material slots (id's separated by whitespace)",
         min=0,
         max=100,
-        default=0
+        default=0,
+        update=update_mtl
     )
 
     scale: EnumProperty(
@@ -353,12 +377,12 @@ class CalMeshExporter(Operator, ExportHelper):
     )
 
     def execute(self, context):
-        global sub_map
-        sub_map[sub_prev][1] = self.bone
-        sub_map[sub_prev][2] = self.mtl
         export_xmf(context, self.filepath,
                     self.pretty, float(next(iter(self.scale))), self.tri)
         return {'FINISHED'}
+
+    def cancel(self, context):
+        pass
 
 
 def menu_export_button(self, context):
