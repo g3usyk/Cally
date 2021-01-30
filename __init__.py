@@ -325,18 +325,19 @@ class CalMeshExporter(Operator, ExportHelper):
     scale: EnumProperty(
         name="Scale",
         description="Applies imvu's scaling factor",
+        options={"ENUM_FLAG"},
         items=(
-            ('100', "Auto", "Default"),
-            ('1', "Native", "Used for oversized meshes")
+            ('100', "Auto", "Default upscaled resolution"),
+            ('1', "Native", "Client resolution")
         ),
-        default='100',
+        default={'100'},
     )
 
     def execute(self, context):
         global sub_map
         sub_map[sub_prev][1] = self.bone
         export_xmf(context, self.filepath,
-                    self.pretty, self.mtl, float(self.scale))
+                    self.pretty, self.mtl, float(next(iter(self.scale))))
         return {'FINISHED'}
 
 
