@@ -38,7 +38,7 @@ bl_info = {
 
 import bpy
 from bpy.types import Operator
-from bpy.props import StringProperty, BoolProperty, EnumProperty, FloatVectorProperty
+from bpy.props import StringProperty, BoolProperty, EnumProperty, IntProperty
 from bpy_extras.io_utils import ExportHelper
 from xml.etree import cElementTree as et
 
@@ -134,7 +134,7 @@ def export_xmf(context, filepath, pretty, scale):
         sub.attrib['numsprings'] = '0'
         sub.attrib['nummorphs'] = '0'
         sub.attrib['numtexcoords'] = '1'
-        sub.attrib['material'] = sub_map[obj.name][2]
+        sub.attrib['material'] = str(sub_map[obj.name][2])
 
         v_id = 0
         v_ids = []
@@ -204,12 +204,13 @@ class CalMeshExporter(Operator, ExportHelper):
         for x in range(0, len(sub_names)):
             next_sub = (sub_names[x], sub_names[x], "")
             items.append(next_sub)
-            sub_map[sub_names[x]] = ['OPT_A', '0', '0']
-            sub_prev = sub_names[x]
+            if sub_names[x] not in sub_map:
+                sub_map[sub_names[x]] = ['OPT_A', '0', 0]
+                sub_prev = sub_names[x]
         return items
 
     subs: EnumProperty(
-        name="Submeshes",
+        name="Submesh",
         description="Selected objects in scene",
         items=sub_items,
         update=update_subs
@@ -316,11 +317,12 @@ class CalMeshExporter(Operator, ExportHelper):
         items=bone_items
     )
 
-    mtl: StringProperty(
-        name="Material ID(s)",
+    mtl: IntProperty(
+        name="Material ID",
         description="Assigns meshes to material slots (id's separated by whitespace)",
-        default='0',
-        maxlen=255
+        min=0,
+        max=100,
+        default=0
     )
 
     scale: EnumProperty(
