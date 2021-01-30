@@ -92,7 +92,6 @@ class XFace():
 
 def export_xmf(context, filepath, pretty, scale, tri):
     objs = [obj for obj in context.selected_objects if obj.type == 'MESH']
-    bm = bmesh.new()
 
     root = et.Element('mesh')
     root.attrib['numsubmesh'] = str(len(objs))
@@ -117,7 +116,8 @@ def export_xmf(context, filepath, pretty, scale, tri):
             xverts.append(next_vert)
 
         xfaces = []
-
+        
+        bm = bmesh.new()
         bm.from_mesh(obj.data)
         if tri:
             bmesh.ops.triangulate(bm, faces=bm.faces[:], quad_method='BEAUTY', ngon_method='BEAUTY')
@@ -161,6 +161,8 @@ def export_xmf(context, filepath, pretty, scale, tri):
             sub.append(elemface)
 
         root.append(sub)
+
+    
 
     xtext = et.tostring(root).decode('utf8')
     if pretty:
