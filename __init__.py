@@ -89,19 +89,17 @@ class XFace():
         return xfac
 
 
-def export_xmf(context, filepath, pretty, mtl, scale):
+def export_xmf(context, filepath, pretty, scale):
     objs = [obj for obj in context.selected_objects if obj.type == 'MESH']
 
     root = et.Element('mesh')
     root.attrib['numsubmesh'] = str(len(objs))
-    mtl = ''.join(m for m in mtl if m.isdigit() or m.isspace())
-    mtls = [m for m in mtl.split()]
 
     for obj in objs:
         coords = [(obj.matrix_world @ v.co) for v in obj.data.vertices]
         norms = [v.normal for v in obj.data.vertices]
         xverts = []
-        bone_id = sub_map[obj.name]
+        bone_id = sub_map[obj.name][1]
         for x in range(0, len(obj.data.vertices)):
             next_vert = XVertex()
             next_vert.posn.append(coords[x][0])
@@ -134,10 +132,7 @@ def export_xmf(context, filepath, pretty, mtl, scale):
         sub.attrib['numsprings'] = '0'
         sub.attrib['nummorphs'] = '0'
         sub.attrib['numtexcoords'] = '1'
-        if len(mtls) == 0:
-            sub.attrib['material'] = '0'
-        else:
-            sub.attrib['material'] = mtls.pop(0)
+        sub.attrib['material'] = sub_map[obj.name][2]
 
         v_id = 0
         v_ids = []
@@ -194,7 +189,7 @@ class CalMeshExporter(Operator, ExportHelper):
         global sub_prev
         next_sub = (sub_names(x), sub_names[x], "")
         sub_items.append(next_sub)
-        sub_map[sub_names(x)] = ['OPT_A', '0']
+        sub_map[sub_names(x)] = ['OPT_A', '0', '0']
         sub_prev = sub_names(x)
     
     def update_subs(self, context):
@@ -202,8 +197,10 @@ class CalMeshExporter(Operator, ExportHelper):
         global sub_prev
         sub_map[sub_prev][0] = self.body
         sub_map[sub_prev][1] = self.bone
+        sub_map[sub_prev][2] = self.mtl
         self.body = sub_map[self.subs][0]
         self.bone = sub_map[self.subs][1]
+        self.mtl = sub_map[self.subs][2]
         sub_prev = self.subs
 
     subs: EnumProperty(
@@ -336,8 +333,9 @@ class CalMeshExporter(Operator, ExportHelper):
     def execute(self, context):
         global sub_map
         sub_map[sub_prev][1] = self.bone
+        sub_map[sub_prev][2] = self.mtl
         export_xmf(context, self.filepath,
-                    self.pretty, self.mtl, float(next(iter(self.scale))))
+                    self.pretty, float(next(iter(self.scale))))
         return {'FINISHED'}
 
 
