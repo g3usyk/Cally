@@ -53,13 +53,13 @@ class XVertex():
         self.color = []
         self.bone = 0
 
-    def parse(self, idx, u_idx):
+    def parse(self, idx, u_idx, scale):
         xvert = et.Element('vertex')
         xvert.attrib['numinfluences'] = '1'
         xvert.attrib['id'] = str(idx)
 
         xposn = et.Element('pos')
-        xposn.text = ''.join([(str(p * 100) + ' ') for p in self.posn])[:-1]
+        xposn.text = ''.join([(str(p * scale) + ' ') for p in self.posn])[:-1]
         xnorm = et.Element('norm')
         xnorm.text = ''.join([(str(n) + ' ') for n in self.norm])[:-1]
         xcol = et.Element('color')
@@ -89,7 +89,7 @@ class XFace():
         return xfac
 
 
-def export_xmf(context, filepath, pretty, mtl):
+def export_xmf(context, filepath, pretty, mtl, scale):
     objs = [obj for obj in context.selected_objects if obj.type == 'MESH']
 
     root = et.Element('mesh')
@@ -144,7 +144,7 @@ def export_xmf(context, filepath, pretty, mtl):
         for y in range(0, len(xverts)):
             v_ids.append([])
             for z in range(0, len(xverts[y].uv)):
-                elemvert = xverts[y].parse(v_id, z)
+                elemvert = xverts[y].parse(v_id, z, scale)
                 sub.append(elemvert)
                 v_ids[y].append(v_id)
                 v_id += 1
@@ -326,8 +326,8 @@ class CalMeshExporter(Operator, ExportHelper):
         name="Scale",
         description="Applies imvu's scaling factor",
         items=(
-            ('100', "1", "Default"),
-            ('1', "0.01", "Used for oversized meshes")
+            ('100', "Auto", "Default"),
+            ('1', "Native", "Used for oversized meshes")
         ),
         default='100',
     )
@@ -336,7 +336,7 @@ class CalMeshExporter(Operator, ExportHelper):
         global sub_map
         sub_map[sub_prev][1] = self.bone
         export_xmf(context, self.filepath,
-                    self.pretty, self.mtl)
+                    self.pretty, self.mtl, float(self.scale))
         return {'FINISHED'}
 
 
