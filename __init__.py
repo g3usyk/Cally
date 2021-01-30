@@ -100,6 +100,8 @@ def export_xmf(context, filepath, pretty, scale):
         norms = [v.normal for v in obj.data.vertices]
         xverts = []
         bone_id = sub_map[obj.name][1]
+        if bone_id == "":
+            bone_id = '0'
         for x in range(0, len(obj.data.vertices)):
             next_vert = XVertex()
             next_vert.posn.append(coords[x][0])
