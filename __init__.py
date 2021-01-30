@@ -26,7 +26,7 @@
 bl_info = {
     "name": "Cal3D Toolkit",
     "author": "hsoju",
-    "version": (1, 0, 2),
+    "version": (1, 0, 3),
     "blender": (2, 90, 0),
     "location": "File > Import-Export",
     "description": "Import-Export Cal3D objects",
