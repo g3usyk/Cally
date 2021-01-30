@@ -37,6 +37,7 @@ bl_info = {
 
 
 import bpy
+import bmesh
 from bpy.types import Operator
 from bpy.props import StringProperty, BoolProperty, EnumProperty, IntProperty
 from bpy_extras.io_utils import ExportHelper
@@ -89,8 +90,9 @@ class XFace():
         return xfac
 
 
-def export_xmf(context, filepath, pretty, scale):
+def export_xmf(context, filepath, pretty, scale, tri):
     objs = [obj for obj in context.selected_objects if obj.type == 'MESH']
+    bm = bmesh.new()
 
     root = et.Element('mesh')
     root.attrib['numsubmesh'] = str(len(objs))
@@ -116,10 +118,15 @@ def export_xmf(context, filepath, pretty, scale):
 
         xfaces = []
 
-        for face in obj.data.polygons:
+        bm.from_mesh(obj.data)
+        if tri:
+            bmesh.ops.triangulate(bm, faces=bm.faces[:], quad_method='BEAUTY', ngon_method='BEAUTY')
+        uv_layer = bm.loops.layers.uv.active
+        for face in bm.faces:
             next_face = XFace()
-            for v_idx, l_idx in zip(face.vertices, face.loop_indices):
-                uv_coords = obj.data.uv_layers.active.data[l_idx].uv
+            for v, l in zip(face.verts, face.loops):
+                v_idx = v.index
+                uv_coords = l[uv_layer].uv
                 next_uv = [uv_coords[0], uv_coords[1]]
                 if next_uv in xverts[v_idx].uv:
                     next_face.ix.append([v_idx, xverts[v_idx].uv.index(next_uv)])
@@ -127,6 +134,7 @@ def export_xmf(context, filepath, pretty, scale):
                     next_face.ix.append([v_idx, len(xverts[v_idx].uv)])
                     xverts[v_idx].uv.append(next_uv)
             xfaces.append(next_face)
+        bm.free()
 
         sub = et.Element('submesh')
         sub.attrib['numfaces'] = str(len(xfaces))
@@ -336,12 +344,18 @@ class CalMeshExporter(Operator, ExportHelper):
         default={'100'},
     )
 
+    tri: BoolProperty(
+        name="Triangulate",
+        description="Converts all faces to triangles for imvu compatibility",
+        default=True,
+    )
+
     def execute(self, context):
         global sub_map
         sub_map[sub_prev][1] = self.bone
         sub_map[sub_prev][2] = self.mtl
         export_xmf(context, self.filepath,
-                    self.pretty, float(next(iter(self.scale))))
+                    self.pretty, float(next(iter(self.scale))), self.tri)
         return {'FINISHED'}
 
 
