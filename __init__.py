@@ -42,6 +42,8 @@ from bpy.props import StringProperty, BoolProperty, EnumProperty, FloatVectorPro
 from bpy_extras.io_utils import ExportHelper
 from xml.etree import cElementTree as et
 
+sub_map = {}
+sub_prev = ""
 
 class XVertex():
     def __init__(self):
@@ -87,7 +89,7 @@ class XFace():
         return xfac
 
 
-def export_xmf(context, filepath, pretty, mtl, bone):
+def export_xmf(context, filepath, pretty, mtl):
     objs = [obj for obj in context.selected_objects if obj.type == 'MESH']
 
     root = et.Element('mesh')
@@ -99,6 +101,7 @@ def export_xmf(context, filepath, pretty, mtl, bone):
         coords = [(obj.matrix_world @ v.co) for v in obj.data.vertices]
         norms = [v.normal for v in obj.data.vertices]
         xverts = []
+        bone_id = sub_map[obj.name]
         for x in range(0, len(obj.data.vertices)):
             next_vert = XVertex()
             next_vert.posn.append(coords[x][0])
@@ -108,7 +111,7 @@ def export_xmf(context, filepath, pretty, mtl, bone):
             next_vert.norm.append(norms[x][1])
             next_vert.norm.append(norms[x][2])
             next_vert.color = ['1', '1', '1']
-            next_vert.bone = bone
+            next_vert.bone = bone_id
             xverts.append(next_vert)
 
         xfaces = []
@@ -164,7 +167,7 @@ def export_xmf(context, filepath, pretty, mtl, bone):
     f.close()
 
 
-class CAL_MESH_exporter(Operator, ExportHelper):
+class CalMeshExporter(Operator, ExportHelper):
     """Export selected objects as a Cal3D XMF file"""
     bl_idname = "export_scene.export_xmf"
     bl_label = "Export XMF"
@@ -182,6 +185,33 @@ class CAL_MESH_exporter(Operator, ExportHelper):
         name="Pretty-Print",
         description="For debugging only",
         default=False,
+    )
+
+    sub_names = [obj.name for obj in bpy.context.selected_objects if obj.type == 'MESH']
+    sub_items = []
+    for x in range(0, len(sub_names)):
+        global sub_map
+        global sub_prev
+        next_sub = (sub_names(x), sub_names[x], "")
+        sub_items.append(next_sub)
+        sub_map[sub_names(x)] = ['OPT_A', '0']
+        sub_prev = sub_names(x)
+    
+    def update_subs(self, context):
+        global sub_map
+        global sub_prev
+        sub_map[sub_prev][0] = self.body
+        sub_map[sub_prev][1] = self.bone
+        self.body = sub_map[self.subs][0]
+        self.bone = sub_map[self.subs][1]
+        sub_prev = self.subs
+
+    subs: EnumProperty(
+        name="Submeshes",
+        description="Selected objects in scene",
+        items=tuple(sub_items),
+        defaut=sub_prev,
+        update=update_subs
     )
 
     body: EnumProperty(
@@ -303,13 +333,15 @@ class CAL_MESH_exporter(Operator, ExportHelper):
     )
 
     def execute(self, context):
+        global sub_map
+        sub_map[sub_prev][1] = self.bone
         export_xmf(context, self.filepath,
-                    self.pretty, self.mtl, self.bone)
+                    self.pretty, self.mtl)
         return {'FINISHED'}
 
 
 def menu_export_button(self, context):
-    self.layout.operator(CAL_MESH_exporter.bl_idname, text="Cal3D Mesh (.xmf)")
+    self.layout.operator(CalMeshExporter.bl_idname, text="Cal3D Mesh (.xmf)")
 
 
 def export_xmf_manual_map():
@@ -321,13 +353,13 @@ def export_xmf_manual_map():
 
 
 def register():
-    bpy.utils.register_class(CAL_MESH_exporter)
+    bpy.utils.register_class(CalMeshExporter)
     bpy.utils.register_manual_map(export_xmf_manual_map)
     bpy.types.TOPBAR_MT_file_export.append(menu_export_button)
 
 
 def unregister():
-    bpy.utils.unregister_class(CAL_MESH_exporter)
+    bpy.utils.unregister_class(CalMeshExporter)
     bpy.utils.unregister_manual_map(export_xmf_manual_map)
     bpy.types.TOPBAR_MT_file_export.remove(menu_export_button)
 
