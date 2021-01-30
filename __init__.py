@@ -182,16 +182,6 @@ class CalMeshExporter(Operator, ExportHelper):
         default=False,
     )
 
-    sub_names = [obj.name for obj in bpy.context.selected_objects if obj.type == 'MESH']
-    sub_items = []
-    for x in range(0, len(sub_names)):
-        global sub_map
-        global sub_prev
-        next_sub = (sub_names(x), sub_names[x], "")
-        sub_items.append(next_sub)
-        sub_map[sub_names(x)] = ['OPT_A', '0', '0']
-        sub_prev = sub_names(x)
-    
     def update_subs(self, context):
         global sub_map
         global sub_prev
@@ -203,11 +193,22 @@ class CalMeshExporter(Operator, ExportHelper):
         self.mtl = sub_map[self.subs][2]
         sub_prev = self.subs
 
+    def sub_items(self, context):
+        global sub_map
+        global sub_prev
+        sub_names = [obj.name for obj in context.selected_objects if obj.type == 'MESH']
+        items = []
+        for x in range(0, len(sub_names)):
+            next_sub = (sub_names[x], sub_names[x], "")
+            items.append(next_sub)
+            sub_map[sub_names[x]] = ['OPT_A', '0', '0']
+            sub_prev = sub_names[x]
+        return items
+
     subs: EnumProperty(
         name="Submeshes",
         description="Selected objects in scene",
-        items=tuple(sub_items),
-        defaut=sub_prev,
+        items=sub_items,
         update=update_subs
     )
 
