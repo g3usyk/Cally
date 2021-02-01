@@ -10,3 +10,6 @@ For more information on Cal3D file formats visit https://github.com/mp3butcher/C
 4. If there is a previous version of BL-Cal3D installed, disable it and press **Remove**.
 5. Hit **Install** and select the .zip file.
 6. **Enable** the add-on.
+
+# Resources
+- Helpful, easy-to-understand explanations of Cal3D file formats & how IMVU uses them: http://www.boristheengineer.co.uk/imvu/object_file_formats.htm
