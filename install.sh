@@ -1,0 +1,1 @@
+zip -r ./dist/BL-Cal3D.zip src
