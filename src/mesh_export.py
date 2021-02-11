@@ -67,7 +67,8 @@ class CalMeshExporter(Operator, ExportHelper):
     def update_body(self, context):
         global submap
         submap[self.subs][0] = self.body
-        self.bone = self.bone
+        if self.bone != "":
+            self.bone = self.bone
 
     body: EnumProperty(
         name="Body Part",
