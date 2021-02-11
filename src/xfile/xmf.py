@@ -17,15 +17,10 @@ def export_xmf(context, filepath, submap, pretty, scale):
         if bone_id == "":
             bone_id = '0'
         for x in range(0, len(obj.data.vertices)):
-            next_vert = XVertex()
-            next_vert.posn.append(coords[x][0])
-            next_vert.posn.append(coords[x][1])
-            next_vert.posn.append(coords[x][2])
-            next_vert.norm.append(norms[x][0])
-            next_vert.norm.append(norms[x][1])
-            next_vert.norm.append(norms[x][2])
-            next_vert.color = ['1', '1', '1']
-            next_vert.bone = bone_id
+            xcoords = [coords[x][0], coords[x][1], coords[x][2]]
+            xnorms = [norms[x][0], norms[x][1], norms[x][2]]
+            xcol = ['1', '1', '1']
+            next_vert = XVertex(xcoords, xnorms, xcol, bone_id)
             xverts.append(next_vert)
 
         xfaces = []
@@ -34,6 +29,7 @@ def export_xmf(context, filepath, submap, pretty, scale):
         bm.from_mesh(obj.data)
         bmesh.ops.triangulate(bm, faces=bm.faces[:], quad_method='BEAUTY', ngon_method='BEAUTY')
         uv_layer = bm.loops.layers.uv.active
+
         for face in bm.faces:
             next_face = XFace()
             for v, l in zip(face.verts, face.loops):
@@ -46,6 +42,7 @@ def export_xmf(context, filepath, submap, pretty, scale):
                     next_face.ix.append([v_idx, len(xverts[v_idx].uv)])
                     xverts[v_idx].uv.append(next_uv)
             xfaces.append(next_face)
+
         bm.free()
 
         sub = et.Element('submesh')
@@ -73,8 +70,6 @@ def export_xmf(context, filepath, submap, pretty, scale):
             sub.append(elemface)
 
         root.append(sub)
-
-    
 
     xtext = et.tostring(root).decode('utf8')
     if pretty:
