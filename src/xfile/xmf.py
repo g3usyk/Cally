@@ -2,6 +2,7 @@ import bmesh
 from xml.etree import cElementTree as et
 from src.xmesh.xvert import XVertex
 from src.xmesh.xface import XFace
+from src.xfile.prettify import pretty_print
 
 def export_xmf(context, filepath, submap, pretty, scale):
     objs = [obj for obj in context.selected_objects if obj.type == 'MESH']
@@ -66,16 +67,14 @@ def export_xmf(context, filepath, submap, pretty, scale):
         sub.attrib['numvertices'] = str(v_id)
 
         for face in xfaces:
-            elemface = face.parse(v_ids)
-            sub.append(elemface)
+            elem_face = face.parse(v_ids)
+            sub.append(elem_face)
 
         root.append(sub)
 
     xtext = et.tostring(root).decode('utf8')
-    if pretty:
-        xtext = xtext.upper()
-        xtext = xtext.replace('<', '\n<')
-        xtext = xtext.replace('\n</', '</')
+    xtext = pretty_print(xtext) if pretty else xtext
+
     f = open(filepath, 'w', encoding='utf-8')
     f.write("<HEADER MAGIC=\"XMF\" VERSION=\"919\"/>")
     f.write("%s" % xtext)
