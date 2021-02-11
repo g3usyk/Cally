@@ -75,7 +75,6 @@ def export_xmf(context, filepath, submap, pretty, scale):
     xtext = et.tostring(root).decode('utf8')
     xtext = pretty_print(xtext) if pretty else xtext
 
-    f = open(filepath, 'w', encoding='utf-8')
-    f.write("<HEADER MAGIC=\"XMF\" VERSION=\"919\"/>")
-    f.write("%s" % xtext)
-    f.close()
+    with open(filepath, 'w', encoding='utf-8') as f:
+        f.write("<HEADER MAGIC=\"XMF\" VERSION=\"919\"/>")
+        f.write("%s" % xtext)
