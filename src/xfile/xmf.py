@@ -81,7 +81,7 @@ def export_xmf(context, filepath, submap, pretty, scale):
 
         sub = create_submesh(obj.name, submap, xfaces)
         fill_submesh(sub, xverts, xfaces, scale)
-
+        root.append(et.Comment(obj.name))
         root.append(sub)
 
     xtext = et.tostring(root).decode('utf8')
