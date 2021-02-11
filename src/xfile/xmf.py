@@ -4,6 +4,71 @@ from src.xmesh.xvert import XVertex
 from src.xmesh.xface import XFace
 from src.xfile.prettify import pretty_print
 
+def generate_vertices(obj, submap):
+    xverts = []
+
+    coords = [(obj.matrix_world @ v.co) for v in obj.data.vertices]
+    norms = [v.normal for v in obj.data.vertices]
+    bone_id = submap[obj.name][1]
+    
+    for x in range(0, len(obj.data.vertices)):
+        xcoords = [coords[x][0], coords[x][1], coords[x][2]]
+        xnorms = [norms[x][0], norms[x][1], norms[x][2]]
+        xcol = ['1', '1', '1']
+        next_vert = XVertex(xcoords, xnorms, xcol, bone_id)
+        xverts.append(next_vert)
+    
+    return xverts
+
+def generate_faces(obj, verts):
+    xfaces = []
+
+    bm = bmesh.new()
+    bm.from_mesh(obj.data)
+    bmesh.ops.triangulate(bm, faces=bm.faces[:], quad_method='BEAUTY', ngon_method='BEAUTY')
+    uv_layer = bm.loops.layers.uv.active
+
+    for face in bm.faces:
+        next_face = XFace()
+        for v, l in zip(face.verts, face.loops):
+            v_idx = v.index
+            uv_coords = l[uv_layer].uv
+            next_uv = [uv_coords[0], uv_coords[1]]
+            if next_uv in verts[v_idx].uv:
+                next_face.ix.append([v_idx, verts[v_idx].uv.index(next_uv)])
+            else:
+                next_face.ix.append([v_idx, len(verts[v_idx].uv)])
+                verts[v_idx].uv.append(next_uv)
+        xfaces.append(next_face)
+
+    bm.free()
+    return xfaces
+
+def create_submesh(name, submap, faces):
+    sub = et.Element('submesh')
+    sub.attrib['numfaces'] = str(len(faces))
+    sub.attrib['numlodsteps'] = '0'
+    sub.attrib['numsprings'] = '0'
+    sub.attrib['nummorphs'] = '0'
+    sub.attrib['numtexcoords'] = '1'
+    sub.attrib['material'] = str(submap[name][2])
+    return sub
+
+def fill_submesh(sub, verts, faces, scale):
+    v_id = 0
+    v_ids = []
+    for x in range(0, len(verts)):
+        v_ids.append([])
+        for y in range(0, len(verts[x].uv)):
+            elem_vert = verts[x].parse(v_id, y, scale)
+            sub.append(elem_vert)
+            v_ids[x].append(v_id)
+            v_id += 1
+    sub.attrib['numvertices'] = str(v_id)
+    for face in faces:
+        elem_face = face.parse(v_ids)
+        sub.append(elem_face)
+
 def export_xmf(context, filepath, submap, pretty, scale):
     objs = [obj for obj in context.selected_objects if obj.type == 'MESH']
 
@@ -11,64 +76,11 @@ def export_xmf(context, filepath, submap, pretty, scale):
     root.attrib['numsubmesh'] = str(len(objs))
 
     for obj in objs:
-        coords = [(obj.matrix_world @ v.co) for v in obj.data.vertices]
-        norms = [v.normal for v in obj.data.vertices]
-        xverts = []
-        bone_id = submap[obj.name][1]
-        if bone_id == "":
-            bone_id = '0'
-        for x in range(0, len(obj.data.vertices)):
-            xcoords = [coords[x][0], coords[x][1], coords[x][2]]
-            xnorms = [norms[x][0], norms[x][1], norms[x][2]]
-            xcol = ['1', '1', '1']
-            next_vert = XVertex(xcoords, xnorms, xcol, bone_id)
-            xverts.append(next_vert)
+        xverts = generate_vertices(obj, submap)
+        xfaces = generate_faces(obj, xverts)
 
-        xfaces = []
-        
-        bm = bmesh.new()
-        bm.from_mesh(obj.data)
-        bmesh.ops.triangulate(bm, faces=bm.faces[:], quad_method='BEAUTY', ngon_method='BEAUTY')
-        uv_layer = bm.loops.layers.uv.active
-
-        for face in bm.faces:
-            next_face = XFace()
-            for v, l in zip(face.verts, face.loops):
-                v_idx = v.index
-                uv_coords = l[uv_layer].uv
-                next_uv = [uv_coords[0], uv_coords[1]]
-                if next_uv in xverts[v_idx].uv:
-                    next_face.ix.append([v_idx, xverts[v_idx].uv.index(next_uv)])
-                else:
-                    next_face.ix.append([v_idx, len(xverts[v_idx].uv)])
-                    xverts[v_idx].uv.append(next_uv)
-            xfaces.append(next_face)
-
-        bm.free()
-
-        sub = et.Element('submesh')
-        sub.attrib['numfaces'] = str(len(xfaces))
-        sub.attrib['numlodsteps'] = '0'
-        sub.attrib['numsprings'] = '0'
-        sub.attrib['nummorphs'] = '0'
-        sub.attrib['numtexcoords'] = '1'
-        sub.attrib['material'] = str(submap[obj.name][2])
-
-        v_id = 0
-        v_ids = []
-        for y in range(0, len(xverts)):
-            v_ids.append([])
-            for z in range(0, len(xverts[y].uv)):
-                elemvert = xverts[y].parse(v_id, z, scale)
-                sub.append(elemvert)
-                v_ids[y].append(v_id)
-                v_id += 1
-
-        sub.attrib['numvertices'] = str(v_id)
-
-        for face in xfaces:
-            elem_face = face.parse(v_ids)
-            sub.append(elem_face)
+        sub = create_submesh(obj.name, submap, xfaces)
+        fill_submesh(sub, xverts, xfaces, scale)
 
         root.append(sub)
 
