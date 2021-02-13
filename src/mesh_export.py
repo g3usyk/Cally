@@ -1,9 +1,17 @@
+from bpy.props import (
+    StringProperty, 
+    BoolProperty, 
+    EnumProperty, 
+    IntProperty, 
+    FloatProperty, 
+)
 from bpy.types import Operator
 from bpy_extras.io_utils import ExportHelper
-from bpy.props import StringProperty, BoolProperty, EnumProperty, IntProperty
 from src.xfile.xmf import export_xmf
 
 submap = {}
+weighting = {'MANUAL'}
+scaling = {'100'}
 
 class CalMeshExporter(Operator, ExportHelper):
     """Export selected objects as a Cal3D XMF file"""
@@ -23,6 +31,25 @@ class CalMeshExporter(Operator, ExportHelper):
         name="Pretty-Print",
         description="For debugging only",
         default=False,
+    )
+
+    def update_weight(self, context):
+        global weighting
+        if len(self.weight) == 0 or len(self.weight) > 1:
+            self.weight = weighting
+        weighting = self.weight
+
+
+    weight: EnumProperty(
+        name="Weight",
+        description="Specifies body part assignment to mesh",
+        options={"ENUM_FLAG"},
+        items=(
+            ('MANUAL', 'Manual', 'Used for meshes attached to 1 bone (accessories, furniture, etc.)'),
+            ('AUTO', 'Auto', 'Used for meshes attached to multiple bones (clothing, etc.)'),
+        ),
+        default=weighting,
+        update=update_weight,
     )
 
     def update_subs(self, context):
@@ -62,6 +89,15 @@ class CalMeshExporter(Operator, ExportHelper):
         description="Selected objects in scene",
         items=sub_items,
         update=update_subs
+    )
+
+    threshold: FloatProperty(
+        name="Threshold",
+        description="Cutoff ratio for automatic bone weight assignments",
+        min=0.0,
+        max=1.0,
+        default=0.5,
+        step=1
     )
 
     def update_body(self, context):
@@ -190,6 +226,12 @@ class CalMeshExporter(Operator, ExportHelper):
         update=update_mtl
     )
 
+    def update_scale(self, context):
+        global scaling
+        if len(self.scale) == 0 or len(self.scale) > 1:
+            self.scale = scaling
+        scaling = self.scale
+
     scale: EnumProperty(
         name="Scale",
         description="Applies imvu's scaling factor",
@@ -198,13 +240,17 @@ class CalMeshExporter(Operator, ExportHelper):
             ('100', "Auto", "Default upscaled resolution"),
             ('1', "Native", "Client resolution")
         ),
-        default={'100'},
+        default=scaling,
+        update=update_scale
     )
 
     def execute(self, context):
-        export_xmf(context, self.filepath, submap,
-                    self.pretty, float(next(iter(self.scale))))
+        export_xmf(context, self.filepath, submap, float(next(iter(self.scale))),
+                    next(iter(self.weight)), self.pretty)
         return {'FINISHED'}
 
     def cancel(self, context):
+        pass
+
+    def draw(self, context):
         pass

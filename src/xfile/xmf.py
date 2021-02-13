@@ -2,20 +2,28 @@ import bmesh
 from xml.etree import cElementTree as et
 from src.xmesh.xvert import XVertex
 from src.xmesh.xface import XFace
+from src.xmesh.xmap import WeightMap
 from src.xfile.prettify import pretty_print
 
-def generate_vertices(obj, submap):
+def generate_vertices(obj, submap, weight):
     xverts = []
 
     coords = [(obj.matrix_world @ v.co) for v in obj.data.vertices]
     norms = [v.normal for v in obj.data.vertices]
+
+    xcol = ['1', '1', '1']
     bone_id = submap[obj.name][1]
-    
+    xinfls = {bone_id: 1}
+
     for x in range(0, len(obj.data.vertices)):
         xcoords = [coords[x][0], coords[x][1], coords[x][2]]
         xnorms = [norms[x][0], norms[x][1], norms[x][2]]
-        xcol = ['1', '1', '1']
-        next_vert = XVertex(xcoords, xnorms, xcol, bone_id)
+        if weight == 'AUTO':
+            xinfls = {}
+            infls = WeightMap.generate_influences(xcoords)
+            for infl in infls:
+                xinfls[infl[1]] = round(infl[0], 0)
+        next_vert = XVertex(xcoords, xnorms, xcol, xinfls)
         xverts.append(next_vert)
     
     return xverts
@@ -69,14 +77,14 @@ def fill_submesh(sub, verts, faces, scale):
         elem_face = face.parse(v_ids)
         sub.append(elem_face)
 
-def export_xmf(context, filepath, submap, pretty, scale):
+def export_xmf(context, filepath, submap, scale, weight, pretty):
     objs = [obj for obj in context.selected_objects if obj.type == 'MESH']
 
     root = et.Element('mesh')
     root.attrib['numsubmesh'] = str(len(objs))
 
     for obj in objs:
-        xverts = generate_vertices(obj, submap)
+        xverts = generate_vertices(obj, submap, weight)
         xfaces = generate_faces(obj, xverts)
 
         sub = create_submesh(obj.name, submap, xfaces)
