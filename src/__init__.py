@@ -12,10 +12,11 @@ bl_info = {
 
 import bpy
 from src.mesh_export import CalMeshExporter
-from src.panels.mpanel import CAL_MESH_PT_export
+
 
 def mesh_export_button(self, context):
     self.layout.operator(CalMeshExporter.bl_idname, text="Cal3D Mesh (.xmf)")
+
 
 def manual_map():
     url_manual_prefix = "https://docs.blender.org/manual/en/latest/"
@@ -24,10 +25,11 @@ def manual_map():
     )
     return url_manual_prefix, url_manual_mapping
 
+
 classes = (
     CalMeshExporter,
-    CAL_MESH_PT_export,
 )
+
 
 def register():
     for cls in classes:

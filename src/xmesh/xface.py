@@ -1,5 +1,5 @@
 
-from xml.etree import cElementTree as et
+from xml.etree import ElementTree as et
 
 class XFace():
     def __init__(self):

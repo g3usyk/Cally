@@ -1,4 +1,4 @@
-from xml.etree import cElementTree as et
+from xml.etree import ElementTree as et
 
 class XVertex():
     def __init__(self, posn, norm, color, infls):

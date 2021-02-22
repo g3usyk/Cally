@@ -1,21 +1,23 @@
 import bmesh
-from xml.etree import cElementTree as et
+from xml.etree import ElementTree as et
 from src.xmesh.xvert import XVertex
 from src.xmesh.xface import XFace
 from src.xmesh.xmap import WeightMap
 from src.xfile.prettify import pretty_print
 
+
 def generate_vertices(obj, submap, weight):
     xverts = []
+    verts = obj.data.vertices
 
-    coords = [(obj.matrix_world @ v.co) for v in obj.data.vertices]
-    norms = [v.normal for v in obj.data.vertices]
+    coords = [(obj.matrix_world @ v.co) for v in verts]
+    norms = [v.normal for v in verts]
 
     xcol = ['1', '1', '1']
     bone_id = submap[obj.name][1]
     xinfls = {bone_id: 1}
 
-    for x in range(0, len(obj.data.vertices)):
+    for x in range(0, len(verts)):
         xcoords = [coords[x][0], coords[x][1], coords[x][2]]
         xnorms = [norms[x][0], norms[x][1], norms[x][2]]
         if weight == 'AUTO':
@@ -27,6 +29,7 @@ def generate_vertices(obj, submap, weight):
         xverts.append(next_vert)
     
     return xverts
+
 
 def generate_faces(obj, verts):
     xfaces = []
@@ -52,6 +55,7 @@ def generate_faces(obj, verts):
     bm.free()
     return xfaces
 
+
 def create_submesh(name, submap, faces):
     sub = et.Element('submesh')
     sub.attrib['numfaces'] = str(len(faces))
@@ -61,6 +65,7 @@ def create_submesh(name, submap, faces):
     sub.attrib['numtexcoords'] = '1'
     sub.attrib['material'] = str(submap[name][2])
     return sub
+
 
 def fill_submesh(sub, verts, faces, scale):
     v_id = 0
@@ -76,6 +81,7 @@ def fill_submesh(sub, verts, faces, scale):
     for face in faces:
         elem_face = face.parse(v_ids)
         sub.append(elem_face)
+
 
 def export_xmf(context, filepath, submap, scale, weight, pretty):
     objs = [obj for obj in context.selected_objects if obj.type == 'MESH']
@@ -98,3 +104,10 @@ def export_xmf(context, filepath, submap, scale, weight, pretty):
     with open(filepath, 'w', encoding='utf-8') as f:
         f.write("<HEADER MAGIC=\"XMF\" VERSION=\"919\"/>")
         f.write("%s" % xtext)
+
+
+def import_xmf(context, filepath):
+    mesh = []
+    with open(filepath, 'r') as f:
+        pass
+    pass

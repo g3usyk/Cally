@@ -250,7 +250,22 @@ class CalMeshExporter(Operator, ExportHelper):
         return {'FINISHED'}
 
     def cancel(self, context):
-        pass
+        return {'CANCELLED'}
 
     def draw(self, context):
-        pass
+        layout = self.layout
+        layout.use_property_split = True
+        layout.use_property_decorate = False
+
+        sfile = context.space_data
+        operator = sfile.active_operator
+
+        layout.prop(operator, 'pretty')
+        layout.prop(operator, 'weight')
+        layout.prop(operator, 'subs')
+        if next(iter(operator.weight)) == 'MANUAL':
+            layout.prop(operator, 'body')
+            layout.prop(operator, 'bone')
+        layout.prop(operator, 'mtl')
+        layout.prop(operator, 'scale')
+
