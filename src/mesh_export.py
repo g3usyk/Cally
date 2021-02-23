@@ -1,17 +1,18 @@
 from bpy.props import (
-    StringProperty, 
-    BoolProperty, 
-    EnumProperty, 
-    IntProperty, 
-    FloatProperty, 
+    StringProperty,
+    BoolProperty,
+    EnumProperty,
+    IntProperty,
+    FloatProperty,
 )
 from bpy.types import Operator
 from bpy_extras.io_utils import ExportHelper
-from src.xfile.xmf import export_xmf
+from .xfile.xmf import export_xmf
 
 submap = {}
 weighting = {'MANUAL'}
 scaling = {'100'}
+
 
 class CalMeshExporter(Operator, ExportHelper):
     """Export selected objects as a Cal3D XMF file"""
@@ -38,7 +39,6 @@ class CalMeshExporter(Operator, ExportHelper):
         if len(self.weight) == 0 or len(self.weight) > 1:
             self.weight = weighting
         weighting = self.weight
-
 
     weight: EnumProperty(
         name="Weight",
@@ -246,7 +246,7 @@ class CalMeshExporter(Operator, ExportHelper):
 
     def execute(self, context):
         export_xmf(context, self.filepath, submap, float(next(iter(self.scale))),
-                    next(iter(self.weight)), self.pretty)
+                   next(iter(self.weight)), self.pretty)
         return {'FINISHED'}
 
     def cancel(self, context):
@@ -265,4 +265,3 @@ class CalMeshExporter(Operator, ExportHelper):
             layout.prop(self, 'bone')
         layout.prop(self, 'mtl')
         layout.prop(self, 'scale')
-

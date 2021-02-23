@@ -1,9 +1,9 @@
 import bmesh
 from xml.etree import ElementTree as et
-from src.xmesh.xvert import XVertex
-from src.xmesh.xface import XFace
-from src.xmesh.xmap import WeightMap
-from src.xfile.prettify import pretty_print
+from .prettify import pretty_print
+from ..xmesh.xvert import XVertex
+from ..xmesh.xface import XFace
+from ..xmesh.xmap import WeightMap
 
 
 def generate_vertices(obj, submap, weight):

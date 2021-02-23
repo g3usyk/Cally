@@ -1,4 +1,3 @@
-
 from xml.etree import ElementTree as et
 
 class XFace():
