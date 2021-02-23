@@ -1,7 +1,7 @@
 bl_info = {
     "name": "Cal3D Toolkit",
     "author": "hsoju",
-    "version": (1, 0, 5),
+    "version": (1, 0, 6),
     "blender": (2, 90, 0),
     "location": "File > Import-Export",
     "description": "Import-Export Cal3D objects",
@@ -14,11 +14,14 @@ import bpy
 from .src.mesh_export import CalMeshExporter
 from .src.skeleton import DefaultSkeleton
 
+
 def mesh_export_button(self, context):
     self.layout.operator(CalMeshExporter.bl_idname, text="Cal3D Mesh (.xmf)")
 
+
 def default_armature_menu(self, context):
     self.layout.operator(DefaultSkeleton.bl_idname, icon='BONE_DATA')
+
 
 def manual_map():
     url_manual_prefix = "https://docs.blender.org/manual/en/latest/"
@@ -40,6 +43,7 @@ def register():
     bpy.utils.register_manual_map(manual_map)
     bpy.types.TOPBAR_MT_file_export.append(mesh_export_button)
     bpy.types.VIEW3D_MT_armature_add.append(default_armature_menu)
+
 
 def unregister():
     for cls in classes:
