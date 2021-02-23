@@ -10,7 +10,7 @@ class XVertex():
 
     def parse(self, idx, u_idx, scale):
         xvert = et.Element('vertex')
-        xvert.attrib['numinfluences'] = '1'
+        xvert.attrib['numinfluences'] = str(len(self.infls))
         xvert.attrib['id'] = str(idx)
 
         xposn = et.Element('pos')
