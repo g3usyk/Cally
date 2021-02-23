@@ -257,15 +257,12 @@ class CalMeshExporter(Operator, ExportHelper):
         layout.use_property_split = True
         layout.use_property_decorate = False
 
-        sfile = context.space_data
-        operator = sfile.active_operator
-
-        layout.prop(operator, 'pretty')
-        layout.prop(operator, 'weight')
-        layout.prop(operator, 'subs')
-        if next(iter(operator.weight)) == 'MANUAL':
-            layout.prop(operator, 'body')
-            layout.prop(operator, 'bone')
-        layout.prop(operator, 'mtl')
-        layout.prop(operator, 'scale')
+        layout.prop(self, 'pretty')
+        layout.prop(self, 'weight')
+        layout.prop(self, 'subs')
+        if next(iter(self.weight)) == 'MANUAL':
+            layout.prop(self, 'body')
+            layout.prop(self, 'bone')
+        layout.prop(self, 'mtl')
+        layout.prop(self, 'scale')
 
