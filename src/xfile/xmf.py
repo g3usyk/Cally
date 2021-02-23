@@ -8,26 +8,31 @@ from src.xfile.prettify import pretty_print
 
 def generate_vertices(obj, submap, weight):
     xverts = []
-    verts = obj.data.vertices
 
-    coords = [(obj.matrix_world @ v.co) for v in verts]
-    norms = [v.normal for v in verts]
+    groups = {g.index : WeightMap.lookup(g.name) for g in obj.vertex_groups}
 
     xcol = ['1', '1', '1']
     bone_id = submap[obj.name][1]
     xinfls = {bone_id: 1}
 
-    for x in range(0, len(verts)):
-        xcoords = [coords[x][0], coords[x][1], coords[x][2]]
-        xnorms = [norms[x][0], norms[x][1], norms[x][2]]
-        if weight == 'AUTO':
-            xinfls = {}
-            infls = WeightMap.generate_influences(xcoords)
-            for infl in infls:
-                xinfls[infl[1]] = round(infl[0], 0)
-        next_vert = XVertex(xcoords, xnorms, xcol, xinfls)
-        xverts.append(next_vert)
-    
+    if weight == 'MANUAL':
+        for v in obj.data.vertices:
+            coords = obj.matrix_world @ v.co
+            xcoords = [coords[0], coords[1], coords[2]]
+            xnorms = [v.normal[0], v.normal[1], v.normal[2]]
+            next_vert = XVertex(xcoords, xnorms, xcol, xinfls)
+            xverts.append(next_vert)
+    else:
+        for v in obj.data.vertices:
+            coords = obj.matrix_world @ v.co
+            xcoords = [coords[0], coords[1], coords[2]]
+            xnorms = [v.normal[0], v.normal[1], v.normal[2]]
+            if len(v.groups) != 0:
+                xinfls = {}
+                for g in v.groups:
+                    xinfls[str(groups[g.group])] = g.weight
+            next_vert = XVertex(xcoords, xnorms, xcol, xinfls)
+            xverts.append(next_vert)
     return xverts
 
 
