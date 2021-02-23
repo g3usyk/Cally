@@ -2,100 +2,83 @@ import math
 
 class WeightMap():
     """Default weights for imvu base male avatar"""
-    wmap = []
+    wmap = {}
 
-    wmap.append(([0.0, 0.08434, 6.63894], "1"))
-    wmap.append(([0.28157, -0.01605, 6.47887], "2"))
-    wmap.append(([0.52033, 0.01992, 5.0733], "3"))
-    wmap.append(([0.48931, 0.20753, 2.3698], "4"))
-    wmap.append(([0.50518, 0.04963, 0.72157], "5"))
-    wmap.append(([0.50919, -0.62176, 0.37218], "6"))
-    wmap.append(([-0.27885, -0.01605, 6.47887], "8"))
-    wmap.append(([-0.51982, 0.01987, 5.07348], "9"))
-    wmap.append(([-0.49346, 0.20741, 2.37008], "10"))
-    wmap.append(([-0.51252, 0.04957, 0.72183], "11"))
-    wmap.append(([-0.52098, -0.62182, 0.37247], "12"))
-    wmap.append(([0.00347, -0.0206, 7.05369], "14"))
-    wmap.append(([0.00347, -0.09204, 7.49012], "15"))
-    wmap.append(([0.00347, -0.1449, 8.02203], "16"))
-    wmap.append(([0.00341, -0.0294, 8.73427], "17"))
-    wmap.append(([0.00349, 0.11253, 9.2895], "18"))
-    wmap.append(([0.00349, 0.11221, 9.45449], "19"))
-    wmap.append(([0.00349, 0.11844, 9.59845], "20"))
-    wmap.append(([0.00349, 0.12373, 9.77202], "21"))
-    wmap.append(([0.00349, 0.12276, 10.06059], "22"))
-    wmap.append(([0.58168, 0.07901, 9.07994], "24"))
-    wmap.append(([1.23406, 0.05891, 8.9856], "25"))
-    wmap.append(([1.91881, 0.05485, 8.6756], "26"))
-    wmap.append(([2.96389, -0.02826, 8.24004], "27"))
-    wmap.append(([3.6276, -0.15036, 7.96861], "28"))
-    wmap.append(([3.92626, -0.2086, 7.83624], "29"))
-    wmap.append(([4.26272, -0.2985, 7.70492], "30"))
-    wmap.append(([4.64457, -0.3923, 7.52312], "31"))
-    wmap.append(([4.8367, -0.42074, 7.36453], "32"))
-    wmap.append(([4.97117, -0.43146, 7.18604], "33"))
-    wmap.append(([3.98359, -0.32667, 7.76257], "35"))
-    wmap.append(([4.02591, -0.47447, 7.64926], "36"))
-    wmap.append(([4.14378, -0.59095, 7.50345], "37"))
-    wmap.append(([4.2524, -0.71139, 7.35287], "38"))
-    wmap.append(([4.26603, -0.18151, 7.70349], "40"))
-    wmap.append(([4.62422, -0.14279, 7.5395], "41"))
-    wmap.append(([4.77036, -0.14681, 7.41717], "42"))
-    wmap.append(([4.87388, -0.15285, 7.26684], "43"))
-    wmap.append(([4.24379, -0.36348, 7.69371], "45"))
-    wmap.append(([4.58133, -0.53235, 7.50873], "46"))
-    wmap.append(([4.72022, -0.56708, 7.3563], "47"))
-    wmap.append(([4.80936, -0.57831, 7.19183], "48"))
-    wmap.append(([4.27347, -0.23659, 7.70563], "50"))
-    wmap.append(([4.66077, -0.26047, 7.53589], "51"))
-    wmap.append(([4.83989, -0.27722, 7.39577], "52"))
-    wmap.append(([4.96873, -0.28662, 7.23736], "53"))
-    wmap.append(([-0.57511, 0.07902, 9.07994], "55"))
-    wmap.append(([-1.22749, 0.05891, 8.9856], "56"))
-    wmap.append(([-1.91108, 0.0586, 8.67355], "57"))
-    wmap.append(([-2.9604, 0.00292, 8.24361], "58"))
-    wmap.append(([-3.65964, -0.09725, 7.98728], "59"))
-    wmap.append(([-3.98241, -0.15316, 7.86626], "60"))
-    wmap.append(([-4.32645, -0.2311, 7.73961], "61"))
-    wmap.append(([-4.7239, -0.31302, 7.56079], "62"))
-    wmap.append(([-4.91982, -0.33484, 7.4059], "63"))
-    wmap.append(([-5.05792, -0.34108, 7.22996], "64"))
-    wmap.append(([-4.03642, -0.26765, 7.79706], "66"))
-    wmap.append(([-4.08112, -0.41293, 7.68778], "67"))
-    wmap.append(([-4.19886, -0.52291, 7.5498], "68"))
-    wmap.append(([-4.30751, -0.63726, 7.40655], "69"))
-    wmap.append(([-4.32377, -0.10187, 7.73852], "71"))
-    wmap.append(([-4.68969, -0.03651, 7.57759], "72"))
-    wmap.append(([-4.83642, -0.02942, 7.45853], "73"))
-    wmap.append(([-4.94152, -0.027, 7.31057], "74"))
-    wmap.append(([-4.30623, -0.30396, 7.72729], "76"))
-    wmap.append(([-4.65687, -0.47154, 7.54365], "77"))
-    wmap.append(([-4.79722, -0.50453, 7.3939], "78"))
-    wmap.append(([-4.88787, -0.51505, 7.2311], "79"))
-    wmap.append(([-4.33543, -0.16172, 7.74122], "81"))
-    wmap.append(([-4.73614, -0.16389, 7.57539], "82"))
-    wmap.append(([-4.91843, -0.17007, 7.43895], "83"))
-    wmap.append(([-5.05063, -0.17159, 7.28318], "84"))
+    wmap["Female03MasterRoot"] = 0
+    wmap["PelvisNode"] = 1
+    wmap["lfHip"] = 2
+    wmap["lfThigh"] = 3
+    wmap["lfCalf"] = 4
+    wmap["lfFoot"] = 5
+    wmap["lfToes"] = 6
+    wmap["rtHip"] = 8
+    wmap["rtThigh"] = 9
+    wmap["rtCalf"] = 10
+    wmap["rtFoot"] = 11
+    wmap["rtToes"] = 12
+    wmap["Spine01"] = 14
+    wmap["Spine02"] = 15
+    wmap["Spine03"] = 16
+    wmap["Spine04"] = 17
+    wmap["Neck01"] = 18
+    wmap["Neck02"] = 19
+    wmap["Neck03"] = 20
+    wmap["Neck04"] = 21
+    wmap["Head"] = 22
+    wmap["lfClavicle"] = 24
+    wmap["lfShoulder"] = 25
+    wmap["lfBicep"] = 26
+    wmap["lfElbow"] = 27
+    wmap["lfWrist"] = 28
+    wmap["lfHand"] = 29
+    wmap["lfmetaCarpal03"] = 30
+    wmap["lfFingerMiddle01"] = 31
+    wmap["lfFingerMiddle02"] = 32
+    wmap["lfFingerMiddle03"] = 33
+    wmap["lfmetaCarpal01"] = 35
+    wmap["lfThumb01"] = 36
+    wmap["lfThumb02"] = 37
+    wmap["lfThumb03"] = 38
+    wmap["lfmetaCarpal05"] = 40
+    wmap["lfFingerPinky01"] = 41
+    wmap["lfFingerPinky02"] = 42
+    wmap["lfFingerPinky03"] = 43
+    wmap["lfmetaCarpal02"] = 45
+    wmap["lfFingerIndex01"] = 46
+    wmap["lfFingerIndex02"] = 47
+    wmap["lfFingerIndex03"] = 48
+    wmap["lfmetaCarpal04"] = 50
+    wmap["lfFingerRing01"] = 51
+    wmap["lfFingerRing02"] = 52
+    wmap["lfFingerRing03"] = 53
+    wmap["rtClavicle"] = 55
+    wmap["rtShoulder"] = 56
+    wmap["rtBicep"] = 57
+    wmap["rtElbow"] = 58
+    wmap["rtWrist"] = 59
+    wmap["rtHand"] = 60
+    wmap["rtmetaCarpal03"] = 61
+    wmap["rtFingerMiddle01"] = 62
+    wmap["rtFingerMiddle02"] = 63
+    wmap["rtFingerMiddle03"] = 64
+    wmap["rtmetaCarpal01"] = 66
+    wmap["rtThumb01"] = 67
+    wmap["rtThumb02"] = 68
+    wmap["rtThumb03"] = 69
+    wmap["rtmetaCarpal05"] = 71
+    wmap["rtFingerPinky01"] = 72
+    wmap["rtFingerPinky02"] = 73
+    wmap["rtFingerPinky03"] = 74
+    wmap["rtmetaCarpal02"] = 76
+    wmap["rtFingerIndex01"] = 77
+    wmap["rtFingerIndex02"] = 78
+    wmap["rtFingerIndex03"] = 79
+    wmap["rtmetaCarpal04"] = 81
+    wmap["rtFingerRing01"] = 82
+    wmap["rtFingerRing02"] = 83
+    wmap["rtFingerRing03"] = 84
 
     @classmethod
-    def generate_influences(cls, coords):
-        def distance(coord1, coord2):
-            return math.sqrt(
-                ((coord1[0] - coord2[0])**2) +
-                ((coord1[1] - coord2[1])**2) +
-                ((coord1[2] - coord2[2])**2)
-            )
-        dists = []
-        for w in cls.wmap:
-            dist, bone = distance(coords, w[0]), w[1]
-            dists.append((dist, bone))
-        ordered_dists = sorted(dists)[:2]
-        closest, furthest = ordered_dists[0], ordered_dists[1]
-
-        total_dist = closest[0] + furthest[0]
-        c_weight = 1.0 - (closest[0] / total_dist)
-        f_weight = 1.0 - (furthest[0] / total_dist)
-
-        infls = [(c_weight, closest[1]), (f_weight, furthest[1])]
-        return infls
+    def lookup(cls, bone):
+        return cls.wmap[bone]
 
