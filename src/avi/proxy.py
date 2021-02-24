@@ -10,11 +10,14 @@ class Proxy(BaseMesh):
     def __init__(self, name, fpath):
         vertices = []
         faces = []
+        uvs = []
         full_path = self.relative_path / 'assets' / fpath
         abs_path = full_path.absolute()
         with open(abs_path, "rb") as f:
             mapping = pickle.load(f)
             vertices = mapping['vertices']
             faces = mapping['faces']
-        super().__init__(name, vertices, faces)
+            if 'uvs' in mapping:
+                uvs = mapping['uvs']
+        super().__init__(name, vertices, faces, uvs)
 
