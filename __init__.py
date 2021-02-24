@@ -13,10 +13,16 @@ bl_info = {
 import bpy
 from .src.mesh_export import CalMeshExporter
 from .src.skeleton import DefaultSkeleton
+from .src.mesh_add import VIEW3D_MT_mesh_imvu, VIEW3D_MT_mesh_imvu_male
+from .src.ops.head import MaleHead
 
 
 def mesh_export_button(self, context):
     self.layout.operator(CalMeshExporter.bl_idname, text="Cal3D Mesh (.xmf)")
+
+
+def mesh_add_menu(self, context):
+    self.layout.menu(VIEW3D_MT_mesh_imvu.bl_idname, text="IMVU", icon="INFO")
 
 
 def default_armature_menu(self, context):
@@ -34,6 +40,9 @@ def manual_map():
 classes = (
     CalMeshExporter,
     DefaultSkeleton,
+    MaleHead,
+    VIEW3D_MT_mesh_imvu_male,
+    VIEW3D_MT_mesh_imvu,
 )
 
 
@@ -43,6 +52,7 @@ def register():
     bpy.utils.register_manual_map(manual_map)
     bpy.types.TOPBAR_MT_file_export.append(mesh_export_button)
     bpy.types.VIEW3D_MT_armature_add.append(default_armature_menu)
+    bpy.types.VIEW3D_MT_mesh_add.append(mesh_add_menu)
 
 
 def unregister():
@@ -51,6 +61,7 @@ def unregister():
     bpy.utils.unregister_manual_map(manual_map)
     bpy.types.TOPBAR_MT_file_export.remove(mesh_export_button)
     bpy.types.VIEW3D_MT_armature_add.remove(default_armature_menu)
+    bpy.types.VIEW3D_MT_mesh_add.remove(mesh_add_menu)
 
 
 if __name__ == "__main__":
