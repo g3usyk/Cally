@@ -14,7 +14,7 @@ import bpy
 from .src.mesh_export import CalMeshExporter
 from .src.skeleton import DefaultSkeleton
 from .src.mesh_add import VIEW3D_MT_mesh_imvu, VIEW3D_MT_mesh_imvu_male
-from .src.ops import head, torso, hands, legs, calfs, feet
+from .src.ops import body, head, torso, hands, legs, calfs, feet
 
 
 def mesh_export_button(self, context):
@@ -22,7 +22,7 @@ def mesh_export_button(self, context):
 
 
 def mesh_add_menu(self, context):
-    self.layout.menu(VIEW3D_MT_mesh_imvu.bl_idname, text="IMVU", icon="INFO")
+    self.layout.menu(VIEW3D_MT_mesh_imvu.bl_idname, icon="INFO")
 
 
 def default_armature_menu(self, context):
@@ -40,6 +40,7 @@ def manual_map():
 classes = (
     CalMeshExporter,
     DefaultSkeleton,
+    body.MaleBody,
     head.MaleHead,
     torso.MaleTorso,
     hands.MaleHands,

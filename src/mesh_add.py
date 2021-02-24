@@ -8,6 +8,7 @@ class VIEW3D_MT_mesh_imvu_male(bpy.types.Menu):
     def draw(self, context):
         layout = self.layout
         layout.operator_context = 'INVOKE_REGION_WIN'
+        layout.operator("mesh.primitive_imvu_male_body_add", icon="OUTLINER_OB_ARMATURE")
         layout.operator("mesh.primitive_imvu_male_head_add", icon="MONKEY")
         layout.operator("mesh.primitive_imvu_male_torso_add", icon="USER")
         layout.operator("mesh.primitive_imvu_male_hands_add", icon="VIEW_PAN")
@@ -23,4 +24,4 @@ class VIEW3D_MT_mesh_imvu(bpy.types.Menu):
     def draw(self, context):
         layout = self.layout
         layout.operator_context = 'INVOKE_REGION_WIN'
-        layout.menu("VIEW3D_MT_mesh_imvu_male", text="Male", icon="OUTLINER_DATA_ARMATURE")
+        layout.menu("VIEW3D_MT_mesh_imvu_male", icon="OUTLINER_DATA_ARMATURE")
