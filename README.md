@@ -9,9 +9,10 @@ For more information on Cal3D file formats visit https://github.com/mp3butcher/C
 1. Download binary for latest *stable* release with the name: **BL-Cal3D.zip**.
 2. In Blender open the File menu and access Preferences.
 3. Go to Add-Ons.
-   - I*f there is a previous version of BL-Cal3D installed, disable it and press Remove.*
+   - *If there is a previous version of BL-Cal3D installed, disable it and press Remove.*
 4. Press Install, then navigate to the BL-Cal3D.zip file and select it.
 5. Enable the add-on.
+   - *If there was a previous version of BL-Cal3D installed, restart Blender for changes to take effect.*
 
 # Build
 1. Open terminal and run **./install.sh**
