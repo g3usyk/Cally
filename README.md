@@ -1,6 +1,6 @@
-<a href="https://github.com/hsoju/BL-Cal3D/releases"><img src="https://img.shields.io/github/v/release/hsoju/BL-Cal3D" alt="Latest Release"></a> <img src="https://img.shields.io/github/license/hsoju/BL-Cal3D">
+<a href="https://github.com/hsoju/Cally/releases"><img src="https://img.shields.io/github/v/release/hsoju/Cally" alt="Latest Release"></a> <img src="https://img.shields.io/github/license/hsoju/Cally">
 
-# BL-Cal3D
+# Cally
 Cal3D Import-Export options for Blender 2.9. This addon includes parameters for generalized importing of IMVU objects, as well as supporting the ability to export IMVU objects for immediate use in IMVU's creator mode.
 
 For more information on Cal3D file formats visit https://github.com/mp3butcher/Cal3D
