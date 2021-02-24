@@ -9,6 +9,6 @@ class MaleFeet(bpy.types.Operator):
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
-        mesh = Proxy("MFeet", ["assets", "male", "feet.pickle"])
+        mesh = Proxy("M.Feet", ["assets", "male", "feet.pickle"])
         mesh.to_mesh()
         return {'FINISHED'}

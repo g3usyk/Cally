@@ -9,12 +9,12 @@ class FemaleBody(bpy.types.Operator):
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
-        head_prox = ("FHead", ["assets", "female", "head.pickle"])
-        torso_prox = ("FTorso", ["assets", "female", "torso.pickle"])
-        hands_prox = ("FHands", ["assets", "female", "hands.pickle"])
-        legs_prox = ("FLegs", ["assets", "female", "legs.pickle"])
-        thighs_prox = ("FThighs", ["assets", "female", "thighs.pickle"])
-        feet_prox = ("FFeet", ["assets", "female", "feet.pickle"])
+        head_prox = ("F.Head", ["assets", "female", "head.pickle"])
+        torso_prox = ("F.Torso", ["assets", "female", "torso.pickle"])
+        hands_prox = ("F.Hands", ["assets", "female", "hands.pickle"])
+        legs_prox = ("F.Legs", ["assets", "female", "legs.pickle"])
+        thighs_prox = ("F.Thighs", ["assets", "female", "thighs.pickle"])
+        feet_prox = ("F.Feet", ["assets", "female", "feet.pickle"])
         mesh_group = ProxyGroup(head_prox, torso_prox, hands_prox,
                                 legs_prox, thighs_prox, feet_prox)
         mesh_group.to_mesh("FBody")
