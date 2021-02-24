@@ -13,8 +13,13 @@ bl_info = {
 import bpy
 from .src.mesh_export import CalMeshExporter
 from .src.skeleton import DefaultSkeleton
-from .src.mesh_add import VIEW3D_MT_mesh_imvu, VIEW3D_MT_mesh_imvu_male
-from .src.ops import body, head, torso, hands, legs, calfs, feet
+from .src.mesh_add import (
+    VIEW3D_MT_mesh_imvu,
+    VIEW3D_MT_mesh_imvu_female,
+    VIEW3D_MT_mesh_imvu_male,
+)
+from .src.ops import f_body, f_head, f_torso, f_hands, f_legs, f_thighs, f_feet
+from .src.ops import m_body, m_head, m_torso, m_hands, m_legs, m_calfs, m_feet
 
 
 def mesh_export_button(self, context):
@@ -40,13 +45,21 @@ def manual_map():
 classes = (
     CalMeshExporter,
     DefaultSkeleton,
-    body.MaleBody,
-    head.MaleHead,
-    torso.MaleTorso,
-    hands.MaleHands,
-    legs.MaleLegs,
-    calfs.MaleCalfs,
-    feet.MaleFeet,
+    f_body.FemaleBody,
+    f_head.FemaleHead,
+    f_torso.FemaleTorso,
+    f_hands.FemaleHands,
+    f_legs.FemaleLegs,
+    f_thighs.FemaleThighs,
+    f_feet.FemaleFeet,
+    m_body.MaleBody,
+    m_head.MaleHead,
+    m_torso.MaleTorso,
+    m_hands.MaleHands,
+    m_legs.MaleLegs,
+    m_calfs.MaleCalfs,
+    m_feet.MaleFeet,
+    VIEW3D_MT_mesh_imvu_female,
     VIEW3D_MT_mesh_imvu_male,
     VIEW3D_MT_mesh_imvu,
 )
