@@ -13,3 +13,6 @@ class BaseMesh:
         col.objects.link(ob)
         bpy.context.view_layer.objects.active = ob
         mesh.from_pydata(self.vertices, [], self.faces)
+        bpy.ops.object.select_all(action='DESELECT')
+        bpy.data.objects[mesh.name].select_set(True)
+        bpy.ops.object.shade_smooth()

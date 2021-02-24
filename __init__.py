@@ -14,7 +14,7 @@ import bpy
 from .src.mesh_export import CalMeshExporter
 from .src.skeleton import DefaultSkeleton
 from .src.mesh_add import VIEW3D_MT_mesh_imvu, VIEW3D_MT_mesh_imvu_male
-from .src.ops.head import MaleHead
+from .src.ops import head, torso, hands, legs, calfs, feet
 
 
 def mesh_export_button(self, context):
@@ -40,7 +40,12 @@ def manual_map():
 classes = (
     CalMeshExporter,
     DefaultSkeleton,
-    MaleHead,
+    head.MaleHead,
+    torso.MaleTorso,
+    hands.MaleHands,
+    legs.MaleLegs,
+    calfs.MaleCalfs,
+    feet.MaleFeet,
     VIEW3D_MT_mesh_imvu_male,
     VIEW3D_MT_mesh_imvu,
 )
