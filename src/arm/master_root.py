@@ -1,5 +1,6 @@
 import bpy
 
+
 def add_master_root():
     bpy.ops.object.select_all(action='DESELECT')
     bpy.ops.object.armature_add()
