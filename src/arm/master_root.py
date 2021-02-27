@@ -2,7 +2,7 @@ import bpy
 
 
 def add_master_root():
-    """Generates default armature for imvu skeleton rig.
+    """Generates the default armature for imvu skeleton rig.
 
     """
     bpy.ops.object.select_all(action='DESELECT')

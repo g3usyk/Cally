@@ -301,7 +301,7 @@ class CalMeshExporter(Operator, ExportHelper):
             context (): A bpy context containing data in the current 3d view.
 
         Returns:
-            A dict containing the success state of the method.
+            A set containing the success state of the method.
         """
         export_xmf(context, self.filepath, submap, float(next(iter(self.scale))),
                    next(iter(self.weight)), self.pretty)
@@ -314,7 +314,7 @@ class CalMeshExporter(Operator, ExportHelper):
             context (): A bpy context containing data in the current 3d view.
 
         Returns:
-            A dict containing the failure state of the method.
+            A set containing the failure state of the method.
         """
         return {'CANCELLED'}
 

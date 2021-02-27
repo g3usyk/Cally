@@ -16,7 +16,7 @@ class DefaultSkeleton(bpy.types.Operator):
             context (): A bpy context containing data in the current 3d view.
 
         Returns:
-            A dictionary containing the success state of the method.
+            A set containing the success state of the method.
 
         """
         add_master_root()

@@ -2,7 +2,7 @@ from ..avi.proxy_group import ProxyGroup
 
 
 class BodyGroup:
-    """Abstracts creation of group of body meshes.
+    """Abstracts creation of a group of body meshes.
 
     """
 
@@ -14,6 +14,15 @@ class BodyGroup:
         self.bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
+        """Specifies the behaviour for the operator method called by Blender.
+
+        Args:
+            context (): A bpy context containing data in the current 3d view.
+
+        Returns:
+            A set containing the success state of the method.
+
+        """
         proxies = []
         g = self.gender[0].upper()
         for part in self.parts:

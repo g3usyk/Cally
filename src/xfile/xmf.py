@@ -6,20 +6,21 @@ from ..xmesh.xface import XFace
 from ..xmesh.xmap import WeightMap
 
 
-def generate_vertices(obj, submap, weight):
-    """
+def generate_vertices(obj, submap: dict, weight: str) -> list:
+    """Constructs vertices with each representing an xmf vertex tag.
 
     Args:
-        obj ():
-        submap ():
-        weight ():
+        obj (): A bpy mesh object containing geometric data.
+        submap (dict): A dictionary mapping each submesh to its corresponding bone and material ids.
+        weight (str): A string determining bone weight assignment for all vertices.
 
     Returns:
+        A list of vertex objects.
 
     """
     xverts = []
 
-    groups = {g.index : WeightMap.lookup(g.name) for g in obj.vertex_groups}
+    groups = {g.index: WeightMap.lookup(g.name) for g in obj.vertex_groups}
 
     xcol = ['1', '1', '1']
     bone_id = submap[obj.name][1]
@@ -46,14 +47,15 @@ def generate_vertices(obj, submap, weight):
     return xverts
 
 
-def generate_faces(obj, verts):
-    """
+def generate_faces(obj, verts: list) -> list:
+    """Constructs faces with each representing an xmf face tag.
 
     Args:
-        obj ():
-        verts ():
+        obj (): A bpy mesh object containing geometric data.
+        verts (list): A list of vertex objects.
 
     Returns:
+        A list of face objects.
 
     """
     xfaces = []
@@ -80,15 +82,16 @@ def generate_faces(obj, verts):
     return xfaces
 
 
-def create_submesh(name, submap, faces):
-    """
+def create_submesh(name: str, submap: dict, faces: list) -> et.Element:
+    """Generates a submesh xmf tag.
 
     Args:
-        name ():
-        submap ():
-        faces ():
+        name (str): A string referring to the name of the submesh.
+        submap (dict): A dictionary mapping each submesh to its corresponding bone and material ids.
+        faces (list): A list of face objects.
 
     Returns:
+        An xml Element representing a single submesh.
 
     """
     sub = et.Element('submesh')
@@ -101,14 +104,14 @@ def create_submesh(name, submap, faces):
     return sub
 
 
-def fill_submesh(sub, verts, faces, scale):
-    """
+def fill_submesh(sub: et.Element, verts: list, faces: list, scale: float):
+    """Places xmf tags for vertices and faces into a submesh xmf tag.
 
     Args:
-        sub ():
-        verts ():
-        faces ():
-        scale ():
+        sub (et.Element): An xml Element for a single submesh.
+        verts (list): A list of vertex objects.
+        faces (list): A list of face objects.
+        scale (float): A float determining scaling factor for mesh on export.
     """
     v_id = 0
     v_ids = []
@@ -125,19 +128,17 @@ def fill_submesh(sub, verts, faces, scale):
         sub.append(elem_face)
 
 
-def export_xmf(context, filepath: str, submap: dict, scale: str, weight: str, pretty: bool):
-    """
+def export_xmf(context, filepath: str, submap: dict,
+               scale: float, weight: str, pretty: bool):
+    """Writes a new xmf file containing the selected meshes geometric data.
 
     Args:
-        context ():
-        filepath (str):
-        submap (dict):
-        scale (str):
-        weight (str):
-        pretty (bool):
-
-    Returns:
-
+        context (): A bpy context containing data in the current 3d view.
+        filepath (str): A string pointing to the output location of the xmf file.
+        submap (dict): A dictionary mapping each submesh to its corresponding bone and material ids.
+        scale (float): A float determining scaling factor for mesh on export.
+        weight (str): A string determining bone weight assignment for all vertices.
+        pretty (bool): A boolean determining whether xmf file should be formatted.
     """
     objs = [obj for obj in context.selected_objects if obj.type == 'MESH']
 
@@ -161,8 +162,9 @@ def export_xmf(context, filepath: str, submap: dict, scale: str, weight: str, pr
         f.write("%s" % xtext)
 
 
+# TODO Finish this
 def import_xmf(context, filepath: str):
-    """
+    """Parses an xmf file into meshes.
 
     Args:
         context (): A bpy context containing data in the current 3d view.
