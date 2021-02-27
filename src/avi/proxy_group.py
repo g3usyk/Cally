@@ -6,7 +6,7 @@ class ProxyGroup:
     """Constructs multiple meshes under a single collection.
 
     """
-    def __init__(self, *proxies):
+    def __init__(self, proxies):
         self.proxies = []
         for name, fpath in proxies:
             prox = Proxy(name, fpath)
