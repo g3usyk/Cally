@@ -1,6 +1,11 @@
 from xml.etree import ElementTree as et
 
-class XVertex():
+
+class XVertex:
+    """Represents a vertex object as outlined in a xmf file.
+
+    """
+
     def __init__(self, posn, norm, color, infls):
         self.posn = posn
         self.norm = norm
@@ -9,6 +14,17 @@ class XVertex():
         self.infls = infls
 
     def parse(self, idx, u_idx, scale):
+        """
+
+        Args:
+            idx ():
+            u_idx ():
+            scale ():
+
+        Returns:
+            An xml element representing an xmf <VERTEX> tag.
+
+        """
         xvert = et.Element('vertex')
         xvert.attrib['numinfluences'] = str(len(self.infls))
         xvert.attrib['id'] = str(idx)
@@ -22,7 +38,6 @@ class XVertex():
         xnorm.text = ''.join([(str(n) + ' ') for n in self.norm])[:-1]
         xcol.text = ''.join([(str(c) + ' ') for c in self.color])[:-1]
         xuv.text = str(self.uv[u_idx][0]) + ' ' + str(abs(1 - self.uv[u_idx][1]))
-
 
         xvert.append(xposn)
         xvert.append(xnorm)

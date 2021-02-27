@@ -2,11 +2,18 @@ import bpy
 
 
 class VIEW3D_MT_mesh_imvu_female(bpy.types.Menu):
-    """Submenu for IMVU female mesh primitives"""
+    """Outlines submenu layout for imvu female mesh primitives.
+
+    """
     bl_idname = "VIEW3D_MT_mesh_imvu_female"
     bl_label = "Female"
 
     def draw(self, context):
+        """Determines the order of imvu mesh primitives in the female submenu.
+
+        Args:
+            context (): A bpy context containing data in the current 3d view.
+        """
         layout = self.layout
         layout.operator_context = 'INVOKE_REGION_WIN'
         layout.operator("mesh.primitive_imvu_female_body_add", icon="OUTLINER_OB_ARMATURE")
@@ -19,11 +26,18 @@ class VIEW3D_MT_mesh_imvu_female(bpy.types.Menu):
 
 
 class VIEW3D_MT_mesh_imvu_male(bpy.types.Menu):
-    """Submenu for IMVU male mesh primitives"""
+    """Outlines submenu layout for imvu male mesh primitives.
+
+    """
     bl_idname = "VIEW3D_MT_mesh_imvu_male"
     bl_label = "Male"
 
     def draw(self, context):
+        """Determines the order of imvu mesh primitives in the male submenu.
+
+        Args:
+            context (): A bpy context containing data in the current 3d view.
+        """
         layout = self.layout
         layout.operator_context = 'INVOKE_REGION_WIN'
         layout.operator("mesh.primitive_imvu_male_body_add", icon="OUTLINER_OB_ARMATURE")
@@ -36,11 +50,18 @@ class VIEW3D_MT_mesh_imvu_male(bpy.types.Menu):
 
 
 class VIEW3D_MT_mesh_imvu(bpy.types.Menu):
-    """Menu for IMVU mesh primitives"""
+    """Outlines menu layout for imvu mesh primitives.
+
+    """
     bl_idname = "VIEW3D_MT_mesh_imvu"
     bl_label = "IMVU"
 
     def draw(self, context):
+        """Determines the order of imvu submenus in the mesh add menu.
+
+        Args:
+            context (): A bpy context containing data in the current 3d view.
+        """
         layout = self.layout
         layout.operator_context = 'INVOKE_REGION_WIN'
         layout.menu("VIEW3D_MT_mesh_imvu_female", icon="MOD_ARMATURE")

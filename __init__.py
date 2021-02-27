@@ -23,18 +23,41 @@ from .src.ops import m_body, m_head, m_torso, m_hands, m_legs, m_calfs, m_feet
 
 
 def mesh_export_button(self, context):
+    """Targets exporter class on menu button press.
+
+    Args:
+        self (): A reference to this bpy dynamic draw function.
+        context (): A bpy context containing data in the current 3d view.
+    """
     self.layout.operator(CalMeshExporter.bl_idname, text="Cal3D Mesh (.xmf)")
 
 
 def mesh_add_menu(self, context):
+    """Targets mesh menu class on menu button press.
+
+    Args:
+        self (): A reference to this bpy dynamic draw function.
+        context (): A bpy context containing data in the current 3D view.
+    """
     self.layout.menu(VIEW3D_MT_mesh_imvu.bl_idname, icon="INFO")
 
 
 def default_armature_menu(self, context):
+    """Targets armature menu class on menu button press.
+
+    Args:
+        self (): A reference to this bpy dynamic draw function.
+        context (): A bpy context containing data in the current 3d view.
+    """
     self.layout.operator(DefaultSkeleton.bl_idname, icon='BONE_DATA')
 
 
 def manual_map():
+    """Defines documentation for addon.
+
+    Returns: A tuple containing a hyperlink to the relevant documentation.
+
+    """
     url_manual_prefix = "https://docs.blender.org/manual/en/latest/"
     url_manual_mapping = (
         ("bpy.ops.export", "files/import_export.html"),
@@ -66,6 +89,9 @@ classes = (
 
 
 def register():
+    """Defines behaviour when addon installs onto Blender.
+
+    """
     for cls in classes:
         bpy.utils.register_class(cls)
     bpy.utils.register_manual_map(manual_map)
@@ -75,6 +101,9 @@ def register():
 
 
 def unregister():
+    """Defines behaviour when addon uninstalls from Blender.
+
+    """
     for cls in classes:
         bpy.utils.unregister_class(cls)
     bpy.utils.unregister_manual_map(manual_map)

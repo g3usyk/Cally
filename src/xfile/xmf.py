@@ -7,6 +7,16 @@ from ..xmesh.xmap import WeightMap
 
 
 def generate_vertices(obj, submap, weight):
+    """
+
+    Args:
+        obj ():
+        submap ():
+        weight ():
+
+    Returns:
+
+    """
     xverts = []
 
     groups = {g.index : WeightMap.lookup(g.name) for g in obj.vertex_groups}
@@ -37,6 +47,15 @@ def generate_vertices(obj, submap, weight):
 
 
 def generate_faces(obj, verts):
+    """
+
+    Args:
+        obj ():
+        verts ():
+
+    Returns:
+
+    """
     xfaces = []
 
     bm = bmesh.new()
@@ -62,6 +81,16 @@ def generate_faces(obj, verts):
 
 
 def create_submesh(name, submap, faces):
+    """
+
+    Args:
+        name ():
+        submap ():
+        faces ():
+
+    Returns:
+
+    """
     sub = et.Element('submesh')
     sub.attrib['numfaces'] = str(len(faces))
     sub.attrib['numlodsteps'] = '0'
@@ -73,6 +102,14 @@ def create_submesh(name, submap, faces):
 
 
 def fill_submesh(sub, verts, faces, scale):
+    """
+
+    Args:
+        sub ():
+        verts ():
+        faces ():
+        scale ():
+    """
     v_id = 0
     v_ids = []
     for x in range(0, len(verts)):
@@ -88,7 +125,20 @@ def fill_submesh(sub, verts, faces, scale):
         sub.append(elem_face)
 
 
-def export_xmf(context, filepath, submap, scale, weight, pretty):
+def export_xmf(context, filepath: str, submap, scale, weight, pretty):
+    """
+
+    Args:
+        context ():
+        filepath (str):
+        submap (dict):
+        scale (str):
+        weight (str):
+        pretty (bool):
+
+    Returns:
+
+    """
     objs = [obj for obj in context.selected_objects if obj.type == 'MESH']
 
     root = et.Element('mesh')
@@ -111,7 +161,13 @@ def export_xmf(context, filepath, submap, scale, weight, pretty):
         f.write("%s" % xtext)
 
 
-def import_xmf(context, filepath):
+def import_xmf(context, filepath: str):
+    """
+
+    Args:
+        context (): A bpy context containing data in the current 3d view.
+        filepath (str): A string specifying the file path of the xml object.
+    """
     mesh = []
     with open(filepath, 'r') as f:
         pass

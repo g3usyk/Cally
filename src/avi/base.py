@@ -2,13 +2,29 @@ import bpy
 
 
 class BaseMesh:
-    def __init__(self, name, vertices, faces, uvs):
+    """Prototypes behaviour for default mesh instantiation into Blender.
+
+    """
+    def __init__(self, name: str, vertices: list, faces: list, uvs: list):
+        """
+
+        Args:
+            name (str): A string representing the name of the mesh.
+            vertices (list): A list of tuples containing x, y, and z position coordinates for each vertex.
+            faces (list): A list of lists containing vertex indices for each face.
+            uvs (list): A list of tuples containing u, and v texture coordinates for each vertex.
+        """
         self.name = name
         self.vertices = vertices
         self.faces = faces
         self.uvs = uvs
 
     def add_uvs(self, ob):
+        """Generates uv coordinates to mesh object.
+
+        Args:
+            ob (): A bpy object without a uv map or uv coordinates.
+        """
         bpy.ops.mesh.uv_texture_add()
         if len(self.uvs) != 0:
             uvl = ob.data.uv_layers.active
@@ -21,6 +37,11 @@ class BaseMesh:
                     uv_idx += 1
 
     def to_mesh(self, collection=None):
+        """Generates a mesh using raw vertex, face, and uv data.
+
+        Args:
+            collection (): A bpy collection in the scene to contain the mesh.
+        """
         if collection is None:
             collection = bpy.data.collections.get("Collection")
 

@@ -3,12 +3,23 @@ from ..avi.proxy_group import ProxyGroup
 
 
 class FemaleBody(bpy.types.Operator):
-    """Add default IMVU female body"""
+    """Adds imvu mesh primitive female body parts to scene.
+
+    """
     bl_idname = "mesh.primitive_imvu_female_body_add"
     bl_label = "Body"
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
+        """Generates mesh data for each female body part under a new collection.
+
+        Args:
+            context (): A bpy context containing data in the current 3D View.
+
+        Returns:
+            A dictionary containing the success state of the method.
+
+        """
         head_prox = ("F.Head", ["assets", "female", "head.pickle"])
         torso_prox = ("F.Torso", ["assets", "female", "torso.pickle"])
         hands_prox = ("F.Hands", ["assets", "female", "hands.pickle"])

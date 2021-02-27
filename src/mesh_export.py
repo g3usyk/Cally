@@ -15,7 +15,9 @@ scaling = {'100'}
 
 
 class CalMeshExporter(Operator, ExportHelper):
-    """Export selected objects as a Cal3D XMF file"""
+    """Exports selected objects as a Cal3D XMF file.
+
+    """
     bl_idname = "export_scene.export_xmf"
     bl_label = "Export XMF"
     bl_options = {'REGISTER', 'PRESET'}
@@ -35,6 +37,11 @@ class CalMeshExporter(Operator, ExportHelper):
     )
 
     def update_weight(self, context):
+        """Checks if weight enum has an invalid state.
+
+        Args:
+            context (): A bpy context containing data in the current 3d view.
+        """
         global weighting
         if len(self.weight) == 0 or len(self.weight) > 1:
             self.weight = weighting
@@ -53,11 +60,25 @@ class CalMeshExporter(Operator, ExportHelper):
     )
 
     def update_subs(self, context):
+        """Configures child menus to reflect change in submesh menu.
+
+        Args:
+            context (): A bpy context containing data in the current 3d view.
+        """
         self.body = submap[self.subs][0]
         self.bone = submap[self.subs][1]
         self.mtl = submap[self.subs][2]
 
-    def sub_items(self, context):
+    def sub_items(self, context) -> list:
+        """Outputs dynamic submesh menu configuration.
+
+        Args:
+            context (): A bpy context containing data in the current 3d view.
+
+        Returns:
+            A list of tuples defining submeshes in the menu.
+
+        """
         global submap
         sub_names = [obj.name for obj in context.selected_objects if obj.type == 'MESH']
         items = []
@@ -101,6 +122,11 @@ class CalMeshExporter(Operator, ExportHelper):
     )
 
     def update_body(self, context):
+        """Logs changes made to the body menu.
+
+        Args:
+            context (): A bpy context containing data in the current 3d view.
+        """
         global submap
         submap[self.subs][0] = self.body
         if self.bone != "":
@@ -126,10 +152,24 @@ class CalMeshExporter(Operator, ExportHelper):
     )
 
     def update_bone(self, context):
+        """Logs changes made to the bone menu.
+
+        Args:
+            context (): A bpy context containing data in the current 3d view.
+        """
         global submap
         submap[self.subs][1] = self.bone
 
-    def bone_items(self, context):
+    def bone_items(self, context) -> list:
+        """Outputs dynamic bone menu configuration.
+
+        Args:
+            context (): A bpy context containing data in the current 3d view.
+
+        Returns:
+            A list of tuples defining bones in the menu.
+
+        """
         items = []
         if self.body == 'OPT_A':
             items.append(('0', "Master Root", "'Female03MasterRoot'\n   ID: 0"))
@@ -214,6 +254,11 @@ class CalMeshExporter(Operator, ExportHelper):
     )
 
     def update_mtl(self, context):
+        """Logs changes made to the material menu.
+
+        Args:
+            context (): A bpy context containing data in the current 3d view.
+        """
         global submap
         submap[self.subs][2] = self.mtl
 
@@ -227,6 +272,11 @@ class CalMeshExporter(Operator, ExportHelper):
     )
 
     def update_scale(self, context):
+        """Checks if scale enum has an invalid state.
+
+        Args:
+            context (): A bpy context containing data in the current 3d view.
+        """
         global scaling
         if len(self.scale) == 0 or len(self.scale) > 1:
             self.scale = scaling
@@ -245,14 +295,35 @@ class CalMeshExporter(Operator, ExportHelper):
     )
 
     def execute(self, context):
+        """Calls xmf file generation method.
+
+        Args:
+            context (): A bpy context containing data in the current 3d view.
+
+        Returns:
+            A dict containing the success state of the method.
+        """
         export_xmf(context, self.filepath, submap, float(next(iter(self.scale))),
                    next(iter(self.weight)), self.pretty)
         return {'FINISHED'}
 
     def cancel(self, context):
+        """Specifies abrupt cancellation behaviour.
+
+        Args:
+            context (): A bpy context containing data in the current 3d view.
+
+        Returns:
+            A dict containing the failure state of the method.
+        """
         return {'CANCELLED'}
 
     def draw(self, context):
+        """Determines the format for showing options in the file export dialog menu.
+
+        Args:
+            context (): A bpy context containing data in the current 3d view.
+        """
         layout = self.layout
         layout.use_property_split = True
         layout.use_property_decorate = False
