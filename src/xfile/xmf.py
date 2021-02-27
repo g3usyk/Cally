@@ -125,7 +125,7 @@ def fill_submesh(sub, verts, faces, scale):
         sub.append(elem_face)
 
 
-def export_xmf(context, filepath: str, submap, scale, weight, pretty):
+def export_xmf(context, filepath: str, submap: dict, scale: str, weight: str, pretty: bool):
     """
 
     Args:
