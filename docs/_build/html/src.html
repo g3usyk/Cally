@@ -1,0 +1,704 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>src package &mdash; Cally 1.0.8 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="src.arm package" href="src.arm.html" />
+    <link rel="prev" title="src" href="modules.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> Cally
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">src</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">src package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#subpackages">Subpackages</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="src.arm.html">src.arm package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.avi.html">src.avi package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.ops.html">src.ops package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.xfile.html">src.xfile package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.xmesh.html">src.xmesh package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-src.mesh_add">src.mesh_add module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-src.mesh_export">src.mesh_export module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-src.skeleton">src.skeleton module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-src">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Cally</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="modules.html">src</a> &raquo;</li>
+        
+      <li>src package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/src.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="src-package">
+<h1>src package<a class="headerlink" href="#src-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="src.arm.html">src.arm package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="src.arm.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="src.arm.html#module-src.arm.master_root">src.arm.master_root module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="src.arm.html#module-src.arm">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="src.avi.html">src.avi package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="src.avi.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="src.avi.html#module-src.avi.base">src.avi.base module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="src.avi.html#module-src.avi.proxy">src.avi.proxy module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="src.avi.html#module-src.avi.proxy_group">src.avi.proxy_group module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="src.avi.html#module-src.avi">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="src.ops.html">src.ops package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="src.ops.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="src.ops.female.html">src.ops.female package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="src.ops.female.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.ops.female.html#module-src.ops.female.f_body">src.ops.female.f_body module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.ops.female.html#module-src.ops.female.f_feet">src.ops.female.f_feet module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.ops.female.html#module-src.ops.female.f_hands">src.ops.female.f_hands module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.ops.female.html#module-src.ops.female.f_head">src.ops.female.f_head module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.ops.female.html#module-src.ops.female.f_legs">src.ops.female.f_legs module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.ops.female.html#module-src.ops.female.f_thighs">src.ops.female.f_thighs module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.ops.female.html#module-src.ops.female.f_torso">src.ops.female.f_torso module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.ops.female.html#module-src.ops.female">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="src.ops.male.html">src.ops.male package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="src.ops.male.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.ops.male.html#module-src.ops.male.m_body">src.ops.male.m_body module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.ops.male.html#module-src.ops.male.m_calfs">src.ops.male.m_calfs module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.ops.male.html#module-src.ops.male.m_feet">src.ops.male.m_feet module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.ops.male.html#module-src.ops.male.m_hands">src.ops.male.m_hands module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.ops.male.html#module-src.ops.male.m_head">src.ops.male.m_head module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.ops.male.html#module-src.ops.male.m_legs">src.ops.male.m_legs module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.ops.male.html#module-src.ops.male.m_torso">src.ops.male.m_torso module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.ops.male.html#module-src.ops.male">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="src.ops.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="src.ops.html#module-src.ops.body_group">src.ops.body_group module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="src.ops.html#module-src.ops.body_part">src.ops.body_part module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="src.ops.html#module-src.ops">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="src.xfile.html">src.xfile package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="src.xfile.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="src.xfile.html#module-src.xfile.prettify">src.xfile.prettify module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="src.xfile.html#module-src.xfile.xmf">src.xfile.xmf module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="src.xfile.html#module-src.xfile">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="src.xmesh.html">src.xmesh package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="src.xmesh.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="src.xmesh.html#module-src.xmesh.xface">src.xmesh.xface module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="src.xmesh.html#module-src.xmesh.xmap">src.xmesh.xmap module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="src.xmesh.html#module-src.xmesh.xvert">src.xmesh.xvert module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="src.xmesh.html#module-src.xmesh">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-src.mesh_add">
+<span id="src-mesh-add-module"></span><h2>src.mesh_add module<a class="headerlink" href="#module-src.mesh_add" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="src.mesh_add.VIEW3D_MT_mesh_imvu">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">src.mesh_add.</span></code><code class="sig-name descname"><span class="pre">VIEW3D_MT_mesh_imvu</span></code><a class="headerlink" href="#src.mesh_add.VIEW3D_MT_mesh_imvu" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">bpy.types.Menu</span></code></p>
+<p>Outlines menu layout for imvu mesh primitives.</p>
+<dl class="py attribute">
+<dt id="src.mesh_add.VIEW3D_MT_mesh_imvu.bl_idname">
+<code class="sig-name descname"><span class="pre">bl_idname</span></code><em class="property"><span class="pre">:</span> <span class="pre">str</span></em><em class="property"> <span class="pre">=</span> <span class="pre">'VIEW3D_MT_mesh_imvu'</span></em><a class="headerlink" href="#src.mesh_add.VIEW3D_MT_mesh_imvu.bl_idname" title="Permalink to this definition">¶</a></dt>
+<dd><p>If this is set, the menu gets a custom ID, otherwise it takes the name of the class used to define the menu (for example, if the class name is “OBJECT_MT_hello”, and bl_idname is not set by the script, then bl_idname = “OBJECT_MT_hello”)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="src.mesh_add.VIEW3D_MT_mesh_imvu.bl_label">
+<code class="sig-name descname"><span class="pre">bl_label</span></code><em class="property"><span class="pre">:</span> <span class="pre">str</span></em><em class="property"> <span class="pre">=</span> <span class="pre">'IMVU'</span></em><a class="headerlink" href="#src.mesh_add.VIEW3D_MT_mesh_imvu.bl_label" title="Permalink to this definition">¶</a></dt>
+<dd><p>The menu label</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="src.mesh_add.VIEW3D_MT_mesh_imvu.draw">
+<code class="sig-name descname"><span class="pre">draw</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.mesh_add.VIEW3D_MT_mesh_imvu.draw" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determines the order of imvu submenus in the mesh add menu.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>(</strong><strong>)</strong> (<em>context</em>) – A bpy context containing data in the current 3d view.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="src.mesh_add.VIEW3D_MT_mesh_imvu_female">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">src.mesh_add.</span></code><code class="sig-name descname"><span class="pre">VIEW3D_MT_mesh_imvu_female</span></code><a class="headerlink" href="#src.mesh_add.VIEW3D_MT_mesh_imvu_female" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">bpy.types.Menu</span></code></p>
+<p>Outlines submenu layout for imvu female mesh primitives.</p>
+<dl class="py attribute">
+<dt id="src.mesh_add.VIEW3D_MT_mesh_imvu_female.bl_idname">
+<code class="sig-name descname"><span class="pre">bl_idname</span></code><em class="property"><span class="pre">:</span> <span class="pre">str</span></em><em class="property"> <span class="pre">=</span> <span class="pre">'VIEW3D_MT_mesh_imvu_female'</span></em><a class="headerlink" href="#src.mesh_add.VIEW3D_MT_mesh_imvu_female.bl_idname" title="Permalink to this definition">¶</a></dt>
+<dd><p>If this is set, the menu gets a custom ID, otherwise it takes the name of the class used to define the menu (for example, if the class name is “OBJECT_MT_hello”, and bl_idname is not set by the script, then bl_idname = “OBJECT_MT_hello”)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="src.mesh_add.VIEW3D_MT_mesh_imvu_female.bl_label">
+<code class="sig-name descname"><span class="pre">bl_label</span></code><em class="property"><span class="pre">:</span> <span class="pre">str</span></em><em class="property"> <span class="pre">=</span> <span class="pre">'Female'</span></em><a class="headerlink" href="#src.mesh_add.VIEW3D_MT_mesh_imvu_female.bl_label" title="Permalink to this definition">¶</a></dt>
+<dd><p>The menu label</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="src.mesh_add.VIEW3D_MT_mesh_imvu_female.draw">
+<code class="sig-name descname"><span class="pre">draw</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.mesh_add.VIEW3D_MT_mesh_imvu_female.draw" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determines the order of imvu mesh primitives in the female submenu.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>(</strong><strong>)</strong> (<em>context</em>) – A bpy context containing data in the current 3d view.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="src.mesh_add.VIEW3D_MT_mesh_imvu_male">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">src.mesh_add.</span></code><code class="sig-name descname"><span class="pre">VIEW3D_MT_mesh_imvu_male</span></code><a class="headerlink" href="#src.mesh_add.VIEW3D_MT_mesh_imvu_male" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">bpy.types.Menu</span></code></p>
+<p>Outlines submenu layout for imvu male mesh primitives.</p>
+<dl class="py attribute">
+<dt id="src.mesh_add.VIEW3D_MT_mesh_imvu_male.bl_idname">
+<code class="sig-name descname"><span class="pre">bl_idname</span></code><em class="property"><span class="pre">:</span> <span class="pre">str</span></em><em class="property"> <span class="pre">=</span> <span class="pre">'VIEW3D_MT_mesh_imvu_male'</span></em><a class="headerlink" href="#src.mesh_add.VIEW3D_MT_mesh_imvu_male.bl_idname" title="Permalink to this definition">¶</a></dt>
+<dd><p>If this is set, the menu gets a custom ID, otherwise it takes the name of the class used to define the menu (for example, if the class name is “OBJECT_MT_hello”, and bl_idname is not set by the script, then bl_idname = “OBJECT_MT_hello”)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="src.mesh_add.VIEW3D_MT_mesh_imvu_male.bl_label">
+<code class="sig-name descname"><span class="pre">bl_label</span></code><em class="property"><span class="pre">:</span> <span class="pre">str</span></em><em class="property"> <span class="pre">=</span> <span class="pre">'Male'</span></em><a class="headerlink" href="#src.mesh_add.VIEW3D_MT_mesh_imvu_male.bl_label" title="Permalink to this definition">¶</a></dt>
+<dd><p>The menu label</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="src.mesh_add.VIEW3D_MT_mesh_imvu_male.draw">
+<code class="sig-name descname"><span class="pre">draw</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.mesh_add.VIEW3D_MT_mesh_imvu_male.draw" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determines the order of imvu mesh primitives in the male submenu.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>(</strong><strong>)</strong> (<em>context</em>) – A bpy context containing data in the current 3d view.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-src.mesh_export">
+<span id="src-mesh-export-module"></span><h2>src.mesh_export module<a class="headerlink" href="#module-src.mesh_export" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="src.mesh_export.CalMeshExporter">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">src.mesh_export.</span></code><code class="sig-name descname"><span class="pre">CalMeshExporter</span></code><a class="headerlink" href="#src.mesh_export.CalMeshExporter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">bpy.types.Operator</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">bpy_extras.io_utils.ExportHelper</span></code></p>
+<p>Exports selected objects as a Cal3D XMF file.</p>
+<dl class="py attribute">
+<dt id="src.mesh_export.CalMeshExporter.bl_idname">
+<code class="sig-name descname"><span class="pre">bl_idname</span></code><em class="property"><span class="pre">:</span> <span class="pre">str</span></em><em class="property"> <span class="pre">=</span> <span class="pre">'export_scene.export_xmf'</span></em><a class="headerlink" href="#src.mesh_export.CalMeshExporter.bl_idname" title="Permalink to this definition">¶</a></dt>
+<dd><p>str</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>type</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="src.mesh_export.CalMeshExporter.bl_label">
+<code class="sig-name descname"><span class="pre">bl_label</span></code><em class="property"><span class="pre">:</span> <span class="pre">str</span></em><em class="property"> <span class="pre">=</span> <span class="pre">'Export</span> <span class="pre">XMF'</span></em><a class="headerlink" href="#src.mesh_export.CalMeshExporter.bl_label" title="Permalink to this definition">¶</a></dt>
+<dd><p>str</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>type</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="src.mesh_export.CalMeshExporter.bl_options">
+<code class="sig-name descname"><span class="pre">bl_options</span></code><em class="property"><span class="pre">:</span> <span class="pre">typing.Union</span><span class="p"><span class="pre">[</span></span><span class="pre">typing.Set</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span> </span><span class="pre">typing.Set</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"> <span class="pre">=</span> <span class="pre">{'PRESET',</span> <span class="pre">'REGISTER'}</span></em><a class="headerlink" href="#src.mesh_export.CalMeshExporter.bl_options" title="Permalink to this definition">¶</a></dt>
+<dd><p>Options for this operator type * REGISTER Register, Display in the info window and support the redo toolbar panel. * UNDO Undo, Push an undo event (needed for operator redo). * UNDO_GROUPED Grouped Undo, Push a single undo event for repeated instances of this operator. * BLOCKING Blocking, Block anything else from using the cursor. * MACRO Macro, Use to check if an operator is a macro. * GRAB_CURSOR Grab Pointer, Use so the operator grabs the mouse focus, enables wrapping when continuous grab is enabled. * GRAB_CURSOR_X Grab Pointer X, Grab, only warping the X axis. * GRAB_CURSOR_Y Grab Pointer Y, Grab, only warping the Y axis. * PRESET Preset, Display a preset button with the operators settings. * INTERNAL Internal, Removes the operator from search results.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>typing.Union[typing.Set[str], typing.Set[int]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="src.mesh_export.CalMeshExporter.body">
+<code class="sig-name descname"><span class="pre">body</span></code><em class="property"><span class="pre">:</span> <span class="pre">None</span></em><a class="headerlink" href="#src.mesh_export.CalMeshExporter.body" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="src.mesh_export.CalMeshExporter.bone">
+<code class="sig-name descname"><span class="pre">bone</span></code><em class="property"><span class="pre">:</span> <span class="pre">None</span></em><a class="headerlink" href="#src.mesh_export.CalMeshExporter.bone" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="src.mesh_export.CalMeshExporter.bone_items">
+<code class="sig-name descname"><span class="pre">bone_items</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">list</span><a class="headerlink" href="#src.mesh_export.CalMeshExporter.bone_items" title="Permalink to this definition">¶</a></dt>
+<dd><p>Outputs dynamic bone menu configuration.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>(</strong><strong>)</strong> (<em>context</em>) – A bpy context containing data in the current 3d view.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A list of tuples defining bones in the menu.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="src.mesh_export.CalMeshExporter.cancel">
+<code class="sig-name descname"><span class="pre">cancel</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.mesh_export.CalMeshExporter.cancel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specifies abrupt cancellation behaviour.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>(</strong><strong>)</strong> (<em>context</em>) – A bpy context containing data in the current 3d view.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A set containing the failure state of the method.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="src.mesh_export.CalMeshExporter.draw">
+<code class="sig-name descname"><span class="pre">draw</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.mesh_export.CalMeshExporter.draw" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determines the format for showing options in the file export dialog menu.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>(</strong><strong>)</strong> (<em>context</em>) – A bpy context containing data in the current 3d view.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="src.mesh_export.CalMeshExporter.execute">
+<code class="sig-name descname"><span class="pre">execute</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.mesh_export.CalMeshExporter.execute" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calls xmf file generation method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>(</strong><strong>)</strong> (<em>context</em>) – A bpy context containing data in the current 3d view.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A set containing the success state of the method.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="src.mesh_export.CalMeshExporter.filename_ext">
+<code class="sig-name descname"><span class="pre">filename_ext</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'.xmf'</span></em><a class="headerlink" href="#src.mesh_export.CalMeshExporter.filename_ext" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="src.mesh_export.CalMeshExporter.filter_glob">
+<code class="sig-name descname"><span class="pre">filter_glob</span></code><em class="property"><span class="pre">:</span> <span class="pre">None</span></em><a class="headerlink" href="#src.mesh_export.CalMeshExporter.filter_glob" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="src.mesh_export.CalMeshExporter.mtl">
+<code class="sig-name descname"><span class="pre">mtl</span></code><em class="property"><span class="pre">:</span> <span class="pre">None</span></em><a class="headerlink" href="#src.mesh_export.CalMeshExporter.mtl" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="src.mesh_export.CalMeshExporter.pretty">
+<code class="sig-name descname"><span class="pre">pretty</span></code><em class="property"><span class="pre">:</span> <span class="pre">None</span></em><a class="headerlink" href="#src.mesh_export.CalMeshExporter.pretty" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="src.mesh_export.CalMeshExporter.scale">
+<code class="sig-name descname"><span class="pre">scale</span></code><em class="property"><span class="pre">:</span> <span class="pre">None</span></em><a class="headerlink" href="#src.mesh_export.CalMeshExporter.scale" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="src.mesh_export.CalMeshExporter.sub_items">
+<code class="sig-name descname"><span class="pre">sub_items</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">list</span><a class="headerlink" href="#src.mesh_export.CalMeshExporter.sub_items" title="Permalink to this definition">¶</a></dt>
+<dd><p>Outputs dynamic submesh menu configuration.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>(</strong><strong>)</strong> (<em>context</em>) – A bpy context containing data in the current 3d view.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A list of tuples defining submeshes in the menu.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="src.mesh_export.CalMeshExporter.subs">
+<code class="sig-name descname"><span class="pre">subs</span></code><em class="property"><span class="pre">:</span> <span class="pre">None</span></em><a class="headerlink" href="#src.mesh_export.CalMeshExporter.subs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="src.mesh_export.CalMeshExporter.threshold">
+<code class="sig-name descname"><span class="pre">threshold</span></code><em class="property"><span class="pre">:</span> <span class="pre">None</span></em><a class="headerlink" href="#src.mesh_export.CalMeshExporter.threshold" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="src.mesh_export.CalMeshExporter.update_body">
+<code class="sig-name descname"><span class="pre">update_body</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.mesh_export.CalMeshExporter.update_body" title="Permalink to this definition">¶</a></dt>
+<dd><p>Logs changes made to the body menu.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>(</strong><strong>)</strong> (<em>context</em>) – A bpy context containing data in the current 3d view.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="src.mesh_export.CalMeshExporter.update_bone">
+<code class="sig-name descname"><span class="pre">update_bone</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.mesh_export.CalMeshExporter.update_bone" title="Permalink to this definition">¶</a></dt>
+<dd><p>Logs changes made to the bone menu.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>(</strong><strong>)</strong> (<em>context</em>) – A bpy context containing data in the current 3d view.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="src.mesh_export.CalMeshExporter.update_mtl">
+<code class="sig-name descname"><span class="pre">update_mtl</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.mesh_export.CalMeshExporter.update_mtl" title="Permalink to this definition">¶</a></dt>
+<dd><p>Logs changes made to the material menu.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>(</strong><strong>)</strong> (<em>context</em>) – A bpy context containing data in the current 3d view.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="src.mesh_export.CalMeshExporter.update_scale">
+<code class="sig-name descname"><span class="pre">update_scale</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.mesh_export.CalMeshExporter.update_scale" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks if scale enum has an invalid state.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>(</strong><strong>)</strong> (<em>context</em>) – A bpy context containing data in the current 3d view.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="src.mesh_export.CalMeshExporter.update_subs">
+<code class="sig-name descname"><span class="pre">update_subs</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.mesh_export.CalMeshExporter.update_subs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Configures child menus to reflect change in submesh menu.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>(</strong><strong>)</strong> (<em>context</em>) – A bpy context containing data in the current 3d view.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="src.mesh_export.CalMeshExporter.update_weight">
+<code class="sig-name descname"><span class="pre">update_weight</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.mesh_export.CalMeshExporter.update_weight" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks if weight enum has an invalid state.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>(</strong><strong>)</strong> (<em>context</em>) – A bpy context containing data in the current 3d view.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="src.mesh_export.CalMeshExporter.weight">
+<code class="sig-name descname"><span class="pre">weight</span></code><em class="property"><span class="pre">:</span> <span class="pre">None</span></em><a class="headerlink" href="#src.mesh_export.CalMeshExporter.weight" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-src.skeleton">
+<span id="src-skeleton-module"></span><h2>src.skeleton module<a class="headerlink" href="#module-src.skeleton" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="src.skeleton.DefaultSkeleton">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">src.skeleton.</span></code><code class="sig-name descname"><span class="pre">DefaultSkeleton</span></code><a class="headerlink" href="#src.skeleton.DefaultSkeleton" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">bpy.types.Operator</span></code></p>
+<p>Adds default imvu armature to scene</p>
+<dl class="py attribute">
+<dt id="src.skeleton.DefaultSkeleton.bl_idname">
+<code class="sig-name descname"><span class="pre">bl_idname</span></code><em class="property"><span class="pre">:</span> <span class="pre">str</span></em><em class="property"> <span class="pre">=</span> <span class="pre">'object.armature_imvu_skeleton_add'</span></em><a class="headerlink" href="#src.skeleton.DefaultSkeleton.bl_idname" title="Permalink to this definition">¶</a></dt>
+<dd><p>str</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>type</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="src.skeleton.DefaultSkeleton.bl_label">
+<code class="sig-name descname"><span class="pre">bl_label</span></code><em class="property"><span class="pre">:</span> <span class="pre">str</span></em><em class="property"> <span class="pre">=</span> <span class="pre">'IMVU</span> <span class="pre">Master</span> <span class="pre">Root'</span></em><a class="headerlink" href="#src.skeleton.DefaultSkeleton.bl_label" title="Permalink to this definition">¶</a></dt>
+<dd><p>str</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>type</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="src.skeleton.DefaultSkeleton.bl_options">
+<code class="sig-name descname"><span class="pre">bl_options</span></code><em class="property"><span class="pre">:</span> <span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">Set</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span> </span><span class="pre">Set</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"> <span class="pre">=</span> <span class="pre">{'REGISTER',</span> <span class="pre">'UNDO'}</span></em><a class="headerlink" href="#src.skeleton.DefaultSkeleton.bl_options" title="Permalink to this definition">¶</a></dt>
+<dd><p>Options for this operator type * REGISTER Register, Display in the info window and support the redo toolbar panel. * UNDO Undo, Push an undo event (needed for operator redo). * UNDO_GROUPED Grouped Undo, Push a single undo event for repeated instances of this operator. * BLOCKING Blocking, Block anything else from using the cursor. * MACRO Macro, Use to check if an operator is a macro. * GRAB_CURSOR Grab Pointer, Use so the operator grabs the mouse focus, enables wrapping when continuous grab is enabled. * GRAB_CURSOR_X Grab Pointer X, Grab, only warping the X axis. * GRAB_CURSOR_Y Grab Pointer Y, Grab, only warping the Y axis. * PRESET Preset, Display a preset button with the operators settings. * INTERNAL Internal, Removes the operator from search results.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>typing.Union[typing.Set[str], typing.Set[int]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="src.skeleton.DefaultSkeleton.execute">
+<code class="sig-name descname"><span class="pre">execute</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.skeleton.DefaultSkeleton.execute" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calls armature generation method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>(</strong><strong>)</strong> (<em>context</em>) – A bpy context containing data in the current 3d view.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A set containing the success state of the method.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-src">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-src" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="src.arm.html" class="btn btn-neutral float-right" title="src.arm package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="modules.html" class="btn btn-neutral float-left" title="src" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2021, hsoju
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
