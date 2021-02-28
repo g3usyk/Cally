@@ -22,7 +22,7 @@ copyright = '2021, hsoju'
 author = 'hsoju'
 
 # The full version, including alpha/beta/rc tags
-release = '1.0.9'
+release = '2'
 
 
 # -- General configuration ---------------------------------------------------
