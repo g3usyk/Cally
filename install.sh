@@ -1,3 +1,4 @@
+#!/bin/bash
 rm -rf dist/*
 mkdir dist/BL-Cal3D
 cp ./__init__.py dist/BL-Cal3D
