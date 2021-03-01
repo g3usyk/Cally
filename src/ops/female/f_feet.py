@@ -3,7 +3,7 @@ from ..body_part import BodyPart
 
 
 class FemaleFeet(bpy.types.Operator):
-    """Adds imvu mesh primitive female feet to scene"""
+    """Add imvu mesh primitive female feet to scene"""
     part = BodyPart("female", "feet")
     bl_idname = part.bl_idname
     bl_label = part.bl_label
