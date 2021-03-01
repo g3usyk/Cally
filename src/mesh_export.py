@@ -15,9 +15,7 @@ scaling = {'100'}
 
 
 class CalMeshExporter(Operator, ExportHelper):
-    """Exports selected objects as a Cal3D XMF file.
-
-    """
+    """Exports selected objects as a Cal3D XMF file"""
     bl_idname = "export_scene.export_xmf"
     bl_label = "Export XMF"
     bl_options = {'REGISTER', 'PRESET'}
