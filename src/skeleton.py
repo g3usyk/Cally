@@ -4,9 +4,9 @@ from .arm.master_root import add_master_root
 
 
 class DefaultSkeleton(bpy.types.Operator):
-    """Adds default imvu armature to scene"""
-    bl_idname = "object.armature_imvu_skeleton_add"
-    bl_label = "IMVU Master Root"
+    """Add default imvu armature to the scene"""
+    bl_idname = "object.armature_imvu_bones_add"
+    bl_label = "Bones"
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):

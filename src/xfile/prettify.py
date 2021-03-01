@@ -1,3 +1,6 @@
+import xml.dom.minidom as mini
+
+
 def pretty_print(text: str) -> str:
     """Configures auto generated xml text to a readable format.
 
@@ -8,7 +11,6 @@ def pretty_print(text: str) -> str:
         An xml string with the text optimized for debugging.
 
     """
-    text = text.upper()
-    text = text.replace('<', '\n<')
-    text = text.replace('\n</', '</')
+    dom = mini.parseString(text)
+    text = dom.toprettyxml()
     return text
