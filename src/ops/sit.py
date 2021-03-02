@@ -60,17 +60,17 @@ class SittingSpot(bpy.types.Operator):
 
     def execute(self, context):
         p = Pose('Sitting')
-        ax = next(iter(self.axis))
         if self.array:
-            head = p.to_scene()
+            head = p.to_scene(loc=(0.0, 0.0, 4.0), z_offset=True)
+            ax = next(iter(self.axis))
             for i in range(1, self.count):
                 amt = i * self.offset
                 if ax == 'x':
-                    p.to_scene(loc=(amt, 0, 0), parent=head)
+                    p.to_scene(loc=(amt, 0.0, 4.0 + 0.0), parent=head, z_offset=True)
                 elif ax == 'y':
-                    p.to_scene(loc=(0, amt, 0), parent=head)
+                    p.to_scene(loc=(0.0, amt, 4.0 + 0.0), parent=head, z_offset=True)
                 else:
-                    p.to_scene(loc=(0, 0, amt), parent=head)
+                    p.to_scene(loc=(0.0, 0.0, 4.0 + amt), parent=head, z_offset=True)
         else:
-            p.to_scene()
+            p.to_scene(loc=(0.0, 0.0, 4.0), z_offset=True)
         return {'FINISHED'}
