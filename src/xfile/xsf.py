@@ -62,7 +62,8 @@ def generate_child(ix: int, ix_offset: int, name: list, posn, rotation, scale: f
 
 
 def export_xsf(context, filepath: str, scale: float, pretty: bool):
-    objs = [obj for obj in context.selected_objects if obj.type == 'EMPTY' and obj.parent is None]
+    emptys = [obj for obj in context.selected_objects if obj.type == 'EMPTY']
+    objs = [e for e in emptys if e.parent is None or len(e.children) > 0]
 
     root = et.Element('skeleton')
     root.attrib['numbones'] = str(len(objs) + 1)
@@ -71,15 +72,19 @@ def export_xsf(context, filepath: str, scale: float, pretty: bool):
     root.append(generate_root(len(objs)))
 
     for i, obj in enumerate(objs, 1):
-        handle_posn = obj.location
-        handle_rotation = obj.rotation_quaternion
+        handle_posn = obj.matrix_world.to_translation()
+        handle_rotation = obj.matrix_world.to_quaternion()
         seat_posn = handle_posn
         seat_rotation = handle_rotation
 
         pose_type = "Standing"
         if len(obj.children) > 0:
             spot = obj.children[0]
-
+            if len(obj.children) > 1:
+                for child in obj.children:
+                    if len(child.children) == 0:
+                        spot = child
+                        break
             seat_posn = spot.matrix_world.to_translation()
             seat_rotation = spot.matrix_world.to_quaternion()
 
