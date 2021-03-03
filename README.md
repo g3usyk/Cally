@@ -5,7 +5,7 @@ Cal3D Import-Export options for Blender 2.9. This addon includes parameters for 
 
 For more information on Cal3D file formats visit https://github.com/mp3butcher/Cal3D
 
-# Installation
+# Usage
 1. Download binary for latest *stable* release with the name: **cally_[version].zip**.
 2. In Blender open the File menu and access Preferences.
 3. Go to Add-Ons.
