@@ -24,5 +24,5 @@ class Proxy(BaseMesh):
             faces = mapping['faces']
             if 'uvs' in mapping:
                 uvs = mapping['uvs']
-        super().__init__(name, vertices, faces, uvs)
+        super().__init__(name, vertices, faces, uvs, [])
 

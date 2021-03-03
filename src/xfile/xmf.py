@@ -1,4 +1,5 @@
 import bmesh
+import os
 from xml.etree import ElementTree as et
 from .prettify import pretty_print
 from ..mesh.base import BaseMesh
@@ -203,13 +204,15 @@ def extract_all(elem: et.Element, tag, conversion):
     return values
 
 
-def extract_submesh(sub: et.Element) -> BaseMesh:
+def extract_submesh(sub: et.Element, name: str) -> BaseMesh:
     posns = []
     uvs = []
+    norms = []
     for vert in sub.iter('vertex'):
         pos = extract(vert, 'pos', float)
         posns.append(tuple([p / 100 for p in pos]))
-        # norm = extract(vert, 'norm', float)
+        norm = extract(vert, 'norm', float)
+        norms.append(tuple(norm))
         # col = extract(vert, 'color', float)
         uv = extract(vert, 'texcoord', float)
         uvs.append((uv[0], abs(1 - uv[1])))
@@ -218,7 +221,7 @@ def extract_submesh(sub: et.Element) -> BaseMesh:
     for face in sub.iter('face'):
         vert_ids = [int(x) for x in face.attrib['vertexid'].split()]
         loops.append(vert_ids)
-    return BaseMesh('Submesh', posns, loops, uvs)
+    return BaseMesh(name, posns, loops, uvs, norms)
 
 
 def import_xmf(filepath: str):
@@ -235,7 +238,9 @@ def import_xmf(filepath: str):
     start = data.find('<mesh')
     root = et.fromstring(data[start:])
     objs = []
+    obj_filepath = os.path.split(filepath)[1]
+    obj_name = '.'.join(obj_filepath.split('.')[:-1])
     for sub in root.iter('submesh'):
-        ob = extract_submesh(sub)
+        ob = extract_submesh(sub, obj_name)
         objs.append(ob)
     return objs

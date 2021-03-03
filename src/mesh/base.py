@@ -5,7 +5,8 @@ class BaseMesh:
     """Prototypes behaviour for default mesh instantiation into Blender.
 
     """
-    def __init__(self, name: str, vertices: list, faces: list, uvs: list):
+
+    def __init__(self, name: str, vertices: list, faces: list, uvs: list, norms: list):
         """
 
         Args:
@@ -13,11 +14,19 @@ class BaseMesh:
             vertices (list): A list of tuples containing x, y, and z position coordinates for each vertex.
             faces (list): A list of lists containing vertex indices for each face.
             uvs (list): A list of tuples containing u, and v texture coordinates for each vertex.
+            norms (list): A list of tuples containing s, and t normal coordinates for each vertex.
         """
         self.name = name
         self.vertices = vertices
         self.faces = faces
         self.uvs = uvs
+        self.norms = norms
+
+    def add_normals(self, ob):
+        if len(self.norms) != 0:
+            ob.data.use_auto_smooth = True
+            ob.data.normals_split_custom_set([(0, 0, 0) for _ in ob.data.loops])
+            ob.data.normals_split_custom_set_from_vertices(self.norms)
 
     def add_uvs(self, ob):
         """Generates uv coordinates to mesh object.
@@ -34,12 +43,14 @@ class BaseMesh:
                     uvl.data[l_idx].uv.x = uv_x
                     uvl.data[l_idx].uv.y = uv_y
 
-    def to_mesh(self, collection=None, smooth=True, uvs=True):
+    def to_mesh(self, collection=None, smooth=True, uvs=True, norms=False):
         """Generates a mesh using raw vertex, face, and uv data.
 
         Args:
-            smooth (): A boolean determining whether to apply auto-smooth to the mesh.
             collection (): A bpy collection in the scene to contain the mesh.
+            smooth (bool): A boolean determining whether to apply auto-smooth to the mesh.
+            uvs (bool): A boolean determining whether to include uv coordinates for the mesh.
+            norms (bool): A boolean determining whether to include custom vertex normals for the mesh.
         """
         if collection is None:
             collection = bpy.data.collections.get("Collection")
@@ -59,3 +70,6 @@ class BaseMesh:
 
         if uvs:
             self.add_uvs(ob)
+
+        if norms:
+            self.add_normals(ob)

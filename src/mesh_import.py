@@ -22,8 +22,14 @@ class CalMeshImporter(Operator, ImportHelper):
         maxlen=255,
     )
 
+    norms: BoolProperty(
+        name="Include Normals",
+        description="Include vertex normals in mesh",
+        default=True,
+    )
+
     uvs: BoolProperty(
-        name="Add UVs",
+        name="Include UVs",
         description="Include uv coordinates in mesh",
         default=True,
     )
@@ -31,5 +37,5 @@ class CalMeshImporter(Operator, ImportHelper):
     def execute(self, context):
         submeshes = import_xmf(self.filepath)
         for b in submeshes:
-            b.to_mesh(smooth=False, uvs=self.uvs)
+            b.to_mesh(smooth=False, uvs=self.uvs, norms=self.norms)
         return {'FINISHED'}
