@@ -15,8 +15,8 @@ scaling = {'100'}
 
 
 class CalMeshExporter(Operator, ExportHelper):
-    """Exports selected objects as a Cal3D XMF file"""
-    bl_idname = "export_scene.export_xmf"
+    """Export selection to a Cal3D XMF file"""
+    bl_idname = "export_scene.xmf"
     bl_label = "Export XMF"
     bl_options = {'REGISTER', 'PRESET'}
 
@@ -314,15 +314,6 @@ class CalMeshExporter(Operator, ExportHelper):
         export_xmf(context, self.filepath, submap, float(next(iter(self.scale))),
                    next(iter(self.weight)), self.adv)
         return {'FINISHED'}
-
-    def cancel(self, context):
-        """Specifies abrupt cancellation behaviour.
-
-        Args:
-            context (): A bpy context containing data in the current 3d view.
-
-        """
-        pass
 
     def draw(self, context):
         """Determines the format for showing options in the file export dialog menu.
