@@ -21,5 +21,5 @@ class ProxyGroup:
         col = bpy.data.collections.new(collection_name)
         bpy.context.scene.collection.children.link(col)
         for prox in self.proxies:
-            prox.to_mesh(col)
+            prox.to_mesh(collection=col)
         bpy.ops.object.select_all(action='DESELECT')

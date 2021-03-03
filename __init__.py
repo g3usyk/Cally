@@ -12,6 +12,7 @@ bl_info = {
 
 import bpy
 from .src.mesh_export import CalMeshExporter
+from .src.mesh_import import CalMeshImporter
 from .src.skeleton_export import CalSkeletonExporter
 from .src.ops.skeleton import DefaultSkeleton
 from .src.ops import sit, stand
@@ -28,6 +29,16 @@ def mesh_export_button(self, context):
         context (): A bpy context containing data in the current 3d view.
     """
     self.layout.operator(CalMeshExporter.bl_idname, text="Cal3D Mesh (.xmf)")
+
+
+def mesh_import_button(self, context):
+    """Targets importer class on menu button press.
+
+    Args:
+        self (): A reference to this bpy dynamic draw function.
+        context (): A bpy context containing data in the current 3d view.
+    """
+    self.layout.operator(CalMeshImporter.bl_idname, text="Cal3D Mesh (.xmf)")
 
 
 def skeleton_export_button(self, context):
@@ -53,6 +64,7 @@ def manual_map():
 
 classes = (
     CalMeshExporter,
+    CalMeshImporter,
     CalSkeletonExporter,
     DefaultSkeleton,
     sit.SittingSpot,
@@ -84,6 +96,7 @@ def register():
     bpy.utils.register_manual_map(manual_map)
     bpy.types.TOPBAR_MT_file_export.append(mesh_export_button)
     bpy.types.TOPBAR_MT_file_export.append(skeleton_export_button)
+    bpy.types.TOPBAR_MT_file_import.append(mesh_import_button)
     bpy.types.VIEW3D_MT_add.append(imvu_add_menu)
 
 
@@ -96,6 +109,7 @@ def unregister():
     bpy.utils.unregister_manual_map(manual_map)
     bpy.types.TOPBAR_MT_file_export.remove(mesh_export_button)
     bpy.types.TOPBAR_MT_file_export.remove(skeleton_export_button)
+    bpy.types.TOPBAR_MT_file_import.remove(mesh_import_button)
     bpy.types.VIEW3D_MT_add.remove(imvu_add_menu)
 
 

@@ -1,6 +1,7 @@
 import bmesh
 from xml.etree import ElementTree as et
 from .prettify import pretty_print
+from ..mesh.base import BaseMesh
 from ..xmesh.xvert import XVertex
 from ..xmesh.xface import XFace
 from ..xmesh.xmap import WeightMap
@@ -184,15 +185,55 @@ def export_xmf(context, filepath: str, submap: dict,
         f.write("%s" % xtext)
 
 
-# TODO Finish this
-def import_xmf(context, filepath: str):
-    """Parses an xmf file into meshes.
+def extract(elem: et.Element, tag, conversion):
+    child = elem.find(tag).text.split()
+    values = [conversion(x) for x in child]
+    return values
+
+
+def extract_all(elem: et.Element, tag, conversion):
+    children = elem.findall(tag)
+    seen = set()
+    values = []
+    for child in children:
+        k, v = int(child.attrib['id']), conversion(child.text)
+        if (k, v) not in seen:
+            values.append((k, v))
+            seen.add((k, v))
+    return values
+
+
+def extract_submesh(sub: et.Element) -> BaseMesh:
+    posns = []
+    for vert in sub.iter('vertex'):
+        pos = extract(vert, 'pos', float)
+        posns.append(tuple([p / 100 for p in pos]))
+        # norm = extract(vert, 'norm', float)
+        # col = extract(vert, 'color', float)
+        # uv = extract(vert, 'texcoord', float)
+        # infl = extract_all(vert, 'influence', float)
+    loops = []
+    for face in sub.iter('face'):
+        vert_ids = [int(x) for x in face.attrib['vertexid'].split()]
+        loops.append(vert_ids)
+    return BaseMesh('Submesh', posns, loops, [])
+
+
+def import_xmf(filepath: str):
+    """Parses submeshes from an xmf file.
 
     Args:
         context (): A bpy context containing data in the current 3d view.
         filepath (str): A string specifying the file path of the xml object.
     """
-    mesh = []
+    data = ''
     with open(filepath, 'r') as f:
-        pass
-    pass
+        data = f.read()
+    data = data.lower()
+    start = data.find('<mesh')
+    root = et.fromstring(data[start:])
+    objs = []
+    for sub in root.iter('submesh'):
+        ob = extract_submesh(sub)
+        objs.append(ob)
+    return objs

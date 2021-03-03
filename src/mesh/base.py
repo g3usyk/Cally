@@ -25,8 +25,8 @@ class BaseMesh:
         Args:
             ob (): A bpy object without a uv map or uv coordinates.
         """
-        bpy.ops.mesh.uv_texture_add()
         if len(self.uvs) != 0:
+            bpy.ops.mesh.uv_texture_add()
             uvl = ob.data.uv_layers.active
             uv_idx = 0
             for face in ob.data.polygons:
@@ -36,7 +36,7 @@ class BaseMesh:
                     uvl.data[l_idx].uv.y = uv_y
                     uv_idx += 1
 
-    def to_mesh(self, collection=None):
+    def to_mesh(self, collection=None, smooth=True):
         """Generates a mesh using raw vertex, face, and uv data.
 
         Args:
@@ -53,7 +53,9 @@ class BaseMesh:
 
         mesh.from_pydata(self.vertices, [], self.faces)
         bpy.ops.object.select_all(action='DESELECT')
-        bpy.data.objects[mesh.name].select_set(True)
-        bpy.ops.object.shade_smooth()
+
+        if smooth:
+            bpy.data.objects[mesh.name].select_set(True)
+            bpy.ops.object.shade_smooth()
 
         self.add_uvs(ob)
