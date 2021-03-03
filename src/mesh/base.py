@@ -28,13 +28,11 @@ class BaseMesh:
         if len(self.uvs) != 0:
             bpy.ops.mesh.uv_texture_add()
             uvl = ob.data.uv_layers.active
-            uv_idx = 0
             for face in ob.data.polygons:
                 for v_idx, l_idx in zip(face.vertices, face.loop_indices):
-                    uv_x, uv_y = self.uvs[uv_idx]
+                    uv_x, uv_y = self.uvs[v_idx]
                     uvl.data[l_idx].uv.x = uv_x
                     uvl.data[l_idx].uv.y = uv_y
-                    uv_idx += 1
 
     def to_mesh(self, collection=None, smooth=True, uvs=True):
         """Generates a mesh using raw vertex, face, and uv data.

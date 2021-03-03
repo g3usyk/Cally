@@ -205,18 +205,20 @@ def extract_all(elem: et.Element, tag, conversion):
 
 def extract_submesh(sub: et.Element) -> BaseMesh:
     posns = []
+    uvs = []
     for vert in sub.iter('vertex'):
         pos = extract(vert, 'pos', float)
         posns.append(tuple([p / 100 for p in pos]))
         # norm = extract(vert, 'norm', float)
         # col = extract(vert, 'color', float)
-        # uv = extract(vert, 'texcoord', float)
+        uv = extract(vert, 'texcoord', float)
+        uvs.append((uv[0], abs(1 - uv[1])))
         # infl = extract_all(vert, 'influence', float)
     loops = []
     for face in sub.iter('face'):
         vert_ids = [int(x) for x in face.attrib['vertexid'].split()]
         loops.append(vert_ids)
-    return BaseMesh('Submesh', posns, loops, [])
+    return BaseMesh('Submesh', posns, loops, uvs)
 
 
 def import_xmf(filepath: str):
