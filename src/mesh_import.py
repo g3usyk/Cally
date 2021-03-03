@@ -32,6 +32,4 @@ class CalMeshImporter(Operator, ImportHelper):
         submeshes = import_xmf(self.filepath)
         for b in submeshes:
             b.to_mesh(smooth=False)
-            if self.uvs:
-                b.add_uvs()
         return {'FINISHED'}

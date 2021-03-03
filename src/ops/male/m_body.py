@@ -1,4 +1,7 @@
 import bpy
+from bpy.props import (
+    BoolProperty,
+)
 from ..body_group import BodyGroup
 
 
@@ -9,6 +12,12 @@ class MaleBody(bpy.types.Operator):
     bl_label = group.bl_label
     bl_options = group.bl_options
 
+    uv: BoolProperty(
+        name="Add UVs",
+        description="Generate uv coordinates",
+        default=True,
+    )
+
     def execute(self, context):
         """Specifies the behaviour for the operator method called by Blender.
 
@@ -18,4 +27,5 @@ class MaleBody(bpy.types.Operator):
         Returns:
 
         """
+        self.group.uvs = self.uv
         return self.group.execute(context)

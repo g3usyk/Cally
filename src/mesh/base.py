@@ -36,10 +36,11 @@ class BaseMesh:
                     uvl.data[l_idx].uv.y = uv_y
                     uv_idx += 1
 
-    def to_mesh(self, collection=None, smooth=True):
+    def to_mesh(self, collection=None, smooth=True, uvs=True):
         """Generates a mesh using raw vertex, face, and uv data.
 
         Args:
+            smooth (): A boolean determining whether to apply auto-smooth to the mesh.
             collection (): A bpy collection in the scene to contain the mesh.
         """
         if collection is None:
@@ -58,4 +59,5 @@ class BaseMesh:
             bpy.data.objects[mesh.name].select_set(True)
             bpy.ops.object.shade_smooth()
 
-        self.add_uvs(ob)
+        if uvs:
+            self.add_uvs(ob)
