@@ -1,6 +1,6 @@
 import bpy
 
-from .arm.master_root import add_master_root
+from ..arm.master_root import add_master_root
 
 
 class DefaultSkeleton(bpy.types.Operator):

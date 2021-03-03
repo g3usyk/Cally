@@ -13,7 +13,7 @@ bl_info = {
 import bpy
 from .src.mesh_export import CalMeshExporter
 from .src.skeleton_export import CalSkeletonExporter
-from .src.skeleton import DefaultSkeleton
+from .src.ops.skeleton import DefaultSkeleton
 from .src.ops import sit, stand
 from .src.ops.female import f_body, f_head, f_torso, f_hands, f_legs, f_thighs, f_feet
 from .src.ops.male import m_body, m_head, m_torso, m_hands, m_legs, m_calfs, m_feet
