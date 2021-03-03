@@ -129,7 +129,7 @@ def fill_submesh(sub: et.Element, verts: list, faces: list, scale: float):
 
 
 def export_xmf(context, filepath: str, submap: dict,
-               scale: float, weight: str, pretty: bool):
+               scale: float, weight: str, adv: bool):
     """Writes a new xmf file containing the selected meshes geometric data.
 
     Args:
@@ -137,25 +137,47 @@ def export_xmf(context, filepath: str, submap: dict,
         filepath (str): A string pointing to the output location of the xmf file.
         submap (dict): A dictionary mapping each submesh to its corresponding bone and material ids.
         scale (float): A float determining scaling factor for mesh on export.
-        weight (str): A string determining bone weight assignment for all vertices.
-        pretty (bool): A boolean determining whether xmf file should be formatted.
+        weight (str): A string determining bone-weight assignment mode for all vertices.
+        adv (bool): A boolean determining whether xmf file should be constructed using user input.
     """
     objs = [obj for obj in context.selected_objects if obj.type == 'MESH']
 
     root = et.Element('mesh')
     root.attrib['numsubmesh'] = str(len(objs))
 
+    mapping = submap
+    if not adv:
+        mapping = {}
+        counts = []
+        mtl = 0
+        for obj in objs:
+            posn = obj.matrix_world.translation
+            assignments = ['', WeightMap.get_bone(posn)]
+            count = len(obj.data.vertices)
+            for c, material in counts:
+                if count == c:
+                    assignments.append(material)
+                    break
+            if len(assignments) == 2:
+                assignments.append(mtl)
+                counts.append((count, mtl))
+                mtl += 1
+            mapping[obj.name] = assignments
+            if len(obj.vertex_groups) > 0:
+                weight = 'AUTO'
+        scale = 100.0
+
     for obj in objs:
-        xverts = generate_vertices(obj, submap, weight)
+        xverts = generate_vertices(obj, mapping, weight)
         xfaces = generate_faces(obj, xverts)
 
-        sub = create_submesh(obj.name, submap, xfaces)
+        sub = create_submesh(obj.name, mapping, xfaces)
         fill_submesh(sub, xverts, xfaces, scale)
         root.append(et.Comment(obj.name))
         root.append(sub)
 
     xtext = et.tostring(root).decode('utf8')
-    xtext = pretty_print(xtext) if pretty else xtext
+    xtext = pretty_print(xtext)
 
     with open(filepath, 'w', encoding='utf-8') as f:
         f.write("<HEADER MAGIC=\"XMF\" VERSION=\"919\"/>")

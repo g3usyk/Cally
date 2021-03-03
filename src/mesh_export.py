@@ -34,6 +34,12 @@ class CalMeshExporter(Operator, ExportHelper):
         default=False,
     )
 
+    adv: BoolProperty(
+        name="Advanced",
+        description="For experienced users only",
+        default=False,
+    )
+
     def update_weight(self, context):
         """Checks if weight enum has an invalid state.
 
@@ -292,6 +298,10 @@ class CalMeshExporter(Operator, ExportHelper):
         update=update_scale
     )
 
+    @classmethod
+    def poll(cls, context):
+        return any([(obj.type == 'MESH') for obj in context.selected_objects])
+
     def execute(self, context):
         """Calls xmf file generation method.
 
@@ -302,7 +312,7 @@ class CalMeshExporter(Operator, ExportHelper):
             A set containing the success state of the method.
         """
         export_xmf(context, self.filepath, submap, float(next(iter(self.scale))),
-                   next(iter(self.weight)), self.pretty)
+                   next(iter(self.weight)), self.adv)
         return {'FINISHED'}
 
     def cancel(self, context):
@@ -311,10 +321,8 @@ class CalMeshExporter(Operator, ExportHelper):
         Args:
             context (): A bpy context containing data in the current 3d view.
 
-        Returns:
-            A set containing the failure state of the method.
         """
-        return {'CANCELLED'}
+        pass
 
     def draw(self, context):
         """Determines the format for showing options in the file export dialog menu.
@@ -326,11 +334,13 @@ class CalMeshExporter(Operator, ExportHelper):
         layout.use_property_split = True
         layout.use_property_decorate = False
 
-        layout.prop(self, 'pretty')
-        layout.prop(self, 'weight')
+        layout.prop(self, 'adv')
+        # layout.prop(self, 'pretty')
         layout.prop(self, 'subs')
-        if next(iter(self.weight)) == 'MANUAL':
-            layout.prop(self, 'body')
-            layout.prop(self, 'bone')
-        layout.prop(self, 'mtl')
-        layout.prop(self, 'scale')
+        if self.adv:
+            layout.prop(self, 'weight')
+            if next(iter(self.weight)) == 'MANUAL':
+                layout.prop(self, 'body')
+                layout.prop(self, 'bone')
+            layout.prop(self, 'mtl')
+            layout.prop(self, 'scale')
