@@ -1,7 +1,7 @@
 import inspect
 import pickle
 from pathlib import Path
-from .base import BaseMesh
+from ..mesh.base import BaseMesh
 
 
 class Proxy(BaseMesh):
