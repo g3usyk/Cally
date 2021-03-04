@@ -16,8 +16,7 @@ from .src.mesh_import import CalMeshImporter
 from .src.skeleton_export import CalSkeletonExporter
 from .src.ops.skeleton import DefaultSkeleton
 from .src.ops import sit, stand
-from .src.ops.female import f_body, f_head, f_torso, f_hands, f_legs, f_thighs, f_feet
-from .src.ops.male import m_body, m_head, m_torso, m_hands, m_legs, m_calfs, m_feet
+from .src.ops import f_body, m_body
 from .src.imvu_add import VIEW3D_MT_imvu
 
 
@@ -70,19 +69,7 @@ classes = (
     sit.SittingSpot,
     stand.StandingSpot,
     f_body.FemaleBody,
-    f_head.FemaleHead,
-    f_torso.FemaleTorso,
-    f_hands.FemaleHands,
-    f_legs.FemaleLegs,
-    f_thighs.FemaleThighs,
-    f_feet.FemaleFeet,
     m_body.MaleBody,
-    m_head.MaleHead,
-    m_torso.MaleTorso,
-    m_hands.MaleHands,
-    m_legs.MaleLegs,
-    m_calfs.MaleCalfs,
-    m_feet.MaleFeet,
     VIEW3D_MT_imvu,
 )
 
