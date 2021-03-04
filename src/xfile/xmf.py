@@ -130,50 +130,20 @@ def fill_submesh(sub: et.Element, verts: list, faces: list, scale: float):
         sub.append(elem_face)
 
 
-def export_xmf(context, filepath: str, submap: dict,
-               scale: float, weight: str, adv: bool):
-    """Writes a new xmf file containing the selected meshes geometric data.
+def skip_material(mtl: int):
+    if mtl == 1 or mtl == 6:
+        return mtl + 2
+    return mtl + 1
 
-    Args:
-        context (): A bpy context containing data in the current 3d view.
-        filepath (str): A string pointing to the output location of the xmf file.
-        submap (dict): A dictionary mapping each submesh to its corresponding bone and material ids.
-        scale (float): A float determining scaling factor for mesh on export.
-        weight (str): A string determining bone-weight assignment mode for all vertices.
-        adv (bool): A boolean determining whether xmf file should be constructed using user input.
-    """
-    objs = [obj for obj in context.selected_objects if obj.type == 'MESH']
 
+def write_xmf(filepath: str, objs, submap: dict, scale: float, weight: str):
     root = et.Element('mesh')
     root.attrib['numsubmesh'] = str(len(objs))
-
-    mapping = submap
-    if not adv:
-        mapping = {}
-        counts = []
-        mtl = 0
-        for obj in objs:
-            posn = obj.matrix_world.translation
-            assignments = ['', WeightMap.get_bone(posn)]
-            count = len(obj.data.vertices)
-            for c, material in counts:
-                if count == c:
-                    assignments.append(material)
-                    break
-            if len(assignments) == 2:
-                assignments.append(mtl)
-                counts.append((count, mtl))
-                mtl += 1
-            mapping[obj.name] = assignments
-            if len(obj.vertex_groups) > 0:
-                weight = 'AUTO'
-        scale = 100.0
-
     for obj in objs:
-        xverts = generate_vertices(obj, mapping, weight)
+        xverts = generate_vertices(obj, submap, weight)
         xfaces = generate_faces(obj, xverts)
 
-        sub = create_submesh(obj.name, mapping, xfaces)
+        sub = create_submesh(obj.name, submap, xfaces)
         fill_submesh(sub, xverts, xfaces, scale)
         root.append(et.Comment(obj.name))
         root.append(sub)
@@ -184,6 +154,57 @@ def export_xmf(context, filepath: str, submap: dict,
     with open(filepath, 'w', encoding='utf-8') as f:
         f.write("<HEADER MAGIC=\"XMF\" VERSION=\"919\"/>")
         f.write("%s" % xtext)
+
+
+def export_xmf(context, filepath: str, submap: dict,
+               scale: float, weight: str, adv: bool):
+    """Exports a new xmf file containing the selected submeshes data.
+
+    Args:
+        context (): A bpy context containing data in the current 3d view.
+        filepath (str): A string pointing to the output location of the xmf file.
+        submap (dict): A dictionary mapping each submesh to its corresponding bone and material ids.
+        scale (float): A float determining scaling factor for mesh on export.
+        weight (str): A string determining bone-weight assignment mode for all vertices.
+        adv (bool): A boolean determining whether xmf file should be constructed using user input.
+    """
+    objs = [obj for obj in context.selected_objects if obj.type == 'MESH']
+    body_names = {'F.Feet': 7, 'F.Hands': 7, 'F.Head': 2, 'F.Legs': 7, 'F.Thighs': 7, 'F.Torso': 7,
+                  'M.Feet': 7, 'M.Hands': 7, 'M.Head': 2, 'M.Legs': 7, 'M.Calfs': 7, 'M.Torso': 7}
+    seen = set()
+    mtls = {}
+    obj_names = sorted([o.name for o in objs])
+    for name in obj_names:
+        n = '.'.join(name.split('.')[:2])
+        if n in body_names and n not in seen:
+            mtls[name] = body_names[n]
+            seen.add(n)
+        else:
+            mtls[name] = -1
+    mapping = submap
+    if not adv:
+        mapping = {}
+        counts = {}
+        mtl = 0
+        for obj in objs:
+            if len(obj.vertex_groups) > 0:
+                weight = 'AUTO'
+            posn = obj.matrix_world.translation
+            assignments = ['', WeightMap.get_bone(posn)]
+            m = mtls[obj.name]
+            if m > 0:
+                assignments.append(m)
+            else:
+                count = len(obj.data.vertices)
+                if count in counts:
+                    assignments.append(counts[count])
+                else:
+                    counts[count] = mtl
+                    assignments.append(mtl)
+                    mtl = skip_material(mtl)
+            mapping[obj.name] = assignments
+        scale = 100.0
+    write_xmf(filepath, objs, mapping, scale, weight)
 
 
 def extract(elem: et.Element, tag, conversion):
