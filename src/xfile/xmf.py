@@ -22,7 +22,7 @@ def generate_vertices(obj, submap: dict, weight: str) -> list:
     """
     xverts = []
 
-    groups = {g.index: WeightMap.lookup(g.name) for g in obj.vertex_groups}
+    groups = {g.index: WeightMap.get_bone_id(g.name) for g in obj.vertex_groups}
 
     xcol = ['1', '1', '1']
     bone_id = submap[obj.name][1]
@@ -208,6 +208,7 @@ def extract_submesh(sub: et.Element, name: str) -> BaseMesh:
     posns = []
     uvs = []
     norms = []
+    infls = []
     for vert in sub.iter('vertex'):
         pos = extract(vert, 'pos', float)
         posns.append(tuple([p / 100 for p in pos]))
@@ -216,12 +217,13 @@ def extract_submesh(sub: et.Element, name: str) -> BaseMesh:
         # col = extract(vert, 'color', float)
         uv = extract(vert, 'texcoord', float)
         uvs.append((uv[0], abs(1 - uv[1])))
-        # infl = extract_all(vert, 'influence', float)
+        infl = extract_all(vert, 'influence', float)
+        infls.append(infl)
     loops = []
     for face in sub.iter('face'):
         vert_ids = [int(x) for x in face.attrib['vertexid'].split()]
         loops.append(vert_ids)
-    return BaseMesh(name, posns, loops, uvs, norms)
+    return BaseMesh(name, posns, loops, uvs, norms, infls)
 
 
 def import_xmf(filepath: str):

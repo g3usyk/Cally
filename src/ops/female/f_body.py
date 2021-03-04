@@ -18,6 +18,12 @@ class FemaleBody(bpy.types.Operator):
         default=True,
     )
 
+    weight: BoolProperty(
+        name="Add Vertex Groups",
+        description="Include automatic bone weight assignments",
+        default=True
+    )
+
     def execute(self, context):
         """Specifies the behaviour for the operator method called by Blender.
 
@@ -28,4 +34,5 @@ class FemaleBody(bpy.types.Operator):
 
         """
         self.group.uvs = self.uv
+        self.group.weights = self.weight
         return self.group.execute(context)

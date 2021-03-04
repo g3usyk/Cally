@@ -34,8 +34,14 @@ class CalMeshImporter(Operator, ImportHelper):
         default=True,
     )
 
+    weights: BoolProperty(
+        name="Include Weights",
+        description="Include bone weights for mesh",
+        default=True,
+    )
+
     def execute(self, context):
         submeshes = import_xmf(self.filepath)
         for b in submeshes:
-            b.to_mesh(smooth=False, uvs=self.uvs, norms=self.norms)
+            b.to_mesh(smooth=False, uvs=self.uvs, norms=self.norms, groups=self.weights)
         return {'FINISHED'}

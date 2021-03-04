@@ -12,15 +12,16 @@ class ProxyGroup:
             prox = Proxy(name, fpath)
             self.proxies.append(prox)
 
-    def to_mesh(self, collection_name: str, uvs: bool):
+    def to_mesh(self, collection_name: str, uvs: bool, weights: bool):
         """Generates each mesh contained in the group.
 
         Args:
             collection_name (str): A string representing the containing collection.
             uvs (bool): A boolean determining whether to include the mesh's uv coordinates.
+            weights (bool): A boolean determining whether to include the mesh's bone weights.
         """
         col = bpy.data.collections.new(collection_name)
         bpy.context.scene.collection.children.link(col)
         for prox in self.proxies:
-            prox.to_mesh(collection=col, uvs=uvs)
+            prox.to_mesh(collection=col, uvs=uvs, groups=weights)
         bpy.ops.object.select_all(action='DESELECT')

@@ -182,7 +182,7 @@ class WeightMap:
             'rtFingerRing03': [-5.050625324249268, -0.17158883810043335, 7.283175468444824]}
 
     @classmethod
-    def lookup(cls, bone):
+    def get_bone_id(cls, bone):
         """Maps an imvu bone to its body part id.
 
         Args:
