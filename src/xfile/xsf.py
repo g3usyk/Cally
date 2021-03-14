@@ -4,6 +4,14 @@ from .prettify import pretty_print
 from ..xskel.xbone import XBone
 
 
+def generate_offset(posn, rotation):
+    offset = Quaternion((-0.5, 0.5, 0.5, 0.5))
+    true_posn = offset @ posn
+    true_rot = offset @ rotation
+    true_rot.invert()
+    return true_posn, true_rot
+
+
 def generate_root(name: str, count: int, category: str) -> et.Element:
     rot = []
     childs = [c for c in range(1, count + 1)]
@@ -26,11 +34,16 @@ def generate_child(bone_ix: int, name: list, name_ix: int, posn, rotation, scale
     return child.write()
 
 
-def generate_children(objs, id_offset: int, name_offset: int, scale: float):
+def generate_children(objs, id_offset: int, name_offset: int, scale: float, category: str):
     seats = []
+    use_offset = False
+    if category == 'ROOM':
+        use_offset = True
     for i, spot in enumerate(objs, id_offset):
         posn = spot.matrix_world.to_translation()
         rot = spot.matrix_world.to_quaternion()
+        if use_offset:
+            posn, rot = generate_offset(posn, rot)
         spot_name = spot.name.split('.')
         spot_type = 'Standing'
         if 'sit' in spot_name[0].lower():
@@ -48,19 +61,18 @@ def generate_camera():
     return [camera_root.write(), camera_target.write()]
 
 
-def generate_origin():
-    origin = XBone('Seat01.01.Standing', 3, [0, 0, 0], [0.5, 0.5, 0.5, 0.5])
-    return origin.write()
-
-
-def generate_handle(handles, spots, scale):
+def generate_handle(handles, spots, ix: int, scale: float, category: str):
     if len(handles) > 0:
         node = handles[0]
     else:
         node = spots[0]
     posn = node.matrix_world.to_translation()
-    rot = Quaternion((1.0, 0.0, 0.0, 0.0))
-    handle = XBone('Handle01', 1, [(p * scale) for p in posn], [rot.x, rot.y, rot.z, rot.w])
+    rot = node.matrix_world.to_quaternion()
+    name = 'Handle01'
+    if category == 'ROOM':
+        posn, rot = generate_offset(posn, rot)
+        name = 'Seat01'
+    handle = XBone(name, ix, [(p * scale) for p in posn], [rot.x, rot.y, rot.z, rot.w])
     return handle.write()
 
 
@@ -74,13 +86,13 @@ def export_xsf(context, filepath: str, category: str, scale: float):
 
     if category == 'FURNITURE':
         root.append(generate_root('Root', len(spots) + 1, category))
-        root.append(generate_handle(handles, spots, scale))
-        root.extend(generate_children(spots, 2, 1, scale))
+        root.append(generate_handle(handles, spots, 1, scale, category))
+        root.extend(generate_children(spots, 2, 1, scale, category))
     elif category == 'ROOM':
         root.append(generate_root('Room', len(spots) + 3, category))
         root.extend(generate_camera())
-        root.append(generate_origin())
-        # root.extend(generate_children(spots, 3, 0, scale))
+        root.append(generate_handle(handles, spots, 3, scale, category))
+        root.extend(generate_children(spots, 4, 2, scale, category))
 
     root.attrib['numbones'] = str(len(root))
 
