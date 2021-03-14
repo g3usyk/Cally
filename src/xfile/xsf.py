@@ -68,7 +68,7 @@ def generate_handle(handles, spots, ix: int, scale: float, category: str):
         node = spots[0]
     posn = node.matrix_world.to_translation()
     rot = node.matrix_world.to_quaternion()
-    name = 'Handle01'
+    name = 'Handle00'
     if category == 'ROOM':
         posn, rot = generate_offset(posn, rot)
         name = 'Seat01'
