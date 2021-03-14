@@ -9,6 +9,7 @@ from bpy_extras.io_utils import ExportHelper
 from .xfile.xsf import export_xsf
 
 scaling = {'100'}
+cat = {'FURNITURE'}
 
 
 class CalSkeletonExporter(Operator, ExportHelper):
@@ -25,10 +26,21 @@ class CalSkeletonExporter(Operator, ExportHelper):
         maxlen=255,
     )
 
-    pretty: BoolProperty(
-        name="Pretty-Print",
-        description="For debugging only",
-        default=False,
+    def update_category(self, context):
+        global cat
+        if len(self.category) == 0 or len(self.category) > 1:
+            self.category = cat
+        cat = self.category
+
+    category: EnumProperty(
+        name="Type",
+        options={'ENUM_FLAG'},
+        items=(
+            ('ROOM', "Room", "Used with room meshes"),
+            ('FURNITURE', "Furniture", "Used with furniture meshes"),
+        ),
+        default=cat,
+        update=update_category
     )
 
     def update_scale(self, context):
@@ -56,8 +68,12 @@ class CalSkeletonExporter(Operator, ExportHelper):
 
     @classmethod
     def poll(cls, context):
-        return any([obj.type == 'EMPTY' for obj in context.selected_objects])
+        for obj in context.selected_objects:
+            if obj.type == 'EMPTY':
+                if obj.empty_display_type != 'SPHERE':
+                    return True
+        return False
 
     def execute(self, context):
-        export_xsf(context, self.filepath, float(next(iter(self.scale))), self.pretty)
+        export_xsf(context, self.filepath, next(iter(self.category)), float(next(iter(self.scale))))
         return {'FINISHED'}
