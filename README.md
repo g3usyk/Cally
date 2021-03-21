@@ -1,4 +1,7 @@
-<a href="https://github.com/hsoju/Cally/releases"><img src="https://img.shields.io/github/v/release/hsoju/Cally" alt="Latest Release"></a> <img src="https://img.shields.io/github/license/hsoju/Cally">
+<img src="https://img.shields.io/github/v/release/hsoju/Cally" alt="Latest Release"></a> 
+![Python 3.7](https://img.shields.io/badge/python-3.7-green.svg)
+<img src="https://img.shields.io/github/license/hsoju/Cally" alt="MIT">
+
 
 # Cally
 A general purpose IMVU toolkit for Blender 2.9.0+. This addon includes options for generalized importing, exporting & instancing of IMVU objects, as well as supporting additional features for immediate use in IMVU's creator mode.
