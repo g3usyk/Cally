@@ -11,6 +11,7 @@ bl_info = {
 }
 
 import bpy
+from .src.animation_export import CalAnimationExporter
 from .src.mesh_export import CalMeshExporter
 from .src.mesh_import import CalMeshImporter
 from .src.skeleton_export import CalSkeletonExporter
@@ -20,8 +21,18 @@ from .src.ops import f_body, m_body
 from .src.imvu_add import VIEW3D_MT_imvu
 
 
+def animation_export_button(self, context):
+    """Targets animation exporter class on menu button press.
+
+    Args:
+        self (): A reference to this bpy dynamic draw function.
+        context (): A bpy context containing data in the current 3d view.
+    """
+    self.layout.operator(CalAnimationExporter.bl_idname, text="Cal 3D Animation (.xaf)")
+
+
 def mesh_export_button(self, context):
-    """Targets exporter class on menu button press.
+    """Targets mesh exporter class on menu button press.
 
     Args:
         self (): A reference to this bpy dynamic draw function.
@@ -31,7 +42,7 @@ def mesh_export_button(self, context):
 
 
 def mesh_import_button(self, context):
-    """Targets importer class on menu button press.
+    """Targets mesh importer class on menu button press.
 
     Args:
         self (): A reference to this bpy dynamic draw function.
@@ -41,6 +52,12 @@ def mesh_import_button(self, context):
 
 
 def skeleton_export_button(self, context):
+    """Targets skeleton exporter class on menu button press.
+
+    Args:
+        self (): A reference to this bpy dynamic draw function.
+        context (): A bpy context containing data in the current 3d view.
+    """
     self.layout.operator(CalSkeletonExporter.bl_idname, text="Cal3D Skeleton (.xsf)")
 
 
@@ -62,6 +79,7 @@ def manual_map():
 
 
 classes = (
+    CalAnimationExporter,
     CalMeshExporter,
     CalMeshImporter,
     CalSkeletonExporter,
@@ -81,6 +99,7 @@ def register():
     for cls in classes:
         bpy.utils.register_class(cls)
     bpy.utils.register_manual_map(manual_map)
+    bpy.types.TOPBAR_MT_file_export.append(animation_export_button)
     bpy.types.TOPBAR_MT_file_export.append(mesh_export_button)
     bpy.types.TOPBAR_MT_file_export.append(skeleton_export_button)
     bpy.types.TOPBAR_MT_file_import.append(mesh_import_button)
@@ -94,6 +113,7 @@ def unregister():
     for cls in classes:
         bpy.utils.unregister_class(cls)
     bpy.utils.unregister_manual_map(manual_map)
+    bpy.types.TOPBAR_MT_file_export.remove(animation_export_button)
     bpy.types.TOPBAR_MT_file_export.remove(mesh_export_button)
     bpy.types.TOPBAR_MT_file_export.remove(skeleton_export_button)
     bpy.types.TOPBAR_MT_file_import.remove(mesh_import_button)
