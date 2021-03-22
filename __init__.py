@@ -12,6 +12,7 @@ bl_info = {
 
 import bpy
 from .src.animation_export import CalAnimationExporter
+from .src.animation_import import CalAnimationImporter
 from .src.mesh_export import CalMeshExporter
 from .src.mesh_import import CalMeshImporter
 from .src.skeleton_export import CalSkeletonExporter
@@ -28,7 +29,17 @@ def animation_export_button(self, context):
         self (): A reference to this bpy dynamic draw function.
         context (): A bpy context containing data in the current 3d view.
     """
-    self.layout.operator(CalAnimationExporter.bl_idname, text="Cal 3D Animation (.xaf)")
+    self.layout.operator(CalAnimationExporter.bl_idname, text="Cal3D Animation (.xaf)")
+
+
+def animation_import_button(self, context):
+    """Targets animation importer class on menu button press.
+
+    Args:
+        self (): A reference to this bpy dynamic draw function.
+        context (): A bpy context containing data in the current 3d view.
+    """
+    self.layout.operator(CalAnimationImporter.bl_idname, text="Cal3D Animation (.xaf)")
 
 
 def mesh_export_button(self, context):
@@ -80,6 +91,7 @@ def manual_map():
 
 classes = (
     CalAnimationExporter,
+    CalAnimationImporter,
     CalMeshExporter,
     CalMeshImporter,
     CalSkeletonExporter,
@@ -100,9 +112,10 @@ def register():
         bpy.utils.register_class(cls)
     bpy.utils.register_manual_map(manual_map)
     bpy.types.TOPBAR_MT_file_export.append(animation_export_button)
+    bpy.types.TOPBAR_MT_file_import.append(animation_import_button)
     bpy.types.TOPBAR_MT_file_export.append(mesh_export_button)
-    bpy.types.TOPBAR_MT_file_export.append(skeleton_export_button)
     bpy.types.TOPBAR_MT_file_import.append(mesh_import_button)
+    bpy.types.TOPBAR_MT_file_export.append(skeleton_export_button)
     bpy.types.VIEW3D_MT_add.append(imvu_add_menu)
 
 
@@ -114,9 +127,10 @@ def unregister():
         bpy.utils.unregister_class(cls)
     bpy.utils.unregister_manual_map(manual_map)
     bpy.types.TOPBAR_MT_file_export.remove(animation_export_button)
+    bpy.types.TOPBAR_MT_file_import.remove(animation_import_button)
     bpy.types.TOPBAR_MT_file_export.remove(mesh_export_button)
-    bpy.types.TOPBAR_MT_file_export.remove(skeleton_export_button)
     bpy.types.TOPBAR_MT_file_import.remove(mesh_import_button)
+    bpy.types.TOPBAR_MT_file_export.remove(skeleton_export_button)
     bpy.types.VIEW3D_MT_add.remove(imvu_add_menu)
 
 

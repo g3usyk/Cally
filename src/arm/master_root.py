@@ -11,7 +11,8 @@ def add_master_root():
     bpy.ops.armature.select_all(action='SELECT')
     bpy.ops.armature.delete()
 
-    arm = bpy.context.active_object.data
+    obj = bpy.context.active_object
+    arm = obj.data
 
     bones = {}
 
@@ -528,3 +529,5 @@ def add_master_root():
 
     bpy.ops.object.editmode_toggle()
     bpy.ops.object.select_all(action='DESELECT')
+
+    return obj

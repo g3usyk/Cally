@@ -59,3 +59,33 @@ def export_xaf(context, filepath: str, scale: float, debug: bool):
     with open(filepath, 'w', encoding='utf-8') as f:
         f.write('<HEADER MAGIC="XAF" VERSION="919" />')
         f.write("%s" % xtext)
+
+
+def parse_track(obj, track, mapping):
+    bone_id = track.attrib['boneid']
+    bone_name = mapping[bone_id]
+    bone = obj.pose.bones[bone_name]
+    default_rotation = RotationMap.lookup(bone_name)
+    default_quaternion = Quaternion((default_rotation[3], default_rotation[0],
+                                     default_rotation[1], default_rotation[2]))
+    default_quaternion.conjugate()
+    for keyframe in track.iter('keyframe'):
+        original_rotation = keyframe.find('rotation').text
+        original_rotation = [float(r) for r in original_rotation.split()]
+        original_quaternion = Quaternion((original_rotation[3], original_rotation[0],
+                                          original_rotation[1], original_rotation[2]))
+        difference = original_quaternion @ default_quaternion
+        bone.rotation_quaternion = Quaternion((difference.w, -difference.y,
+                                               -difference.x, difference.z))
+
+
+def import_xaf(obj, filepath: str):
+    data = ''
+    with open(filepath, 'r') as f:
+        data = f.read()
+    data = data.lower()
+    start = data.find('<animation')
+    root = et.fromstring(data[start:])
+    mapping = {str(v): k for k, v in WeightMap.wmap.items()}
+    for track in root.iter('track'):
+        parse_track(obj, track, mapping)
