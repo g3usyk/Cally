@@ -7,5 +7,5 @@ mkdir dist/"${VERSION_NAME}"
 cp ./__init__.py dist/"${VERSION_NAME}"
 cp -r ./src dist/"${VERSION_NAME}"
 cd ./dist || return
-zip -r "${VERSION_NAME}".zip "${VERSION_NAME}"
+zip -r cally.zip "${VERSION_NAME}"
 cd ..

@@ -6,10 +6,8 @@
 # Cally
 A general purpose IMVU toolkit for Blender 2.9.0+. This addon includes options for generalized importing, exporting & instancing of IMVU objects, as well as supporting additional features for immediate use in IMVU's creator mode.
 
-For more information on Cal3D file formats visit https://github.com/mp3butcher/Cal3D
-
 # Usage
-1. Download binary for latest *stable* release with the name: **cally_[version].zip**.
+1. Download binary for latest *stable* release with the name: [**cally.zip**](https://github.com/hsoju/Cally/releases/latest/download/cally.zip).
 2. In Blender open the File menu and access Preferences.
 3. Go to Add-Ons.
    - *If there is a previous version of Cally installed, disable it and press Remove.*
@@ -22,4 +20,5 @@ For more information on Cal3D file formats visit https://github.com/mp3butcher/C
 2. Navigate to dist directory where you will find latest *beta* binary of Cally.
 
 # Resources
+- Official Cal3D Github Repository: https://github.com/mp3butcher/Cal3D
 - Helpful, easy-to-understand explanations of Cal3D file formats & how IMVU uses them: http://www.boristheengineer.co.uk/imvu/object_file_formats.htm
