@@ -6,6 +6,13 @@ from ..xanim.rmap import RotationMap
 from ..xmesh.xmap import WeightMap
 
 
+def compute_offset(original, default):
+    difference = original @ default
+    offset = Quaternion((difference.w, -difference.y,
+                         -difference.x, difference.z))
+    return offset
+
+
 def compute_rotation(original, difference):
     offset = Quaternion((difference.w, -difference.y, difference.z, -difference.x))
     actual = original @ offset
@@ -61,8 +68,7 @@ def export_xaf(context, filepath: str, scale: float, debug: bool):
         f.write("%s" % xtext)
 
 
-def parse_track(obj, track, mapping):
-    bone_id = track.attrib['boneid']
+def parse_track(obj, track, bone_id, mapping, scale):
     bone_name = mapping[bone_id]
     bone = obj.pose.bones[bone_name]
     default_rotation = RotationMap.lookup(bone_name)
@@ -74,12 +80,19 @@ def parse_track(obj, track, mapping):
         original_rotation = [float(r) for r in original_rotation.split()]
         original_quaternion = Quaternion((original_rotation[3], original_rotation[0],
                                           original_rotation[1], original_rotation[2]))
-        difference = original_quaternion @ default_quaternion
-        bone.rotation_quaternion = Quaternion((difference.w, -difference.y,
-                                               -difference.x, difference.z))
+        bone.rotation_quaternion = compute_offset(original_quaternion, default_quaternion)
+        if bone_id == '1':
+            bone.rotation_quaternion = Quaternion((original_rotation[3], -original_rotation[0],
+                                                   -original_rotation[1], -original_rotation[2]))
+            default_vector = Vector((0, -0.0000282434, 663.894))
+            original_translation = keyframe.find('translation').text
+            original_translation = [float(t) for t in original_translation.split()]
+            original_vector = Vector((original_translation[0], original_translation[1],
+                                      original_translation[2]))
+            bone.location = (original_vector - default_vector) / scale
 
 
-def import_xaf(obj, filepath: str):
+def import_xaf(obj, filepath: str, scale: float):
     data = ''
     with open(filepath, 'r') as f:
         data = f.read()
@@ -88,4 +101,6 @@ def import_xaf(obj, filepath: str):
     root = et.fromstring(data[start:])
     mapping = {str(v): k for k, v in WeightMap.wmap.items()}
     for track in root.iter('track'):
-        parse_track(obj, track, mapping)
+        bone_id = track.attrib['boneid']
+        if bone_id in mapping:
+            parse_track(obj, track, bone_id, mapping, scale)
