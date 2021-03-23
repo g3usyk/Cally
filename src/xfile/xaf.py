@@ -30,13 +30,15 @@ def generate_track(bone, scale):
     keyframe.attrib['time'] = "0"
 
     rotation = et.Element('rotation')
+    bone_rotation = bone.rotation_quaternion
     default_rotation = RotationMap.lookup(bone.name)
     default_quaternion = Quaternion((default_rotation[3], default_rotation[0],
                                      default_rotation[2], default_rotation[1]))
-    true_rotation = compute_rotation(default_quaternion, bone.rotation_quaternion)
+    true_rotation = compute_rotation(default_quaternion, bone_rotation)
     rotation.text = f'{true_rotation.x} {true_rotation.z} {true_rotation.y} {true_rotation.w}'
 
     if bone_id == 1:
+        rotation.text = f'{-bone_rotation.x} {-bone_rotation.y} {-bone_rotation.z} {bone_rotation.w}'
         translation = et.Element('translation')
         original_translation = Vector(tuple(WeightMap.pmap['PelvisNode']))
         true_translation = original_translation + bone.location
