@@ -49,6 +49,8 @@ class CalAnimationImporter(Operator, ImportHelper):
         if not context.active_object or context.active_object.type != 'ARMATURE':
             obj = add_master_root()
             obj.select_set(True)
+        obj.animation_data_clear()
         bpy.ops.object.mode_set(mode='POSE')
-        import_xaf(obj, self.filepath, float(next(iter(self.scale))))
+        import_xaf(context, obj, self.filepath, float(next(iter(self.scale))),
+                   context.scene.render.fps)
         return {'FINISHED'}

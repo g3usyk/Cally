@@ -57,5 +57,6 @@ class CalAnimationExporter(Operator, ExportHelper):
         return context.active_object.type == 'ARMATURE'
 
     def execute(self, context):
-        export_xaf(context, self.filepath, float(next(iter(self.scale))), self.debug)
+        export_xaf(context, self.filepath, float(next(iter(self.scale))),
+                   context.scene.render.fps, self.debug)
         return {'FINISHED'}
