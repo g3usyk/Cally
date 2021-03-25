@@ -16,6 +16,12 @@ def add_bone(armature, bone_name: str, head, tail,
     return bone
 
 
+def lock_bones(obj):
+    for bone in obj.pose.bones:
+        if bone.name != 'PelvisNode':
+            bone.lock_location = [True, True, True]
+
+
 def add_master_root():
     """Generates the default armature for imvu skeleton rig.
 
@@ -177,6 +183,11 @@ def add_master_root():
              RollMap.lookup("rtFingerRing03"), True, "rtFingerRing02")
 
     bpy.ops.object.editmode_toggle()
+    lock_bones(obj)
+    bpy.ops.object.posemode_toggle()
+    obj.pose.bones['Female03MasterRoot'].bone.select = True
+    bpy.ops.pose.hide()
+    bpy.ops.object.mode_set(mode='OBJECT')
     bpy.ops.object.select_all(action='DESELECT')
 
     return obj
