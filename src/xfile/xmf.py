@@ -7,7 +7,13 @@ from ..maps.positions import PositionMap
 from ..mesh.base import BaseMesh
 from ..xmesh.xvert import XVertex
 from ..xmesh.xface import XFace
-# from ..xmesh.xmap import WeightMap
+
+
+def generate_vertex(obj, vertex, colors, influences) -> XVertex:
+    coords = obj.matrix_world @ vertex.co
+    xcoords = [coords[0], coords[1], coords[2]]
+    xnorms = [vertex.normal[0], vertex.normal[1], vertex.normal[2]]
+    return XVertex(xcoords, xnorms, colors, influences)
 
 
 def generate_vertices(obj, submap: dict, weight: str) -> list:
@@ -25,7 +31,6 @@ def generate_vertices(obj, submap: dict, weight: str) -> list:
     xverts = []
 
     groups = {g.index: IDMap.lookup(g.name) for g in obj.vertex_groups}
-    # groups = {g.index: WeightMap.get_bone_id(g.name) for g in obj.vertex_groups}
 
     xcol = ['1', '1', '1']
     bone_id = submap[obj.name][1]
@@ -33,21 +38,15 @@ def generate_vertices(obj, submap: dict, weight: str) -> list:
 
     if weight == 'MANUAL':
         for v in obj.data.vertices:
-            coords = obj.matrix_world @ v.co
-            xcoords = [coords[0], coords[1], coords[2]]
-            xnorms = [v.normal[0], v.normal[1], v.normal[2]]
-            next_vert = XVertex(xcoords, xnorms, xcol, xinfls)
+            next_vert = generate_vertex(obj, v, xcol, xinfls)
             xverts.append(next_vert)
     else:
         for v in obj.data.vertices:
-            coords = obj.matrix_world @ v.co
-            xcoords = [coords[0], coords[1], coords[2]]
-            xnorms = [v.normal[0], v.normal[1], v.normal[2]]
             if len(v.groups) != 0:
                 xinfls = {}
                 for g in v.groups:
                     xinfls[str(groups[g.group])] = g.weight
-            next_vert = XVertex(xcoords, xnorms, xcol, xinfls)
+            next_vert = generate_vertex(obj, v, xcol, xinfls)
             xverts.append(next_vert)
     return xverts
 
@@ -139,7 +138,29 @@ def skip_material(mtl: int):
     return mtl + 1
 
 
-def write_xmf(filepath: str, objs, submap: dict, scale: float, weight: str):
+def default_options(objs: list):
+    body_part_ids = {'F.Feet': 7, 'F.Hands': 7, 'F.Head': 2, 'F.Legs': 7, 'F.Thighs': 7, 'F.Torso': 7,
+                     'M.Feet': 7, 'M.Hands': 7, 'M.Head': 2, 'M.Legs': 7, 'M.Calfs': 7, 'M.Torso': 7}
+    scale = 100.0
+    submap = {}
+    material = 0
+    weight = 'MANUAL'
+    for obj in objs:
+        if len(obj.vertex_groups) > 0:
+            weight = 'AUTO'
+        location = obj.matrix_world.translation
+        assignments = ['', str(PositionMap.get_closest_bone(location))]
+        name = '.'.join(obj.name.split('.')[:2])
+        if name in body_part_ids:
+            assignments.append(body_part_ids[obj.name])
+        else:
+            assignments.append(material)
+            material = skip_material(material)
+        submap[obj.name] = assignments
+    return submap, scale, weight
+
+
+def write_xmf(filepath: str, objs: list, submap: dict, scale: float, weight: str):
     root = et.Element('mesh')
     root.attrib['numsubmesh'] = str(len(objs))
     for obj in objs:
@@ -172,43 +193,9 @@ def export_xmf(context, filepath: str, submap: dict,
         adv (bool): A boolean determining whether xmf file should be constructed using user input.
     """
     objs = [obj for obj in context.selected_objects if obj.type == 'MESH']
-    body_names = {'F.Feet': 7, 'F.Hands': 7, 'F.Head': 2, 'F.Legs': 7, 'F.Thighs': 7, 'F.Torso': 7,
-                  'M.Feet': 7, 'M.Hands': 7, 'M.Head': 2, 'M.Legs': 7, 'M.Calfs': 7, 'M.Torso': 7}
-    seen = set()
-    mtls = {}
-    obj_names = sorted([o.name for o in objs])
-    for name in obj_names:
-        n = '.'.join(name.split('.')[:2])
-        if n in body_names and n not in seen:
-            mtls[name] = body_names[n]
-            seen.add(n)
-        else:
-            mtls[name] = -1
-    mapping = submap
-    if not adv:
-        mapping = {}
-        counts = {}
-        mtl = 0
-        for obj in objs:
-            if len(obj.vertex_groups) > 0:
-                weight = 'AUTO'
-            posn = obj.matrix_world.translation
-            assignments = ['', PositionMap.get_closest_bone(posn)]
-            # assignments = ['', WeightMap.get_bone(posn)]
-            m = mtls[obj.name]
-            if m > 0:
-                assignments.append(m)
-            else:
-                count = len(obj.data.vertices)
-                if count in counts:
-                    assignments.append(counts[count])
-                else:
-                    counts[count] = mtl
-                    assignments.append(mtl)
-                    mtl = skip_material(mtl)
-            mapping[obj.name] = assignments
-        scale = 100.0
-    write_xmf(filepath, objs, mapping, scale, weight)
+    if adv:
+        submap, scale, weight = default_options(objs)
+    write_xmf(filepath, objs, submap, scale, weight)
 
 
 def extract(elem: et.Element, tag, conversion):
@@ -260,7 +247,7 @@ def import_xmf(filepath: str):
     """
     data = ''
     with open(filepath, 'r') as f:
-        data = f.read()
+        data += f.read()
     data = data.lower()
     start = data.find('<mesh')
     root = et.fromstring(data[start:])

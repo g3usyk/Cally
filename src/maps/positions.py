@@ -104,5 +104,4 @@ class PositionMap:
             if dist < curr_dist:
                 curr_dist = dist
                 curr_bone = IDMap.lookup(bone_name)
-                # curr_bone = cls.wmap[bone_name]
-        return str(curr_bone)
+        return curr_bone
