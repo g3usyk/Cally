@@ -1,4 +1,19 @@
 import bpy
+from ..maps.bones.heads import HeadMap
+from ..maps.bones.rolls import RollMap
+from ..maps.bones.tails import TailMap
+
+
+def add_bone(armature, bone_name: str, head, tail,
+             roll: float, connect: bool, parent=None):
+    bone = armature.edit_bones.new(bone_name)
+    bone.head[:] = head[0], head[1], head[2]
+    bone.tail[:] = tail[0], tail[1], tail[2]
+    bone.roll = roll
+    bone.use_connect = connect
+    if parent:
+        bone.parent = armature.edit_bones[parent]
+    return bone
 
 
 def add_master_root():
@@ -14,518 +29,152 @@ def add_master_root():
     obj = bpy.context.active_object
     arm = obj.data
 
-    bones = {}
-
-    bone = arm.edit_bones.new('Female03MasterRoot')
-    bone.head[:] = 0.0, 0.0, 0.0
-    bone.tail[:] = 0.0, 6.638941040039063, 1.9786038762958923e-09
-    bone.roll = 0.0
-    bone.use_connect = False
-    bones['Female03MasterRoot'] = bone.name
-    bone = arm.edit_bones.new('PelvisNode')
-    bone.head[:] = 0.0, -6.123301864136011e-07, 6.638941040039063
-    bone.tail[:] = 0.0, 0.16868438720703124, 6.638941040039063
-    bone.roll = -0.0015881052240729332
-    bone.use_connect = False
-    bone.parent = arm.edit_bones[bones['Female03MasterRoot']]
-    bones['PelvisNode'] = bone.name
-    bone = arm.edit_bones.new('lfHip')
-    bone.head[:] = -0.00035677030682563783, 0.0030633527040481567, 6.495139770507812
-    bone.tail[:] = 0.563493881225586, -0.03516971588134766, 6.462601928710938
-    bone.roll = -1.5131534337997437
-    bone.use_connect = False
-    bone.parent = arm.edit_bones[bones['PelvisNode']]
-    bones['lfHip'] = bone.name
-    bone = arm.edit_bones.new('lfThigh')
-    bone.head[:] = 0.563493881225586, -0.03516971588134766, 6.462601928710938
-    bone.tail[:] = 0.4771613311767578, 0.07500462055206299, 3.68400146484375
-    bone.roll = 0.06654335558414459
-    bone.use_connect = True
-    bone.parent = arm.edit_bones[bones['lfHip']]
-    bones['lfThigh'] = bone.name
-    bone = arm.edit_bones.new('lfCalf')
-    bone.head[:] = 0.4771613311767578, 0.07500462055206299, 3.68400146484375
-    bone.tail[:] = 0.5014632034301758, 0.34005523681640626, 1.0555886840820312
-    bone.roll = -0.008793414570391178
-    bone.use_connect = True
-    bone.parent = arm.edit_bones[bones['lfThigh']]
-    bones['lfCalf'] = bone.name
-    bone = arm.edit_bones.new('lfFoot')
-    bone.head[:] = 0.5014632034301758, 0.34005523681640626, 1.0555886840820312
-    bone.tail[:] = 0.5088901519775391, -0.24079013824462892, 0.38755767822265624
-    bone.roll = -0.05981054529547691
-    bone.use_connect = True
-    bone.parent = arm.edit_bones[bones['lfCalf']]
-    bones['lfFoot'] = bone.name
-    bone = arm.edit_bones.new('lfToes')
-    bone.head[:] = 0.5088901519775391, -0.24079013824462892, 0.38755767822265624
-    bone.tail[:] = 0.5094893646240234, -1.0027235412597657, 0.3567979049682617
-    bone.roll = -0.09584161639213562
-    bone.use_connect = True
-    bone.parent = arm.edit_bones[bones['lfFoot']]
-    bones['lfToes'] = bone.name
-    bone = arm.edit_bones.new('rtHip')
-    bone.head[:] = -0.00035677030682563783, 0.0030633527040481567, 6.495139770507812
-    bone.tail[:] = -0.5573517227172852, -0.035169425010681155, 6.462601928710938
-    bone.roll = 1.5124465227127075
-    bone.use_connect = False
-    bone.parent = arm.edit_bones[bones['PelvisNode']]
-    bones['rtHip'] = bone.name
-    bone = arm.edit_bones.new('rtThigh')
-    bone.head[:] = -0.5573517227172852, -0.035169425010681155, 6.462601928710938
-    bone.tail[:] = -0.48229137420654294, 0.07490675926208495, 3.6843582153320313
-    bone.roll = -0.061434149742126465
-    bone.use_connect = True
-    bone.parent = arm.edit_bones[bones['rtHip']]
-    bones['rtThigh'] = bone.name
-    bone = arm.edit_bones.new('rtCalf')
-    bone.head[:] = -0.48229137420654294, 0.07490675926208495, 3.6843582153320313
-    bone.tail[:] = -0.5046239471435547, 0.3399169921875, 1.0558114624023438
-    bone.roll = -0.024180538952350616
-    bone.use_connect = True
-    bone.parent = arm.edit_bones[bones['rtThigh']]
-    bones['rtCalf'] = bone.name
-    bone = arm.edit_bones.new('rtFoot')
-    bone.head[:] = -0.5046239471435547, 0.3399169921875, 1.0558114624023438
-    bone.tail[:] = -0.5204231262207031, -0.2407860565185547, 0.38784202575683596
-    bone.roll = 0.0145308468490839
-    bone.use_connect = True
-    bone.parent = arm.edit_bones[bones['rtCalf']]
-    bones['rtFoot'] = bone.name
-    bone = arm.edit_bones.new('rtToes')
-    bone.head[:] = -0.5204231262207031, -0.2407860565185547, 0.38784202575683596
-    bone.tail[:] = -0.5215355682373047, -1.0028446960449218, 0.3570986175537109
-    bone.roll = 0.07005158811807632
-    bone.use_connect = True
-    bone.parent = arm.edit_bones[bones['rtFoot']]
-    bones['rtToes'] = bone.name
-    bone = arm.edit_bones.new('Spine01')
-    bone.head[:] = 0.0034664705395698546, 0.01600126028060913, 6.856712036132812
-    bone.tail[:] = 0.003463851809501648, -0.05720928192138672, 7.250665283203125
-    bone.roll = 3.1415536403656006
-    bone.use_connect = False
-    bone.parent = arm.edit_bones[bones['PelvisNode']]
-    bones['Spine01'] = bone.name
-    bone = arm.edit_bones.new('Spine02')
-    bone.head[:] = 0.003463853895664215, -0.05720892906188965, 7.250665283203125
-    bone.tail[:] = 0.0034689265489578247, -0.12687450408935547, 7.729581298828125
-    bone.roll = -1.5707859992980957
-    bone.use_connect = False
-    bone.parent = arm.edit_bones[bones['Spine01']]
-    bones['Spine02'] = bone.name
-    bone = arm.edit_bones.new('Spine03')
-    bone.head[:] = 0.0034689265489578247, -0.12687450408935547, 7.729581298828125
-    bone.tail[:] = 0.003474917709827423, -0.16293178558349608, 8.3144873046875
-    bone.roll = -1.5707865953445435
-    bone.use_connect = True
-    bone.parent = arm.edit_bones[bones['Spine02']]
-    bones['Spine03'] = bone.name
-    bone = arm.edit_bones.new('Spine04')
-    bone.head[:] = 0.003474917709827423, -0.16293178558349608, 8.3144873046875
-    bone.tail[:] = 0.0033521005511283875, 0.10413763046264649, 9.15406005859375
-    bone.roll = -1.570788025856018
-    bone.use_connect = True
-    bone.parent = arm.edit_bones[bones['Spine03']]
-    bones['Spine04'] = bone.name
-    bone = arm.edit_bones.new('Neck01')
-    bone.head[:] = 0.003484650254249573, 0.11347934722900391, 9.193770751953124
-    bone.tail[:] = 0.0034867721796035768, 0.1115771198272705, 9.3852294921875
-    bone.roll = -1.5707918405532837
-    bone.use_connect = False
-    bone.parent = arm.edit_bones[bones['Spine04']]
-    bones['Neck01'] = bone.name
-    bone = arm.edit_bones.new('Neck02')
-    bone.head[:] = 0.003486771285533905, 0.11157755851745606, 9.3852294921875
-    bone.tail[:] = 0.00348841518163681, 0.11283585548400879, 9.523759765625
-    bone.roll = -1.5708023309707642
-    bone.use_connect = False
-    bone.parent = arm.edit_bones[bones['Neck01']]
-    bones['Neck02'] = bone.name
-    bone = arm.edit_bones.new('Neck03')
-    bone.head[:] = 0.00348841518163681, 0.11283585548400879, 9.523759765625
-    bone.tail[:] = 0.003491791784763336, 0.12403834342956543, 9.673143920898438
-    bone.roll = -1.5708009004592896
-    bone.use_connect = True
-    bone.parent = arm.edit_bones[bones['Neck02']]
-    bones['Neck03'] = bone.name
-    bone = arm.edit_bones.new('Neck04')
-    bone.head[:] = 0.003491791784763336, 0.12403834342956543, 9.673143920898438
-    bone.tail[:] = 0.003490471541881561, 0.1234202003479004, 9.870889282226562
-    bone.roll = -1.5708259344100952
-    bone.use_connect = True
-    bone.parent = arm.edit_bones[bones['Neck03']]
-    bones['Neck04'] = bone.name
-    bone = arm.edit_bones.new('Head')
-    bone.head[:] = 0.003490471541881561, 0.1234202003479004, 9.870889282226562
-    bone.tail[:] = 0.003486037850379944, 0.12077030181884765, 10.629681396484376
-    bone.roll = -1.5708205699920654
-    bone.use_connect = True
-    bone.parent = arm.edit_bones[bones['Neck04']]
-    bones['Head'] = bone.name
-    bone = arm.edit_bones.new('lfClavicle')
-    bone.head[:] = 0.0032858267426490785, 0.09946446418762207, 9.134200439453124
-    bone.tail[:] = 1.160080108642578, 0.05856241226196289, 9.02568359375
-    bone.roll = -1.4804902076721191
-    bone.use_connect = False
-    bone.parent = arm.edit_bones[bones['Spine04']]
-    bones['lfClavicle'] = bone.name
-    bone = arm.edit_bones.new('lfShoulder')
-    bone.head[:] = 1.1600800323486329, 0.058563127517700195, 9.025682373046875
-    bone.tail[:] = 1.3080487060546875, 0.05924571514129639, 8.945511474609376
-    bone.roll = -2.63690185546875
-    bone.use_connect = False
-    bone.parent = arm.edit_bones[bones['lfClavicle']]
-    bones['lfShoulder'] = bone.name
-    bone = arm.edit_bones.new('lfBicep')
-    bone.head[:] = 1.3080487060546875, 0.05924571514129639, 8.945511474609376
-    bone.tail[:] = 2.5295640563964845, 0.050443077087402345, 8.405696411132812
-    bone.roll = -2.694960832595825
-    bone.use_connect = True
-    bone.parent = arm.edit_bones[bones['lfShoulder']]
-    bones['lfBicep'] = bone.name
-    bone = arm.edit_bones.new('lfElbow')
-    bone.head[:] = 2.5295640563964845, 0.050443077087402345, 8.405696411132812
-    bone.tail[:] = 3.3982086181640625, -0.10697059631347657, 8.07438720703125
-    bone.roll = -2.697723627090454
-    bone.use_connect = True
-    bone.parent = arm.edit_bones[bones['lfBicep']]
-    bones['lfElbow'] = bone.name
-    bone = arm.edit_bones.new('lfWrist')
-    bone.head[:] = 3.3982089233398436, -0.10697090148925781, 8.074387817382812
-    bone.tail[:] = 3.8569818115234376, -0.19375125885009767, 7.862823486328125
-    bone.roll = -2.686941623687744
-    bone.use_connect = False
-    bone.parent = arm.edit_bones[bones['lfElbow']]
-    bones['lfWrist'] = bone.name
-    bone = arm.edit_bones.new('lfHand')
-    bone.head[:] = 3.8569818115234376, -0.19375125885009767, 7.862823486328125
-    bone.tail[:] = 3.9955404663085936, -0.22344715118408204, 7.809659423828125
-    bone.roll = -2.6899843215942383
-    bone.use_connect = True
-    bone.parent = arm.edit_bones[bones['lfWrist']]
-    bones['lfHand'] = bone.name
-    bone = arm.edit_bones.new('lfmetaCarpal03')
-    bone.head[:] = 3.9955404663085936, -0.22344688415527345, 7.809659423828125
-    bone.tail[:] = 4.529894714355469, -0.3735476303100586, 7.600175170898438
-    bone.roll = -2.684018850326538
-    bone.use_connect = False
-    bone.parent = arm.edit_bones[bones['lfHand']]
-    bones['lfmetaCarpal03'] = bone.name
-    bone = arm.edit_bones.new('lfFingerMiddle01')
-    bone.head[:] = 4.529894714355469, -0.3735476303100586, 7.600175170898438
-    bone.tail[:] = 4.759237365722656, -0.4110522079467773, 7.446072998046875
-    bone.roll = -2.2617101669311523
-    bone.use_connect = True
-    bone.parent = arm.edit_bones[bones['lfmetaCarpal03']]
-    bones['lfFingerMiddle01'] = bone.name
-    bone = arm.edit_bones.new('lfFingerMiddle02')
-    bone.head[:] = 4.759237670898438, -0.41105167388916014, 7.446072998046875
-    bone.tail[:] = 4.91416748046875, -0.43043174743652346, 7.2829962158203125
-    bone.roll = -1.9966027736663818
-    bone.use_connect = False
-    bone.parent = arm.edit_bones[bones['lfFingerMiddle01']]
-    bones['lfFingerMiddle02'] = bone.name
-    bone = arm.edit_bones.new('lfFingerMiddle03')
-    bone.head[:] = 4.914168395996094, -0.4304325103759766, 7.282997436523438
-    bone.tail[:] = 5.028179626464844, -0.43248764038085935, 7.089086303710937
-    bone.roll = 1.2503740787506104
-    bone.use_connect = False
-    bone.parent = arm.edit_bones[bones['lfFingerMiddle02']]
-    bones['lfFingerMiddle03'] = bone.name
-    bone = arm.edit_bones.new('lfmetaCarpal01')
-    bone.head[:] = 3.9955404663085936, -0.22344688415527345, 7.809659423828125
-    bone.tail[:] = 3.9716485595703124, -0.4298920440673828, 7.715475463867188
-    bone.roll = 0.7141656279563904
-    bone.use_connect = False
-    bone.parent = arm.edit_bones[bones['lfHand']]
-    bones['lfmetaCarpal01'] = bone.name
-    bone = arm.edit_bones.new('lfThumb01')
-    bone.head[:] = 3.9716485595703124, -0.4298920440673828, 7.715475463867188
-    bone.tail[:] = 4.080173950195313, -0.5190517425537109, 7.583051147460938
-    bone.roll = -0.9172049760818481
-    bone.use_connect = True
-    bone.parent = arm.edit_bones[bones['lfmetaCarpal01']]
-    bones['lfThumb01'] = bone.name
-    bone = arm.edit_bones.new('lfThumb02')
-    bone.head[:] = 4.08017578125, -0.5190508270263672, 7.5830517578125
-    bone.tail[:] = 4.2073907470703125, -0.662849349975586, 7.423841552734375
-    bone.roll = -0.8823888897895813
-    bone.use_connect = False
-    bone.parent = arm.edit_bones[bones['lfThumb01']]
-    bones['lfThumb02'] = bone.name
-    bone = arm.edit_bones.new('lfThumb03')
-    bone.head[:] = 4.2073907470703125, -0.662849349975586, 7.423841552734375
-    bone.tail[:] = 4.297401733398438, -0.759924545288086, 7.2818975830078125
-    bone.roll = -0.6688655614852905
-    bone.use_connect = True
-    bone.parent = arm.edit_bones[bones['lfThumb02']]
-    bones['lfThumb03'] = bone.name
-    bone = arm.edit_bones.new('lfmetaCarpal05')
-    bone.head[:] = 3.9955404663085936, -0.22344688415527345, 7.809659423828125
-    bone.tail[:] = 4.5365185546875, -0.1395719814300537, 7.597313232421875
-    bone.roll = -2.7043204307556152
-    bone.use_connect = False
-    bone.parent = arm.edit_bones[bones['lfHand']]
-    bones['lfmetaCarpal05'] = bone.name
-    bone = arm.edit_bones.new('lfFingerPinky01')
-    bone.head[:] = 4.536518859863281, -0.13957237243652343, 7.5973138427734375
-    bone.tail[:] = 4.711925354003906, -0.1460053253173828, 7.4816796875
-    bone.roll = -2.5176966190338135
-    bone.use_connect = False
-    bone.parent = arm.edit_bones[bones['lfmetaCarpal05']]
-    bones['lfFingerPinky01'] = bone.name
-    bone = arm.edit_bones.new('lfFingerPinky02')
-    bone.head[:] = 4.711924743652344, -0.1460050868988037, 7.481679077148438
-    bone.tail[:] = 4.82878662109375, -0.14762496948242188, 7.35265625
-    bone.roll = -2.33168363571167
-    bone.use_connect = False
-    bone.parent = arm.edit_bones[bones['lfFingerPinky01']]
-    bones['lfFingerPinky02'] = bone.name
-    bone = arm.edit_bones.new('lfFingerPinky03')
-    bone.head[:] = 4.82878662109375, -0.14762496948242188, 7.35265625
-    bone.tail[:] = 4.918982849121094, -0.15807156562805175, 7.181017456054687
-    bone.roll = -2.074286460876465
-    bone.use_connect = True
-    bone.parent = arm.edit_bones[bones['lfFingerPinky02']]
-    bones['lfFingerPinky03'] = bone.name
-    bone = arm.edit_bones.new('lfmetaCarpal02')
-    bone.head[:] = 3.9955404663085936, -0.22344688415527345, 7.809659423828125
-    bone.tail[:] = 4.492049560546875, -0.503525390625, 7.577764892578125
-    bone.roll = -2.6020381450653076
-    bone.use_connect = False
-    bone.parent = arm.edit_bones[bones['lfHand']]
-    bones['lfmetaCarpal02'] = bone.name
-    bone = arm.edit_bones.new('lfFingerIndex01')
-    bone.head[:] = 4.492049560546875, -0.503525390625, 7.577764892578125
-    bone.tail[:] = 4.670606994628907, -0.5611733245849609, 7.439686889648438
-    bone.roll = -2.0544774532318115
-    bone.use_connect = True
-    bone.parent = arm.edit_bones[bones['lfmetaCarpal02']]
-    bones['lfFingerIndex01'] = bone.name
-    bone = arm.edit_bones.new('lfFingerIndex02')
-    bone.head[:] = 4.67060791015625, -0.5611745071411133, 7.439688110351563
-    bone.tail[:] = 4.769830017089844, -0.5729848098754883, 7.272918701171875
-    bone.roll = 1.6322872638702393
-    bone.use_connect = False
-    bone.parent = arm.edit_bones[bones['lfFingerIndex01']]
-    bones['lfFingerIndex02'] = bone.name
-    bone = arm.edit_bones.new('lfFingerIndex03')
-    bone.head[:] = 4.769830017089844, -0.5729848098754883, 7.272918701171875
-    bone.tail[:] = 4.848889465332031, -0.5836392974853516, 7.110748901367187
-    bone.roll = 1.676964282989502
-    bone.use_connect = True
-    bone.parent = arm.edit_bones[bones['lfFingerIndex02']]
-    bones['lfFingerIndex03'] = bone.name
-    bone = arm.edit_bones.new('lfmetaCarpal04')
-    bone.head[:] = 3.9955404663085936, -0.22344688415527345, 7.809659423828125
-    bone.tail[:] = 4.551399230957031, -0.24972719192504883, 7.601590576171875
-    bone.roll = -2.6888461112976074
-    bone.use_connect = False
-    bone.parent = arm.edit_bones[bones['lfHand']]
-    bones['lfmetaCarpal04'] = bone.name
-    bone = arm.edit_bones.new('lfFingerRing01')
-    bone.head[:] = 4.551399230957031, -0.24972719192504883, 7.601590576171875
-    bone.tail[:] = 4.77014892578125, -0.27121719360351565, 7.47019775390625
-    bone.roll = -2.5130014419555664
-    bone.use_connect = True
-    bone.parent = arm.edit_bones[bones['lfmetaCarpal04']]
-    bones['lfFingerRing01'] = bone.name
-    bone = arm.edit_bones.new('lfFingerRing02')
-    bone.head[:] = 4.77014892578125, -0.27121719360351565, 7.47019775390625
-    bone.tail[:] = 4.909639587402344, -0.28323238372802734, 7.321343994140625
-    bone.roll = -2.176374673843384
-    bone.use_connect = True
-    bone.parent = arm.edit_bones[bones['lfFingerRing01']]
-    bones['lfFingerRing02'] = bone.name
-    bone = arm.edit_bones.new('lfFingerRing03')
-    bone.head[:] = 4.909639587402344, -0.28323238372802734, 7.321343994140625
-    bone.tail[:] = 5.027826538085938, -0.29001102447509763, 7.153375244140625
-    bone.roll = 1.0718185901641846
-    bone.use_connect = True
-    bone.parent = arm.edit_bones[bones['lfFingerRing02']]
-    bones['lfFingerRing03'] = bone.name
-    bone = arm.edit_bones.new('rtClavicle')
-    bone.head[:] = 0.0032858267426490785, 0.09946446418762207, 9.134200439453124
-    bone.tail[:] = -1.153507843017578, 0.05856404781341553, 9.02568603515625
-    bone.roll = 1.4804892539978027
-    bone.use_connect = False
-    bone.parent = arm.edit_bones[bones['Spine04']]
-    bones['rtClavicle'] = bone.name
-    bone = arm.edit_bones.new('rtShoulder')
-    bone.head[:] = -1.153507843017578, 0.058564739227294924, 9.025685424804687
-    bone.tail[:] = -1.3014779663085938, 0.05924665451049805, 8.945516357421875
-    bone.roll = 2.6369049549102783
-    bone.use_connect = False
-    bone.parent = arm.edit_bones[bones['rtClavicle']]
-    bones['rtShoulder'] = bone.name
-    bone = arm.edit_bones.new('rtBicep')
-    bone.head[:] = -1.3014779663085938, 0.05924665451049805, 8.945516357421875
-    bone.tail[:] = -2.520682373046875, 0.05794817924499512, 8.401588134765625
-    bone.roll = 2.6933069229125977
-    bone.use_connect = True
-    bone.parent = arm.edit_bones[bones['rtShoulder']]
-    bones['rtBicep'] = bone.name
-    bone = arm.edit_bones.new('rtElbow')
-    bone.head[:] = -2.520682373046875, 0.05794817924499512, 8.401588134765625
-    bone.tail[:] = -3.4001168823242187, -0.05210581302642822, 8.08563720703125
-    bone.roll = 2.7349445819854736
-    bone.use_connect = True
-    bone.parent = arm.edit_bones[bones['rtBicep']]
-    bones['rtElbow'] = bone.name
-    bone = arm.edit_bones.new('rtWrist')
-    bone.head[:] = -3.4001177978515624, -0.05210596561431885, 8.0856396484375
-    bone.tail[:] = -3.9191659545898436, -0.14239076614379884, 7.888919677734375
-    bone.roll = 2.701988935470581
-    bone.use_connect = False
-    bone.parent = arm.edit_bones[bones['rtElbow']]
-    bones['rtWrist'] = bone.name
-    bone = arm.edit_bones.new('rtHand')
-    bone.head[:] = -3.9191659545898436, -0.14239076614379884, 7.888919677734375
-    bone.tail[:] = -4.045657653808593, -0.16393861770629883, 7.8436041259765625
-    bone.roll = 2.7280216217041016
-    bone.use_connect = True
-    bone.parent = arm.edit_bones[bones['rtWrist']]
-    bones['rtHand'] = bone.name
-    bone = arm.edit_bones.new('rtmetaCarpal03')
-    bone.head[:] = -4.045657653808593, -0.16393861770629883, 7.8436041259765625
-    bone.tail[:] = -4.607240295410156, -0.2982571411132813, 7.63562255859375
-    bone.roll = 2.7175164222717285
-    bone.use_connect = True
-    bone.parent = arm.edit_bones[bones['rtHand']]
-    bones['rtmetaCarpal03'] = bone.name
-    bone = arm.edit_bones.new('rtFingerMiddle01')
-    bone.head[:] = -4.607240295410156, -0.2982571411132813, 7.63562255859375
-    bone.tail[:] = -4.840549621582031, -0.32778202056884764, 7.485950927734375
-    bone.roll = 2.3057663440704346
-    bone.use_connect = True
-    bone.parent = arm.edit_bones[bones['rtmetaCarpal03']]
-    bones['rtFingerMiddle01'] = bone.name
-    bone = arm.edit_bones.new('rtFingerMiddle02')
-    bone.head[:] = -4.840549621582031, -0.32778202056884764, 7.485950927734375
-    bone.tail[:] = -4.99909912109375, -0.3419051742553711, 7.325844116210938
-    bone.roll = 2.0460011959075928
-    bone.use_connect = True
-    bone.parent = arm.edit_bones[bones['rtFingerMiddle01']]
-    bones['rtFingerMiddle02'] = bone.name
-    bone = arm.edit_bones.new('rtFingerMiddle03')
-    bone.head[:] = -4.99909912109375, -0.3419051742553711, 7.325844116210938
-    bone.tail[:] = -5.116749877929688, -0.3402544021606445, 7.13408447265625
-    bone.roll = -1.1984894275665283
-    bone.use_connect = True
-    bone.parent = arm.edit_bones[bones['rtFingerMiddle02']]
-    bones['rtFingerMiddle03'] = bone.name
-    bone = arm.edit_bones.new('rtmetaCarpal01')
-    bone.head[:] = -4.045657653808593, -0.16393861770629883, 7.8436041259765625
-    bone.tail[:] = -4.027189636230469, -0.37136550903320314, 7.75051513671875
-    bone.roll = -0.5811967253684998
-    bone.use_connect = True
-    bone.parent = arm.edit_bones[bones['rtHand']]
-    bones['rtmetaCarpal01'] = bone.name
-    bone = arm.edit_bones.new('rtThumb01')
-    bone.head[:] = -4.027189331054688, -0.3713650894165039, 7.750513916015625
-    bone.tail[:] = -4.135041809082031, -0.4544926071166992, 7.625054931640625
-    bone.roll = 0.9830766916275024
-    bone.use_connect = False
-    bone.parent = arm.edit_bones[bones['rtmetaCarpal01']]
-    bones['rtThumb01'] = bone.name
-    bone = arm.edit_bones.new('rtThumb02')
-    bone.head[:] = -4.13504150390625, -0.45449390411376955, 7.625055541992188
-    bone.tail[:] = -4.262677001953125, -0.5913349151611328, 7.474550170898437
-    bone.roll = 0.9586418271064758
-    bone.use_connect = False
-    bone.parent = arm.edit_bones[bones['rtThumb01']]
-    bones['rtThumb02'] = bone.name
-    bone = arm.edit_bones.new('rtThumb03')
-    bone.head[:] = -4.262677001953125, -0.5913349151611328, 7.474550170898437
-    bone.tail[:] = -4.352347412109375, -0.6831780242919921, 7.338557739257812
-    bone.roll = 0.7282332181930542
-    bone.use_connect = True
-    bone.parent = arm.edit_bones[bones['rtThumb02']]
-    bones['rtThumb03'] = bone.name
-    bone = arm.edit_bones.new('rtmetaCarpal05')
-    bone.head[:] = -4.045657653808593, -0.16393861770629883, 7.8436041259765625
-    bone.tail[:] = -4.601882019042969, -0.039804601669311525, 7.633440551757812
-    bone.roll = 2.734788179397583
-    bone.use_connect = True
-    bone.parent = arm.edit_bones[bones['rtHand']]
-    bones['rtmetaCarpal05'] = bone.name
-    bone = arm.edit_bones.new('rtFingerPinky01')
-    bone.head[:] = -4.601882019042969, -0.039804601669311525, 7.633440551757812
-    bone.tail[:] = -4.77749267578125, -0.03320915937423706, 7.521739501953125
-    bone.roll = 2.564638614654541
-    bone.use_connect = True
-    bone.parent = arm.edit_bones[bones['rtmetaCarpal05']]
-    bones['rtFingerPinky01'] = bone.name
-    bone = arm.edit_bones.new('rtFingerPinky02')
-    bone.head[:] = -4.777492980957032, -0.033208863735198976, 7.521739501953125
-    bone.tail[:] = -4.895352172851562, -0.0256307053565979, 7.395323486328125
-    bone.roll = 2.393195152282715
-    bone.use_connect = False
-    bone.parent = arm.edit_bones[bones['rtFingerPinky01']]
-    bones['rtFingerPinky02'] = bone.name
-    bone = arm.edit_bones.new('rtFingerPinky03')
-    bone.head[:] = -4.895352478027344, -0.025630621910095214, 7.395323486328125
-    bone.tail[:] = -4.987683715820313, -0.028363311290740968, 7.225822143554687
-    bone.roll = 2.148073196411133
-    bone.use_connect = False
-    bone.parent = arm.edit_bones[bones['rtFingerPinky02']]
-    bones['rtFingerPinky03'] = bone.name
-    bone = arm.edit_bones.new('rtmetaCarpal02')
-    bone.head[:] = -4.045657653808593, -0.16393861770629883, 7.8436041259765625
-    bone.tail[:] = -4.566811218261718, -0.44398788452148436, 7.610972290039062
-    bone.roll = 2.632312297821045
-    bone.use_connect = True
-    bone.parent = arm.edit_bones[bones['rtHand']]
-    bones['rtmetaCarpal02'] = bone.name
-    bone = arm.edit_bones.new('rtFingerIndex01')
-    bone.head[:] = -4.566811218261718, -0.44398788452148436, 7.610972290039062
-    bone.tail[:] = -4.746919555664062, -0.49910381317138675, 7.476334228515625
-    bone.roll = 2.0876400470733643
-    bone.use_connect = True
-    bone.parent = arm.edit_bones[bones['rtmetaCarpal02']]
-    bones['rtFingerIndex01'] = bone.name
-    bone = arm.edit_bones.new('rtFingerIndex02')
-    bone.head[:] = -4.746919555664062, -0.49910381317138675, 7.476334228515625
-    bone.tail[:] = -4.8475146484375, -0.509963264465332, 7.31145751953125
-    bone.roll = -1.602952003479004
-    bone.use_connect = True
-    bone.parent = arm.edit_bones[bones['rtFingerIndex01']]
-    bones['rtFingerIndex02'] = bone.name
-    bone = arm.edit_bones.new('rtFingerIndex03')
-    bone.head[:] = -4.8475146484375, -0.509963264465332, 7.31145751953125
-    bone.tail[:] = -4.928233642578125, -0.5201431274414062, 7.1507501220703125
-    bone.roll = -1.6466150283813477
-    bone.use_connect = True
-    bone.parent = arm.edit_bones[bones['rtFingerIndex02']]
-    bones['rtFingerIndex03'] = bone.name
-    bone = arm.edit_bones.new('rtmetaCarpal04')
-    bone.head[:] = -4.045657653808593, -0.16393861770629883, 7.8436041259765625
-    bone.tail[:] = -4.625206604003906, -0.15951334953308105, 7.638841552734375
-    bone.roll = 2.7223334312438965
-    bone.use_connect = True
-    bone.parent = arm.edit_bones[bones['rtHand']]
-    bones['rtmetaCarpal04'] = bone.name
-    bone = arm.edit_bones.new('rtFingerRing01')
-    bone.head[:] = -4.625205993652344, -0.15951297760009767, 7.6388397216796875
-    bone.tail[:] = -4.847066040039063, -0.16827491760253907, 7.5119390869140625
-    bone.roll = 2.5594592094421387
-    bone.use_connect = False
-    bone.parent = arm.edit_bones[bones['rtmetaCarpal04']]
-    bones['rtFingerRing01'] = bone.name
-    bone = arm.edit_bones.new('rtFingerRing02')
-    bone.head[:] = -4.847066650390625, -0.16827508926391602, 7.511940307617188
-    bone.tail[:] = -4.989788818359375, -0.17186614990234375, 7.365953369140625
-    bone.roll = 2.2360308170318604
-    bone.use_connect = False
-    bone.parent = arm.edit_bones[bones['rtFingerRing01']]
-    bones['rtFingerRing02'] = bone.name
-    bone = arm.edit_bones.new('rtFingerRing03')
-    bone.head[:] = -4.989788818359375, -0.17186614990234375, 7.365953369140625
-    bone.tail[:] = -5.11146240234375, -0.17131389617919923, 7.200397338867187
-    bone.roll = -1.0072417259216309
-    bone.use_connect = True
-    bone.parent = arm.edit_bones[bones['rtFingerRing02']]
-    bones['rtFingerRing03'] = bone.name
+    add_bone(arm, "Female03MasterRoot", HeadMap.lookup("Female03MasterRoot"), TailMap.lookup("Female03MasterRoot"),
+             RollMap.lookup("Female03MasterRoot"), False)
+    add_bone(arm, "PelvisNode", HeadMap.lookup("PelvisNode"), TailMap.lookup("PelvisNode"),
+             RollMap.lookup("PelvisNode"), False, "Female03MasterRoot")
+    add_bone(arm, "lfHip", HeadMap.lookup("lfHip"), TailMap.lookup("lfHip"),
+             RollMap.lookup("lfHip"), False, "PelvisNode")
+    add_bone(arm, "lfThigh", HeadMap.lookup("lfThigh"), TailMap.lookup("lfThigh"),
+             RollMap.lookup("lfThigh"), True, "lfHip")
+    add_bone(arm, "lfCalf", HeadMap.lookup("lfCalf"), TailMap.lookup("lfCalf"),
+             RollMap.lookup("lfCalf"), True, "lfThigh")
+    add_bone(arm, "lfFoot", HeadMap.lookup("lfFoot"), TailMap.lookup("lfFoot"),
+             RollMap.lookup("lfFoot"), True, "lfCalf")
+    add_bone(arm, "lfToes", HeadMap.lookup("lfToes"), TailMap.lookup("lfToes"),
+             RollMap.lookup("lfToes"), True, "lfFoot")
+    add_bone(arm, "rtHip", HeadMap.lookup("rtHip"), TailMap.lookup("rtHip"),
+             RollMap.lookup("rtHip"), False, "PelvisNode")
+    add_bone(arm, "rtThigh", HeadMap.lookup("rtThigh"), TailMap.lookup("rtThigh"),
+             RollMap.lookup("rtThigh"), True, "rtHip")
+    add_bone(arm, "rtCalf", HeadMap.lookup("rtCalf"), TailMap.lookup("rtCalf"),
+             RollMap.lookup("rtCalf"), True, "rtThigh")
+    add_bone(arm, "rtFoot", HeadMap.lookup("rtFoot"), TailMap.lookup("rtFoot"),
+             RollMap.lookup("rtFoot"), True, "rtCalf")
+    add_bone(arm, "rtToes", HeadMap.lookup("rtToes"), TailMap.lookup("rtToes"),
+             RollMap.lookup("rtToes"), True, "rtFoot")
+    add_bone(arm, "Spine01", HeadMap.lookup("Spine01"), TailMap.lookup("Spine01"),
+             RollMap.lookup("Spine01"), False, "PelvisNode")
+    add_bone(arm, "Spine02", HeadMap.lookup("Spine02"), TailMap.lookup("Spine02"),
+             RollMap.lookup("Spine02"), False, "Spine01")
+    add_bone(arm, "Spine03", HeadMap.lookup("Spine03"), TailMap.lookup("Spine03"),
+             RollMap.lookup("Spine03"), True, "Spine02")
+    add_bone(arm, "Spine04", HeadMap.lookup("Spine04"), TailMap.lookup("Spine04"),
+             RollMap.lookup("Spine04"), True, "Spine03")
+    add_bone(arm, "Neck01", HeadMap.lookup("Neck01"), TailMap.lookup("Neck01"),
+             RollMap.lookup("Neck01"), False, "Spine04")
+    add_bone(arm, "Neck02", HeadMap.lookup("Neck02"), TailMap.lookup("Neck02"),
+             RollMap.lookup("Neck02"), False, "Neck01")
+    add_bone(arm, "Neck03", HeadMap.lookup("Neck03"), TailMap.lookup("Neck03"),
+             RollMap.lookup("Neck03"), True, "Neck02")
+    add_bone(arm, "Neck04", HeadMap.lookup("Neck04"), TailMap.lookup("Neck04"),
+             RollMap.lookup("Neck04"), True, "Neck03")
+    add_bone(arm, "Head", HeadMap.lookup("Head"), TailMap.lookup("Head"),
+             RollMap.lookup("Head"), True, "Neck04")
+    add_bone(arm, "lfClavicle", HeadMap.lookup("lfClavicle"), TailMap.lookup("lfClavicle"),
+             RollMap.lookup("lfClavicle"), False, "Spine04")
+    add_bone(arm, "lfShoulder", HeadMap.lookup("lfShoulder"), TailMap.lookup("lfShoulder"),
+             RollMap.lookup("lfShoulder"), False, "lfClavicle")
+    add_bone(arm, "lfBicep", HeadMap.lookup("lfBicep"), TailMap.lookup("lfBicep"),
+             RollMap.lookup("lfBicep"), True, "lfShoulder")
+    add_bone(arm, "lfElbow", HeadMap.lookup("lfElbow"), TailMap.lookup("lfElbow"),
+             RollMap.lookup("lfElbow"), True, "lfBicep")
+    add_bone(arm, "lfWrist", HeadMap.lookup("lfWrist"), TailMap.lookup("lfWrist"),
+             RollMap.lookup("lfWrist"), False, "lfElbow")
+    add_bone(arm, "lfHand", HeadMap.lookup("lfHand"), TailMap.lookup("lfHand"),
+             RollMap.lookup("lfHand"), True, "lfWrist")
+    add_bone(arm, "lfmetaCarpal03", HeadMap.lookup("lfmetaCarpal03"), TailMap.lookup("lfmetaCarpal03"),
+             RollMap.lookup("lfmetaCarpal03"), False, "lfHand")
+    add_bone(arm, "lfFingerMiddle01", HeadMap.lookup("lfFingerMiddle01"), TailMap.lookup("lfFingerMiddle01"),
+             RollMap.lookup("lfFingerMiddle01"), True, "lfmetaCarpal03")
+    add_bone(arm, "lfFingerMiddle02", HeadMap.lookup("lfFingerMiddle02"), TailMap.lookup("lfFingerMiddle02"),
+             RollMap.lookup("lfFingerMiddle02"), False, "lfFingerMiddle01")
+    add_bone(arm, "lfFingerMiddle03", HeadMap.lookup("lfFingerMiddle03"), TailMap.lookup("lfFingerMiddle03"),
+             RollMap.lookup("lfFingerMiddle03"), False, "lfFingerMiddle02")
+    add_bone(arm, "lfmetaCarpal01", HeadMap.lookup("lfmetaCarpal01"), TailMap.lookup("lfmetaCarpal01"),
+             RollMap.lookup("lfmetaCarpal01"), False, "lfHand")
+    add_bone(arm, "lfThumb01", HeadMap.lookup("lfThumb01"), TailMap.lookup("lfThumb01"),
+             RollMap.lookup("lfThumb01"), True, "lfmetaCarpal01")
+    add_bone(arm, "lfThumb02", HeadMap.lookup("lfThumb02"), TailMap.lookup("lfThumb02"),
+             RollMap.lookup("lfThumb02"), False, "lfThumb01")
+    add_bone(arm, "lfThumb03", HeadMap.lookup("lfThumb03"), TailMap.lookup("lfThumb03"),
+             RollMap.lookup("lfThumb03"), True, "lfThumb02")
+    add_bone(arm, "lfmetaCarpal05", HeadMap.lookup("lfmetaCarpal05"), TailMap.lookup("lfmetaCarpal05"),
+             RollMap.lookup("lfmetaCarpal05"), False, "lfHand")
+    add_bone(arm, "lfFingerPinky01", HeadMap.lookup("lfFingerPinky01"), TailMap.lookup("lfFingerPinky01"),
+             RollMap.lookup("lfFingerPinky01"), False, "lfmetaCarpal05")
+    add_bone(arm, "lfFingerPinky02", HeadMap.lookup("lfFingerPinky02"), TailMap.lookup("lfFingerPinky02"),
+             RollMap.lookup("lfFingerPinky02"), False, "lfFingerPinky01")
+    add_bone(arm, "lfFingerPinky03", HeadMap.lookup("lfFingerPinky03"), TailMap.lookup("lfFingerPinky03"),
+             RollMap.lookup("lfFingerPinky03"), True, "lfFingerPinky02")
+    add_bone(arm, "lfmetaCarpal02", HeadMap.lookup("lfmetaCarpal02"), TailMap.lookup("lfmetaCarpal02"),
+             RollMap.lookup("lfmetaCarpal02"), False, "lfHand")
+    add_bone(arm, "lfFingerIndex01", HeadMap.lookup("lfFingerIndex01"), TailMap.lookup("lfFingerIndex01"),
+             RollMap.lookup("lfFingerIndex01"), True, "lfmetaCarpal02")
+    add_bone(arm, "lfFingerIndex02", HeadMap.lookup("lfFingerIndex02"), TailMap.lookup("lfFingerIndex02"),
+             RollMap.lookup("lfFingerIndex02"), False, "lfFingerIndex01")
+    add_bone(arm, "lfFingerIndex03", HeadMap.lookup("lfFingerIndex03"), TailMap.lookup("lfFingerIndex03"),
+             RollMap.lookup("lfFingerIndex03"), True, "lfFingerIndex02")
+    add_bone(arm, "lfmetaCarpal04", HeadMap.lookup("lfmetaCarpal04"), TailMap.lookup("lfmetaCarpal04"),
+             RollMap.lookup("lfmetaCarpal04"), False, "lfHand")
+    add_bone(arm, "lfFingerRing01", HeadMap.lookup("lfFingerRing01"), TailMap.lookup("lfFingerRing01"),
+             RollMap.lookup("lfFingerRing01"), True, "lfmetaCarpal04")
+    add_bone(arm, "lfFingerRing02", HeadMap.lookup("lfFingerRing02"), TailMap.lookup("lfFingerRing02"),
+             RollMap.lookup("lfFingerRing02"), True, "lfFingerRing01")
+    add_bone(arm, "lfFingerRing03", HeadMap.lookup("lfFingerRing03"), TailMap.lookup("lfFingerRing03"),
+             RollMap.lookup("lfFingerRing03"), True, "lfFingerRing02")
+    add_bone(arm, "rtClavicle", HeadMap.lookup("rtClavicle"), TailMap.lookup("rtClavicle"),
+             RollMap.lookup("rtClavicle"), False, "Spine04")
+    add_bone(arm, "rtShoulder", HeadMap.lookup("rtShoulder"), TailMap.lookup("rtShoulder"),
+             RollMap.lookup("rtShoulder"), False, "rtClavicle")
+    add_bone(arm, "rtBicep", HeadMap.lookup("rtBicep"), TailMap.lookup("rtBicep"),
+             RollMap.lookup("rtBicep"), True, "rtShoulder")
+    add_bone(arm, "rtElbow", HeadMap.lookup("rtElbow"), TailMap.lookup("rtElbow"),
+             RollMap.lookup("rtElbow"), True, "rtBicep")
+    add_bone(arm, "rtWrist", HeadMap.lookup("rtWrist"), TailMap.lookup("rtWrist"),
+             RollMap.lookup("rtWrist"), False, "rtElbow")
+    add_bone(arm, "rtHand", HeadMap.lookup("rtHand"), TailMap.lookup("rtHand"),
+             RollMap.lookup("rtHand"), True, "rtWrist")
+    add_bone(arm, "rtmetaCarpal03", HeadMap.lookup("rtmetaCarpal03"), TailMap.lookup("rtmetaCarpal03"),
+             RollMap.lookup("rtmetaCarpal03"), True, "rtHand")
+    add_bone(arm, "rtFingerMiddle01", HeadMap.lookup("rtFingerMiddle01"), TailMap.lookup("rtFingerMiddle01"),
+             RollMap.lookup("rtFingerMiddle01"), True, "rtmetaCarpal03")
+    add_bone(arm, "rtFingerMiddle02", HeadMap.lookup("rtFingerMiddle02"), TailMap.lookup("rtFingerMiddle02"),
+             RollMap.lookup("rtFingerMiddle02"), True, "rtFingerMiddle01")
+    add_bone(arm, "rtFingerMiddle03", HeadMap.lookup("rtFingerMiddle03"), TailMap.lookup("rtFingerMiddle03"),
+             RollMap.lookup("rtFingerMiddle03"), True, "rtFingerMiddle02")
+    add_bone(arm, "rtmetaCarpal01", HeadMap.lookup("rtmetaCarpal01"), TailMap.lookup("rtmetaCarpal01"),
+             RollMap.lookup("rtmetaCarpal01"), True, "rtHand")
+    add_bone(arm, "rtThumb01", HeadMap.lookup("rtThumb01"), TailMap.lookup("rtThumb01"),
+             RollMap.lookup("rtThumb01"), False, "rtmetaCarpal01")
+    add_bone(arm, "rtThumb02", HeadMap.lookup("rtThumb02"), TailMap.lookup("rtThumb02"),
+             RollMap.lookup("rtThumb02"), False, "rtThumb01")
+    add_bone(arm, "rtThumb03", HeadMap.lookup("rtThumb03"), TailMap.lookup("rtThumb03"),
+             RollMap.lookup("rtThumb03"), True, "rtThumb02")
+    add_bone(arm, "rtmetaCarpal05", HeadMap.lookup("rtmetaCarpal05"), TailMap.lookup("rtmetaCarpal05"),
+             RollMap.lookup("rtmetaCarpal05"), True, "rtHand")
+    add_bone(arm, "rtFingerPinky01", HeadMap.lookup("rtFingerPinky01"), TailMap.lookup("rtFingerPinky01"),
+             RollMap.lookup("rtFingerPinky01"), True, "rtmetaCarpal05")
+    add_bone(arm, "rtFingerPinky02", HeadMap.lookup("rtFingerPinky02"), TailMap.lookup("rtFingerPinky02"),
+             RollMap.lookup("rtFingerPinky02"), False, "rtFingerPinky01")
+    add_bone(arm, "rtFingerPinky03", HeadMap.lookup("rtFingerPinky03"), TailMap.lookup("rtFingerPinky03"),
+             RollMap.lookup("rtFingerPinky03"), False, "rtFingerPinky02")
+    add_bone(arm, "rtmetaCarpal02", HeadMap.lookup("rtmetaCarpal02"), TailMap.lookup("rtmetaCarpal02"),
+             RollMap.lookup("rtmetaCarpal02"), True, "rtHand")
+    add_bone(arm, "rtFingerIndex01", HeadMap.lookup("rtFingerIndex01"), TailMap.lookup("rtFingerIndex01"),
+             RollMap.lookup("rtFingerIndex01"), True, "rtmetaCarpal02")
+    add_bone(arm, "rtFingerIndex02", HeadMap.lookup("rtFingerIndex02"), TailMap.lookup("rtFingerIndex02"),
+             RollMap.lookup("rtFingerIndex02"), True, "rtFingerIndex01")
+    add_bone(arm, "rtFingerIndex03", HeadMap.lookup("rtFingerIndex03"), TailMap.lookup("rtFingerIndex03"),
+             RollMap.lookup("rtFingerIndex03"), True, "rtFingerIndex02")
+    add_bone(arm, "rtmetaCarpal04", HeadMap.lookup("rtmetaCarpal04"), TailMap.lookup("rtmetaCarpal04"),
+             RollMap.lookup("rtmetaCarpal04"), True, "rtHand")
+    add_bone(arm, "rtFingerRing01", HeadMap.lookup("rtFingerRing01"), TailMap.lookup("rtFingerRing01"),
+             RollMap.lookup("rtFingerRing01"), False, "rtmetaCarpal04")
+    add_bone(arm, "rtFingerRing02", HeadMap.lookup("rtFingerRing02"), TailMap.lookup("rtFingerRing02"),
+             RollMap.lookup("rtFingerRing02"), False, "rtFingerRing01")
+    add_bone(arm, "rtFingerRing03", HeadMap.lookup("rtFingerRing03"), TailMap.lookup("rtFingerRing03"),
+             RollMap.lookup("rtFingerRing03"), True, "rtFingerRing02")
 
     bpy.ops.object.editmode_toggle()
     bpy.ops.object.select_all(action='DESELECT')

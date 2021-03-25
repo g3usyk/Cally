@@ -2,10 +2,12 @@ import bmesh
 import os
 from xml.etree import ElementTree as et
 from .prettify import pretty_print
+from ..maps.ids import IDMap
+from ..maps.positions import PositionMap
 from ..mesh.base import BaseMesh
 from ..xmesh.xvert import XVertex
 from ..xmesh.xface import XFace
-from ..xmesh.xmap import WeightMap
+# from ..xmesh.xmap import WeightMap
 
 
 def generate_vertices(obj, submap: dict, weight: str) -> list:
@@ -22,7 +24,8 @@ def generate_vertices(obj, submap: dict, weight: str) -> list:
     """
     xverts = []
 
-    groups = {g.index: WeightMap.get_bone_id(g.name) for g in obj.vertex_groups}
+    groups = {g.index: IDMap.lookup(g.name) for g in obj.vertex_groups}
+    # groups = {g.index: WeightMap.get_bone_id(g.name) for g in obj.vertex_groups}
 
     xcol = ['1', '1', '1']
     bone_id = submap[obj.name][1]
@@ -190,7 +193,8 @@ def export_xmf(context, filepath: str, submap: dict,
             if len(obj.vertex_groups) > 0:
                 weight = 'AUTO'
             posn = obj.matrix_world.translation
-            assignments = ['', WeightMap.get_bone(posn)]
+            assignments = ['', PositionMap.get_closest_bone(posn)]
+            # assignments = ['', WeightMap.get_bone(posn)]
             m = mtls[obj.name]
             if m > 0:
                 assignments.append(m)

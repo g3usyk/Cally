@@ -1,3 +1,7 @@
+import math
+from .ids import IDMap
+
+
 class PositionMap:
     mapping = {'PelvisNode': [0.0, 0.08434296399354935, 6.638940811157227],
                'lfHip': [0.2815685272216797, -0.0160521250218153, 6.478870868682861],
@@ -90,3 +94,15 @@ class PositionMap:
     @classmethod
     def lookup(cls, bone_name: str) -> list:
         return cls.mapping[bone_name]
+
+    @classmethod
+    def get_closest_bone(cls, loc) -> str:
+        curr_bone = 0
+        curr_dist = float("inf")
+        for bone_name, posn in cls.mapping.items():
+            dist = math.sqrt(((loc[0] - posn[0]) ** 2) + ((loc[1] - posn[1]) ** 2) + ((loc[2] - posn[2]) ** 2))
+            if dist < curr_dist:
+                curr_dist = dist
+                curr_bone = IDMap.lookup(bone_name)
+                # curr_bone = cls.wmap[bone_name]
+        return str(curr_bone)

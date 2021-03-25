@@ -1,5 +1,6 @@
 import bpy
-from ..xmesh.xmap import WeightMap
+from ..maps.ids import IDMap
+from ..maps.names import NameMap
 
 
 class BaseMesh:
@@ -49,13 +50,14 @@ class BaseMesh:
 
     def add_groups(self, ob):
         if len(self.groups) > 0:
-            for bone_name, bone_id in WeightMap.wmap.items():
+            for bone_name in IDMap.mapping:
                 ob.vertex_groups.new(name=bone_name)
-            mapping = {v: k for k, v in WeightMap.wmap.items()}
             for i, group in enumerate(self.groups):
                 for influence in group:
-                    if influence[0] in mapping:
-                        ob.vertex_groups[mapping[influence[0]]].add([i], influence[1], 'ADD')
+                    bone_id = influence[0]
+                    if bone_id in NameMap.mapping:
+                        bone_name = NameMap.lookup(bone_id)
+                        ob.vertex_groups[bone_name].add([i], influence[1], 'ADD')
 
     def to_mesh(self, collection=None, smooth=True, uvs=True, norms=False, groups=False):
         """Generates a mesh using raw geometric data.
