@@ -2,52 +2,58 @@ from xml.etree import ElementTree as et
 
 
 class XVertex:
-    """Represents a vertex object as outlined in a xmf file.
+    """Represents a vertex object following the xmf file format.
 
     """
 
-    def __init__(self, posn, norm, color, infls):
-        self.posn = posn
-        self.norm = norm
-        self.uv = []
+    def __init__(self, position: list, normal: list, color: list, influences: dict):
+        self.position = position
+        self.normal = normal
         self.color = color
-        self.infls = infls
+        self.influences = influences
+        self.uv = []
+        self.blends = {}
 
-    def parse(self, idx, u_idx, scale):
+    def add_blend(self, name: str, position: list, normal: list):
+        if position != self.position:
+            self.blends[name] = position, normal
+
+    def parse(self, vertex_id: int, uv_id: int, scale: float) -> et.Element:
         """
 
         Args:
-            idx ():
-            u_idx ():
+            vertex_id ():
+            uv_id ():
             scale ():
 
         Returns:
             An xml element representing an xmf <VERTEX> tag.
 
         """
-        xvert = et.Element('vertex')
-        xvert.attrib['numinfluences'] = str(len(self.infls))
-        xvert.attrib['id'] = str(idx)
+        tag = et.Element('vertex')
+        tag.attrib['numinfluences'] = str(len(self.influences))
+        tag.attrib['id'] = str(vertex_id)
 
         xposn = et.Element('pos')
         xnorm = et.Element('norm')
         xcol = et.Element('color')
         xuv = et.Element('texcoord')
 
-        xposn.text = ''.join([(str(p * scale) + ' ') for p in self.posn])[:-1]
-        xnorm.text = ''.join([(str(n) + ' ') for n in self.norm])[:-1]
-        xcol.text = ''.join([(str(c) + ' ') for c in self.color])[:-1]
-        xuv.text = str(self.uv[u_idx][0]) + ' ' + str(abs(1 - self.uv[u_idx][1]))
+        xposn.text = ' '.join([(str(p * scale)) for p in self.position])
+        xnorm.text = ' '.join([(str(n)) for n in self.normal])
+        xcol.text = ' '.join([(str(c)) for c in self.color])
+        xuv.text = f'{self.uv[uv_id][0]} {abs(1 - self.uv[uv_id][1])}'
+        # xuv.text = str(self.uv[uv_id][0]) + ' ' + str(abs(1 - self.uv[uv_id][1]))
 
-        xvert.append(xposn)
-        xvert.append(xnorm)
-        xvert.append(xcol)
-        xvert.append(xuv)
+        tag.append(xposn)
+        tag.append(xnorm)
+        tag.append(xcol)
+        tag.append(xuv)
 
-        for bone, infl in self.infls.items():
+        for bone, infl in self.influences.items():
             xinf = et.Element('influence')
             xinf.attrib['id'] = bone
             xinf.text = str(infl)
-            xvert.append(xinf)
+            tag.append(xinf)
 
-        return xvert
+        return tag

@@ -7,18 +7,18 @@ class XFace:
     """
 
     def __init__(self):
-        self.ix = []
+        self.vertices = []
 
-    def parse(self, idxs):
-        """Concatenates a group of vertex indices into an xmf face tag.
+    def parse(self, vertex_ids: list) -> et.Element:
+        """Concatenates a group of vertex index assignments into an xmf face tag.
 
         Args:
-            idxs (list): A list of lists of vertex indices.
+            vertex_ids (list): The assignments for each vertex to their corresponding vertex ids.
 
         Returns:
             An xml Element representing an xml <FACE> tag.
 
         """
-        xfac = et.Element('face')
-        xfac.attrib['vertexid'] = ''.join([(str(idxs[i[0]][i[1]]) + ' ') for i in self.ix])[:-1]
-        return xfac
+        tag = et.Element('face')
+        tag.attrib['vertexid'] = ' '.join([(str(vertex_ids[vertex[0]][vertex[1]])) for vertex in self.vertices])
+        return tag
