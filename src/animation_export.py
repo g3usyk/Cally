@@ -1,7 +1,9 @@
 import bpy
+
 from bpy.props import BoolProperty, EnumProperty, StringProperty
 from bpy.types import Operator
 from bpy_extras.io_utils import ExportHelper
+
 from .xfile.xaf import export_xaf
 
 
