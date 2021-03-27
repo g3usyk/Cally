@@ -16,6 +16,7 @@ from .src.animation_export import CalAnimationExporter
 from .src.animation_import import CalAnimationImporter
 from .src.mesh_export import CalMeshExporter
 from .src.mesh_import import CalMeshImporter
+from .src.morph_export import CalMorphExporter
 from .src.skeleton_export import CalSkeletonExporter
 from .src.ops.skeleton import DefaultSkeleton
 from .src.ops import sit, stand
@@ -63,6 +64,16 @@ def mesh_import_button(self, context: bpy.types.Context):
     self.layout.operator(CalMeshImporter.bl_idname, text="Cal3D Mesh (.xmf)")
 
 
+def morph_export_button(self, context: bpy.types.Context):
+    """Targets morph exporter class on menu button press.
+
+    Args:
+        self (): A reference to this bpy dynamic draw function.
+        context (bpy.types.Context): The context containing data for the current 3d view.
+    """
+    self.layout.operator(CalMorphExporter.bl_idname, text="Cal3D Morph (.xpf)")
+
+
 def skeleton_export_button(self, context: bpy.types.Context):
     """Targets skeleton exporter class on menu button press.
 
@@ -96,6 +107,7 @@ classes = (
     CalAnimationImporter,
     CalMeshExporter,
     CalMeshImporter,
+    CalMorphExporter,
     CalSkeletonExporter,
     DefaultSkeleton,
     sit.SittingSpot,
@@ -117,6 +129,7 @@ def register():
     bpy.types.TOPBAR_MT_file_import.append(animation_import_button)
     bpy.types.TOPBAR_MT_file_export.append(mesh_export_button)
     bpy.types.TOPBAR_MT_file_import.append(mesh_import_button)
+    bpy.types.TOPBAR_MT_file_export.append(morph_export_button)
     bpy.types.TOPBAR_MT_file_export.append(skeleton_export_button)
     bpy.types.VIEW3D_MT_add.append(imvu_add_menu)
 
@@ -132,6 +145,7 @@ def unregister():
     bpy.types.TOPBAR_MT_file_import.remove(animation_import_button)
     bpy.types.TOPBAR_MT_file_export.remove(mesh_export_button)
     bpy.types.TOPBAR_MT_file_import.remove(mesh_import_button)
+    bpy.types.TOPBAR_MT_file_export.remove(morph_export_button)
     bpy.types.TOPBAR_MT_file_export.remove(skeleton_export_button)
     bpy.types.VIEW3D_MT_add.remove(imvu_add_menu)
 
