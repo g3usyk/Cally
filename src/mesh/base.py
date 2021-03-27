@@ -1,6 +1,5 @@
 import bpy
 from mathutils import Vector
-from ..maps.ids import IDMap
 from ..maps.names import NameMap
 
 

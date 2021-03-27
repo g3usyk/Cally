@@ -1,8 +1,5 @@
-from bpy.props import (
-    BoolProperty,
-    EnumProperty,
-    StringProperty,
-)
+import bpy
+from bpy.props import BoolProperty, EnumProperty, StringProperty
 from bpy.types import Operator
 from bpy_extras.io_utils import ExportHelper
 from .xfile.xaf import export_xaf
@@ -28,18 +25,6 @@ class CalAnimationExporter(Operator, ExportHelper):
         default=False,
     )
 
-    scaling = {'100'}
-
-    def update_scale(self, context):
-        """Checks if scale enum has an invalid state.
-
-        Args:
-            context (): A bpy context containing data in the current 3d view.
-        """
-        if len(self.scale) == 0 or len(self.scale) > 1:
-            self.scale = self.scaling
-        self.scaling = self.scale
-
     scale: EnumProperty(
         name="Scale",
         description="Applies imvu's scaling factor",
@@ -48,15 +33,13 @@ class CalAnimationExporter(Operator, ExportHelper):
             ('100', "Auto", "Default upscaled resolution"),
             ('1', "Native", "Client resolution")
         ),
-        default=scaling,
-        update=update_scale
+        default='100'
     )
 
     @classmethod
-    def poll(cls, context):
+    def poll(cls, context: bpy.types.Context):
         return context.active_object.type == 'ARMATURE'
 
-    def execute(self, context):
-        export_xaf(context, self.filepath, float(next(iter(self.scale))),
-                   context.scene.render.fps, self.debug)
+    def execute(self, context: bpy.types.Context):
+        export_xaf(context, self.filepath, float(self.scale), context.scene.render.fps, self.debug)
         return {'FINISHED'}

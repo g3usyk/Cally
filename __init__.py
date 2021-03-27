@@ -11,6 +11,7 @@ bl_info = {
 }
 
 import bpy
+
 from .src.animation_export import CalAnimationExporter
 from .src.animation_import import CalAnimationImporter
 from .src.mesh_export import CalMeshExporter
@@ -22,64 +23,65 @@ from .src.ops import f_body, m_body
 from .src.imvu_add import VIEW3D_MT_imvu
 
 
-def animation_export_button(self, context):
+def animation_export_button(self, context: bpy.types.Context):
     """Targets animation exporter class on menu button press.
 
     Args:
         self (): A reference to this bpy dynamic draw function.
-        context (): A bpy context containing data in the current 3d view.
+        context (bpy.types.Context): The context containing data for the current 3d view.
     """
     self.layout.operator(CalAnimationExporter.bl_idname, text="Cal3D Animation (.xaf)")
 
 
-def animation_import_button(self, context):
+def animation_import_button(self, context: bpy.types.Context):
     """Targets animation importer class on menu button press.
 
     Args:
         self (): A reference to this bpy dynamic draw function.
-        context (): A bpy context containing data in the current 3d view.
+        context (bpy.types.Context): The context containing data for the current 3d view.
     """
     self.layout.operator(CalAnimationImporter.bl_idname, text="Cal3D Animation (.xaf)")
 
 
-def mesh_export_button(self, context):
+def mesh_export_button(self, context: bpy.types.Context):
     """Targets mesh exporter class on menu button press.
 
     Args:
         self (): A reference to this bpy dynamic draw function.
-        context (): A bpy context containing data in the current 3d view.
+        context (bpy.types.Context): The context containing data for the current 3d view.
     """
     self.layout.operator(CalMeshExporter.bl_idname, text="Cal3D Mesh (.xmf)")
 
 
-def mesh_import_button(self, context):
+def mesh_import_button(self, context: bpy.types.Context):
     """Targets mesh importer class on menu button press.
 
     Args:
         self (): A reference to this bpy dynamic draw function.
-        context (): A bpy context containing data in the current 3d view.
+        context (bpy.types.Context): The context containing data for the current 3d view.
     """
     self.layout.operator(CalMeshImporter.bl_idname, text="Cal3D Mesh (.xmf)")
 
 
-def skeleton_export_button(self, context):
+def skeleton_export_button(self, context: bpy.types.Context):
     """Targets skeleton exporter class on menu button press.
 
     Args:
         self (): A reference to this bpy dynamic draw function.
-        context (): A bpy context containing data in the current 3d view.
+        context (bpy.types.Context): The context containing data for the current 3d view.
     """
     self.layout.operator(CalSkeletonExporter.bl_idname, text="Cal3D Skeleton (.xsf)")
 
 
-def imvu_add_menu(self, context):
+def imvu_add_menu(self, context: bpy.types.Context):
     self.layout.menu(VIEW3D_MT_imvu.bl_idname, icon="INFO")
 
 
-def manual_map():
+def manual_map() -> tuple:
     """Defines documentation for addon.
 
-    Returns: A tuple containing a hyperlink to the relevant documentation.
+    Returns:
+        tuple: A hyperlink to the relevant documentation.
 
     """
     url_manual_prefix = "https://docs.blender.org/manual/en/latest/"

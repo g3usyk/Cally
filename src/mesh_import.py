@@ -1,8 +1,4 @@
-import bpy
-from bpy.props import (
-    BoolProperty,
-    StringProperty,
-)
+from bpy.props import BoolProperty, StringProperty
 from bpy.types import Operator
 from bpy_extras.io_utils import ImportHelper
 from .xfile.xmf import import_xmf
