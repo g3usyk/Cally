@@ -1,4 +1,5 @@
 import bpy
+
 from ..maps.bones.heads import HeadMap
 from ..maps.bones.rolls import RollMap
 from ..maps.bones.tails import TailMap
@@ -16,10 +17,24 @@ def add_bone(armature, bone_name: str, head, tail,
     return bone
 
 
-def lock_bones(obj):
+def lock_bones(obj: bpy.types.Object):
     for bone in obj.pose.bones:
-        if bone.name != 'PelvisNode':
+        bone.lock_scale = [True, True, True]
+        name = bone.name
+        if name != 'PelvisNode':
             bone.lock_location = [True, True, True]
+            if 'meta' in name or 'Hip' in name:
+                bone.lock_rotation = [True, True, True]
+            elif '02' in name or '03' in name or 'Calf' in name or 'Toes' in name:
+                if 'Spine' not in name and 'Neck' not in name:
+                    bone.lock_rotation = [False, True, True]
+            elif '01' in name or 'Hand' in name:
+                if 'Spine' not in name and 'Neck' not in name:
+                    bone.lock_rotation = [False, True, False]
+            elif 'Bicep' in name or 'Wrist' in name:
+                bone.lock_rotation = [True, False, True]
+            elif 'Elbow' in name:
+                bone.lock_rotation = [True, True, False]
 
 
 def add_master_root():
