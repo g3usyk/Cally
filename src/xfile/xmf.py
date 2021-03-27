@@ -263,7 +263,18 @@ def extract_influences(elem: et.Element, tag: str, conversion) -> list:
     return list(seen)
 
 
-def extract_morphs(sub: et.Element) -> dict:
+def extract_morph_names(root: et.Element) -> dict:
+    morphs = {}
+    for morph in root.iter('morph'):
+        morph_name = morph.attrib['name']
+        morphs[morph_name.lower()] = morph_name
+    for morph in root.iter('MORPH'):
+        morph_name = morph.attrib['NAME']
+        morphs[morph_name.lower()] = morph_name
+    return morphs
+
+
+def extract_morphs(sub: et.Element, morph_names: dict) -> dict:
     morphs = {}
     for morph in sub.iter('morph'):
         blend_vertices = []
@@ -271,11 +282,12 @@ def extract_morphs(sub: et.Element) -> dict:
             position = extract(blend_vertex, 'position', float)
             positions = [p / 100 for p in position]
             blend_vertices.append((int(blend_vertex.attrib['vertexid']), positions))
-        morphs[morph.attrib['name']] = blend_vertices
+        alt_name = morph.attrib['name']
+        morphs[morph_names[alt_name]] = blend_vertices
     return morphs
 
 
-def extract_submesh(sub: et.Element, name: str) -> BaseMesh:
+def extract_submesh(sub: et.Element, mesh_name: str, morph_names: dict) -> BaseMesh:
     positions = []
     uvs = []
     normals = []
@@ -288,12 +300,12 @@ def extract_submesh(sub: et.Element, name: str) -> BaseMesh:
         uv = extract(vertex, 'texcoord', float)
         uvs.append((uv[0], abs(1 - uv[1])))
         influences.append(extract_influences(vertex, 'influence', float))
-    morphs = extract_morphs(sub)
+    morphs = extract_morphs(sub, morph_names)
     loops = []
     for face in sub.iter('face'):
         vertex_ids = [int(vertex_id) for vertex_id in face.attrib['vertexid'].split()]
         loops.append(vertex_ids)
-    return BaseMesh(name, positions, loops, uvs, normals, influences, morphs)
+    return BaseMesh(mesh_name, positions, loops, uvs, normals, influences, morphs)
 
 
 def import_xmf(filepath: str):
@@ -305,13 +317,14 @@ def import_xmf(filepath: str):
     data = ''
     with open(filepath, 'r') as f:
         data += f.read()
-    data = data.lower()
-    start = data.find('<mesh')
-    root = et.fromstring(data[start:])
+    data_copy = data.lower()
+    start = data_copy.find('<mesh')
+    morph_names = extract_morph_names(et.fromstring(data[start:]))
+    root = et.fromstring(data_copy[start:])
     objs = []
     filename = os.path.split(filepath)[1]
     mesh_name = os.path.splitext(filename)[0]
     for submesh in root.iter('submesh'):
-        obj = extract_submesh(submesh, mesh_name)
+        obj = extract_submesh(submesh, mesh_name, morph_names)
         objs.append(obj)
     return objs

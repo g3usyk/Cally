@@ -11,7 +11,7 @@ class XMorph:
 
     def parse(self, scale: float) -> et.Element:
         tag = et.Element('morph')
-        tag.attrib['name'] = self.name
+        tag.attrib['name'] = self.name.replace(' ', '.')
         tag.attrib['morphid'] = str(self.morph_id)
         tag.attrib['numblendverts'] = str(len(self.vertices))
         for vertex in self.vertices:
