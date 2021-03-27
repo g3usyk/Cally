@@ -1,7 +1,7 @@
 bl_info = {
     "name": "Cally",
     "author": "hsoju",
-    "version": (3, 0, 3),
+    "version": (4, 0, 0),
     "blender": (2, 90, 0),
     "location": "File > Import-Export",
     "description": "Import-Export Cal3D objects",
@@ -85,6 +85,12 @@ def skeleton_export_button(self, context: bpy.types.Context):
 
 
 def imvu_add_menu(self, context: bpy.types.Context):
+    """Targets object add menu for imvu primitives.
+
+    Args:
+        self (): A reference to this bpy dynamic draw function.
+        context (bpy.types.Context): The context containing data for the current 3d view.
+    """
     self.layout.menu(VIEW3D_MT_imvu.bl_idname, icon="INFO")
 
 
