@@ -3,6 +3,7 @@ import bmesh
 import os
 
 from xml.etree import ElementTree as et
+
 from .prettify import pretty_print
 from ..maps.ids import IDMap
 from ..maps.positions import PositionMap
@@ -32,7 +33,7 @@ def generate_vertices(obj, bone_id: int, weight: str) -> list:
     """
     xverts = []
     color = ['1', '1', '1']
-    influences = {bone_id: 1}
+    influences = {str(bone_id): 1}
 
     if weight == 'OBJECT':
         for vertex in obj.data.vertices:
@@ -229,12 +230,12 @@ def write_xmf(filepath: str, objs: list, submap: dict, scale: float, weight: str
         f.write("%s" % xtext)
 
 
-def export_xmf(context, filepath: str, submap: dict,
+def export_xmf(context: bpy.types.Context, filepath: str, submap: dict,
                scale: float, weight: str, auto: bool):
     """Exports a new xmf file containing the selected submeshes' data.
 
     Args:
-        context (): A bpy context containing data in the current 3d view.
+        context (bpy.types.Context): A bpy context containing data in the current 3d view.
         filepath (str): The filepath of the xmf file.
         submap (dict): A mapping where each submesh corresponds to a bone id and a material id.
         scale (float): The scaling factor for the mesh on export.
