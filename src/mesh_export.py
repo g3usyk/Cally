@@ -1,6 +1,6 @@
 import bpy
-from bpy.props import (StringProperty, BoolProperty, EnumProperty,
-                       IntProperty, FloatProperty)
+import re
+from bpy.props import (StringProperty, BoolProperty, EnumProperty, IntProperty)
 from bpy.types import Operator
 from bpy_extras.io_utils import ExportHelper
 from .maps.ids import IDMap
@@ -16,7 +16,13 @@ def get_bone(obj) -> str:
 
 def get_material(obj) -> int:
     mtl = bpy.data.objects[obj].active_material
-    material = bpy.data.materials.find(mtl.name) if mtl else 0
+    material = 0
+    if mtl:
+        mtl_id = re.findall('\d+', mtl.name)
+        if mtl_id:
+            material = int(mtl_id[0])
+        else:
+            material = bpy.data.materials.find(mtl.name)
     return material
 
 
