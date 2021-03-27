@@ -40,8 +40,14 @@ class CalMeshImporter(Operator, ImportHelper):
         default=True,
     )
 
+    morphs: BoolProperty(
+        name="Include Morphs",
+        description="Include morphs for mesh",
+        default=True,
+    )
+
     def execute(self, context):
         submeshes = import_xmf(self.filepath)
         for b in submeshes:
-            b.to_mesh(smooth=False, uvs=self.uvs, norms=self.norms, groups=self.weights)
+            b.to_mesh(smooth=False, uvs=self.uvs, norms=self.norms, groups=self.weights, morphs=self.morphs)
         return {'FINISHED'}

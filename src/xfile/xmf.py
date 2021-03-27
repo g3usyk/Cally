@@ -247,52 +247,59 @@ def export_xmf(context, filepath: str, submap: dict,
     write_xmf(filepath, objs, submap, scale, weight)
 
 
-def extract(elem: et.Element, tag, conversion):
+def extract(elem: et.Element, tag: str, conversion) -> list:
     child = elem.find(tag).text.split()
     values = [conversion(x) for x in child]
     return values
 
 
-def extract_all(elem: et.Element, tag, conversion):
+def extract_influences(elem: et.Element, tag: str, conversion) -> list:
     children = elem.findall(tag)
     seen = set()
-    values = []
-    for child in children:
-        k, v = int(child.attrib['id']), conversion(child.text)
-        if (k, v) not in seen:
-            values.append((k, v))
-            seen.add((k, v))
-    return values
+    for influence in children:
+        bone_id, weight = int(influence.attrib['id']), conversion(influence.text)
+        seen.add((bone_id, weight))
+    return list(seen)
+
+
+def extract_morphs(sub: et.Element) -> dict:
+    morphs = {}
+    for morph in sub.iter('morph'):
+        blend_vertices = []
+        for blend_vertex in morph.iter('blendvertex'):
+            position = extract(blend_vertex, 'position', float)
+            positions = [p / 100 for p in position]
+            blend_vertices.append((int(blend_vertex.attrib['vertexid']), positions))
+        morphs[morph.attrib['name']] = blend_vertices
+    return morphs
 
 
 def extract_submesh(sub: et.Element, name: str) -> BaseMesh:
-    posns = []
+    positions = []
     uvs = []
-    norms = []
-    infls = []
-    for vert in sub.iter('vertex'):
-        pos = extract(vert, 'pos', float)
-        posns.append(tuple([p / 100 for p in pos]))
-        norm = extract(vert, 'norm', float)
-        norms.append(tuple(norm))
+    normals = []
+    influences = []
+    for vertex in sub.iter('vertex'):
+        position = extract(vertex, 'pos', float)
+        positions.append([p / 100 for p in position])
+        normals.append(extract(vertex, 'norm', float))
         # col = extract(vert, 'color', float)
-        uv = extract(vert, 'texcoord', float)
+        uv = extract(vertex, 'texcoord', float)
         uvs.append((uv[0], abs(1 - uv[1])))
-        infl = extract_all(vert, 'influence', float)
-        infls.append(infl)
+        influences.append(extract_influences(vertex, 'influence', float))
+    morphs = extract_morphs(sub)
     loops = []
     for face in sub.iter('face'):
-        vert_ids = [int(x) for x in face.attrib['vertexid'].split()]
-        loops.append(vert_ids)
-    return BaseMesh(name, posns, loops, uvs, norms, infls)
+        vertex_ids = [int(vertex_id) for vertex_id in face.attrib['vertexid'].split()]
+        loops.append(vertex_ids)
+    return BaseMesh(name, positions, loops, uvs, normals, influences, morphs)
 
 
 def import_xmf(filepath: str):
     """Parses submeshes from an xmf file.
 
     Args:
-        context (): A bpy context containing data in the current 3d view.
-        filepath (str): A string specifying the file path of the xml object.
+        filepath (str): The filepath of the xml file.
     """
     data = ''
     with open(filepath, 'r') as f:
@@ -301,9 +308,9 @@ def import_xmf(filepath: str):
     start = data.find('<mesh')
     root = et.fromstring(data[start:])
     objs = []
-    obj_filepath = os.path.split(filepath)[1]
-    obj_name = '.'.join(obj_filepath.split('.')[:-1])
-    for sub in root.iter('submesh'):
-        ob = extract_submesh(sub, obj_name)
-        objs.append(ob)
+    filename = os.path.split(filepath)[1]
+    mesh_name = os.path.splitext(filename)[0]
+    for submesh in root.iter('submesh'):
+        obj = extract_submesh(submesh, mesh_name)
+        objs.append(obj)
     return objs

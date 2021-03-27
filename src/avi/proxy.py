@@ -29,17 +29,17 @@ class Proxy(BaseMesh):
                 uvs = mapping['uvs']
         super().__init__(name, vertices, faces, uvs, [], groups)
 
-    def add_uvs(self, ob):
+    def add_uvs(self, obj):
         """Generates uv coordinates to mesh object.
 
         Args:
-            ob (): A bpy object without a uv map or uv coordinates.
+            obj (): A bpy object without a uv map or uv coordinates.
         """
         bpy.ops.mesh.uv_texture_add()
         if len(self.uvs) != 0:
-            uvl = ob.data.uv_layers.active
+            uvl = obj.data.uv_layers.active
             uv_idx = 0
-            for face in ob.data.polygons:
+            for face in obj.data.polygons:
                 for v_idx, l_idx in zip(face.vertices, face.loop_indices):
                     uv_x, uv_y = self.uvs[uv_idx]
                     uvl.data[l_idx].uv.x = uv_x
