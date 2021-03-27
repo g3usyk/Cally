@@ -27,14 +27,14 @@ def generate_vertices(obj, bone_id: int, weight: str) -> list:
         weight (str): The vertex bone-weight assignment method.
 
     Returns:
-        list: A list of xmf vertex objects.
+        list: The xmf vertex objects.
 
     """
     xverts = []
     color = ['1', '1', '1']
     influences = {bone_id: 1}
 
-    if weight == 'MANUAL':
+    if weight == 'OBJECT':
         for vertex in obj.data.vertices:
             next_vertex = generate_vertex(obj, vertex, color, influences)
             xverts.append(next_vertex)
@@ -192,19 +192,19 @@ def default_options(objs: list) -> tuple:
     submap = {}
     material = 0
     scale = 100.0
-    weight = 'MANUAL'
+    weight = 'OBJECT'
     for obj in objs:
+        submap[obj.name] = {}
         if len(obj.vertex_groups) > 0:
-            weight = 'AUTO'
+            weight = 'VERTEX'
         location = obj.matrix_world.translation
-        assignments = ['', str(PositionMap.get_closest_bone(location))]
+        submap[obj.name]['bone'] = PositionMap.get_closest_bone(location)
         name = '.'.join(obj.name.split('.')[:2])
         if name in body_part_ids:
-            assignments.append(body_part_ids[obj.name])
+            submap[obj.name]['material'] = body_part_ids[name]
         else:
-            assignments.append(material)
+            submap[obj.name]['material'] = material
             material = skip_material(material)
-        submap[obj.name] = assignments
     return submap, scale, weight
 
 
@@ -212,12 +212,12 @@ def write_xmf(filepath: str, objs: list, submap: dict, scale: float, weight: str
     root = et.Element('mesh')
     root.attrib['numsubmesh'] = str(len(objs))
     for obj in objs:
-        vertices = generate_vertices(obj, submap[obj.name][1], weight)
+        vertices = generate_vertices(obj, submap[obj.name]['bone'], weight)
         generate_blend_vertices(obj, vertices)
         faces = generate_faces(obj, vertices)
         root.append(et.Comment(obj.name))
         morphs = generate_morphs(obj)
-        sub = create_submesh(submap[obj.name][2], len(faces), len(morphs))
+        sub = create_submesh(submap[obj.name]['material'], len(faces), len(morphs))
         fill_submesh(sub, vertices, morphs, faces, scale)
         root.append(sub)
 
@@ -230,7 +230,7 @@ def write_xmf(filepath: str, objs: list, submap: dict, scale: float, weight: str
 
 
 def export_xmf(context, filepath: str, submap: dict,
-               scale: float, weight: str, adv: bool):
+               scale: float, weight: str, auto: bool):
     """Exports a new xmf file containing the selected submeshes' data.
 
     Args:
@@ -239,10 +239,10 @@ def export_xmf(context, filepath: str, submap: dict,
         submap (dict): A mapping where each submesh corresponds to a bone id and a material id.
         scale (float): The scaling factor for the mesh on export.
         weight (str): The vertex bone-weight assignment method.
-        adv (bool): Whether or not to use automatically generated file output options.
+        auto (bool): Whether or not to use automatically generated file output options.
     """
     objs = [obj for obj in context.selected_objects if obj.type == 'MESH']
-    if not adv:
+    if auto:
         submap, scale, weight = default_options(objs)
     write_xmf(filepath, objs, submap, scale, weight)
 

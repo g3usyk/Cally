@@ -96,7 +96,7 @@ class PositionMap:
         return cls.mapping[bone_name]
 
     @classmethod
-    def get_closest_bone(cls, loc) -> str:
+    def get_closest_bone(cls, loc) -> int:
         curr_bone = 0
         curr_dist = float("inf")
         for bone_name, posn in cls.mapping.items():
