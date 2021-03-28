@@ -1,8 +1,10 @@
 import bpy
-from bpy.props import EnumProperty, StringProperty
+
+from bpy.props import BoolProperty, EnumProperty, StringProperty
 from bpy.types import Operator
 from bpy_extras.io_utils import ImportHelper
-from .arm.master_root import add_master_root
+
+from .arm.master_root import add_master_root, lock_bones
 from .xfile.xaf import import_xaf
 
 
@@ -20,6 +22,12 @@ class CalAnimationImporter(Operator, ImportHelper):
         maxlen=255,
     )
 
+    lock: BoolProperty(
+        name="Lock",
+        description="Use default transformation locks on each bone",
+        default=True,
+    )
+
     scale: EnumProperty(
         name="Scale",
         description="Applies imvu's scaling factor",
@@ -33,6 +41,7 @@ class CalAnimationImporter(Operator, ImportHelper):
     def execute(self, context):
         obj = context.active_object
         if context.active_object and context.active_object.type == 'ARMATURE':
+            bpy.ops.object.mode_set(mode='OBJECT')
             bpy.ops.object.delete()
         obj = add_master_root()
         obj.select_set(True)
@@ -40,4 +49,6 @@ class CalAnimationImporter(Operator, ImportHelper):
         bpy.ops.object.mode_set(mode='POSE')
         import_xaf(context, obj, self.filepath, float(self.scale),
                    context.scene.render.fps)
+        if self.lock:
+            lock_bones(obj)
         return {'FINISHED'}
