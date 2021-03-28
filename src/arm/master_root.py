@@ -1,12 +1,13 @@
 import bpy
+import random
 
 from ..maps.bones.heads import HeadMap
 from ..maps.bones.rolls import RollMap
 from ..maps.bones.tails import TailMap
 
 
-def add_bone(armature, bone_name: str, head, tail,
-             roll: float, connect: bool, parent=None):
+def add_bone(armature: bpy.types.Armature, bone_name: str, head: list, tail: list,
+             roll: float, connect: bool, parent=None) -> bpy.types.EditBone:
     bone = armature.edit_bones.new(bone_name)
     bone.head[:] = head[0], head[1], head[2]
     bone.tail[:] = tail[0], tail[1], tail[2]
@@ -37,6 +38,54 @@ def lock_bones(obj: bpy.types.Object):
                 bone.lock_rotation = [True, True, False]
 
 
+def randomize_pelvis(bone: bpy.types.PoseBone) -> str:
+    height = random.choice(['STAND', 'SIT'])
+    if height == 'STAND':
+        bone.location.z = 0
+    else:
+        bone.location.z = random.uniform(-2.5, -2.3)
+    return height
+
+
+def randomize_spine(bones: dict):
+    # conjugate = random.choice([1, -1])
+    bones['Spine01'].rotation_euler = [random.uniform(-11, -9), 0, 0]
+    bones['Spine02'].rotation_euler = [0, 0, random.uniform(-1, -0.5)]
+    bones['Spine03'].rotation_euler = [0, 0, random.uniform(-7.5, -5)]
+    bones['Spine04'].rotation_euler = [0, 0, random.uniform(-18, -16)]
+
+
+def randomize_head(bones: dict):
+    bones['Neck01'].rotation_euler = [0, 0, random.uniform(0, 5)]
+    bones['Neck02'].rotation_euler = [0, 0, random.uniform(-10, -5)]
+    bones['Neck03'].rotation_euler = [0, 0, random.uniform(0, 2)]
+    bones['Neck04'].rotation_euler = [0, 0, random.uniform(5, 10)]
+    bones['Head'].rotation_euler = [random.uniform(-10, 10), random.uniform(-45, 45), random.uniform(-10, 0)]
+
+
+def randomize_arm(bones: dict, conjugate: int):
+    bones['Clavicle'].rotation_euler = [0, 0, random.uniform(0, 10)]
+    bones['Shoulder'].rotation_euler = [random.uniform(20, 50), random.uniform(7, 10), random.uniform(10, 40)]
+    bones['Wrist'].rotation_euler = [random.uniform(-1, 1), random.uniform(-1, 1), random.uniform(-1, 1)]
+    bones['Elbow'].rotation_euler = [0, 0, random.uniform(20, 100)]
+
+
+def randomize_hand(bones: dict):
+    bones['Hand'].rotation_euler = [0, 0, 0]
+
+
+def randomize_leg(bones: dict, conjugate: int):
+    bones['Thigh'].rotation_euler = [random.uniform(15, 25), conjugate * random.uniform(10, 30),
+                                     conjugate * random.uniform(10, 15)]
+    bones['Calf'].rotation_euler = [random.uniform(4, 6), 0, 0]
+    bones['Foot'].rotation_euler = [random.uniform(0, 4), random.uniform(-8, 8), random.uniform(-8, 8)]
+
+
+def randomize_bones(obj: bpy.types.Object):
+    bones = {bone.name: bone for bone in obj.pose.bones}
+    pose_type = randomize_pelvis(bones['PelvisNode'])
+
+
 def add_master_root():
     """Generates the default armature for imvu skeleton rig.
 
@@ -50,8 +99,9 @@ def add_master_root():
     obj = bpy.context.active_object
     arm = obj.data
 
-    add_bone(arm, "Female03MasterRoot", HeadMap.lookup("Female03MasterRoot"), TailMap.lookup("Female03MasterRoot"),
-             RollMap.lookup("Female03MasterRoot"), False)
+    root = add_bone(arm, "Female03MasterRoot", HeadMap.lookup("Female03MasterRoot"),
+                    TailMap.lookup("Female03MasterRoot"), RollMap.lookup("Female03MasterRoot"), False)
+    root.use_deform = False
     add_bone(arm, "PelvisNode", HeadMap.lookup("PelvisNode"), TailMap.lookup("PelvisNode"),
              RollMap.lookup("PelvisNode"), False, "Female03MasterRoot")
     add_bone(arm, "lfHip", HeadMap.lookup("lfHip"), TailMap.lookup("lfHip"),
@@ -198,7 +248,7 @@ def add_master_root():
              RollMap.lookup("rtFingerRing03"), True, "rtFingerRing02")
 
     bpy.ops.object.editmode_toggle()
-    lock_bones(obj)
+    # lock_bones(obj)
     bpy.ops.object.posemode_toggle()
     obj.pose.bones['Female03MasterRoot'].bone.select = True
     bpy.ops.pose.hide()
