@@ -30,7 +30,6 @@ class CalAnimationExporter(Operator, ExportHelper):
     scale: EnumProperty(
         name="Scale",
         description="Applies imvu's scaling factor",
-        options={"ENUM_FLAG"},
         items=(
             ('100', "Auto", "Default upscaled resolution"),
             ('1', "Native", "Client resolution")

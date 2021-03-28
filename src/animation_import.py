@@ -20,28 +20,14 @@ class CalAnimationImporter(Operator, ImportHelper):
         maxlen=255,
     )
 
-    scaling = {'100'}
-
-    def update_scale(self, context):
-        """Checks if scale enum has an invalid state.
-
-        Args:
-            context (): A bpy context containing data in the current 3d view.
-        """
-        if len(self.scale) == 0 or len(self.scale) > 1:
-            self.scale = self.scaling
-        self.scaling = self.scale
-
     scale: EnumProperty(
         name="Scale",
         description="Applies imvu's scaling factor",
-        options={"ENUM_FLAG"},
         items=(
             ('100', "Auto", "Default upscaled resolution"),
             ('1', "Native", "Client resolution")
         ),
-        default=scaling,
-        update=update_scale
+        default='100',
     )
 
     def execute(self, context):
@@ -51,6 +37,6 @@ class CalAnimationImporter(Operator, ImportHelper):
             obj.select_set(True)
         obj.animation_data_clear()
         bpy.ops.object.mode_set(mode='POSE')
-        import_xaf(context, obj, self.filepath, float(next(iter(self.scale))),
+        import_xaf(context, obj, self.filepath, float(self.scale),
                    context.scene.render.fps)
         return {'FINISHED'}
