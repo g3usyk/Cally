@@ -63,12 +63,14 @@ class BaseMesh:
 
     def add_morphs(self, obj: bpy.types.Object):
         obj.shape_key_add(name='Basis')
-        for morph, blend_vertices in self.morphs.items():
-            shape_key = obj.shape_key_add(name=morph)
+        num_vertices = len(obj.data.vertices)
+        for morph_name, blend_vertices in self.morphs.items():
+            shape_key = obj.shape_key_add(name=morph_name)
             for vertex_id, position in blend_vertices:
-                new_position = Vector()
-                new_position[:] = position
-                shape_key.data[vertex_id].co = new_position
+                if vertex_id < num_vertices:
+                    new_position = Vector()
+                    new_position[:] = position if position else [0, 0, 0]
+                    shape_key.data[vertex_id].co = new_position
 
     def to_mesh(self, collection: bpy.types.Collection = None, smooth: bool = True, uvs: bool = True,
                 norms: bool = False, groups: bool = False, morphs: bool = False):

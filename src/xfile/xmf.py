@@ -248,6 +248,10 @@ def export_xmf(context: bpy.types.Context, filepath: str, submap: dict,
     write_xmf(filepath, objs, submap, scale, weight)
 
 
+def apply_scale(value: str) -> float:
+    return float(value) / 100
+
+
 def extract(elem: et.Element, tag: str, conversion) -> list:
     child = elem.find(tag).text.split()
     values = [conversion(x) for x in child]
@@ -279,9 +283,9 @@ def extract_morphs(sub: et.Element, morph_names: dict) -> dict:
     for morph in sub.iter('morph'):
         blend_vertices = []
         for blend_vertex in morph.iter('blendvertex'):
-            position = extract(blend_vertex, 'position', float)
-            positions = [p / 100 for p in position]
-            blend_vertices.append((int(blend_vertex.attrib['vertexid']), positions))
+            vertex_id = int(blend_vertex.attrib['vertexid'])
+            position = extract(blend_vertex, 'position', apply_scale)
+            blend_vertices.append((vertex_id, position))
         alt_name = morph.attrib['name']
         morphs[morph_names[alt_name]] = blend_vertices
     return morphs
@@ -293,8 +297,7 @@ def extract_submesh(sub: et.Element, mesh_name: str, morph_names: dict) -> BaseM
     normals = []
     influences = []
     for vertex in sub.iter('vertex'):
-        position = extract(vertex, 'pos', float)
-        positions.append([p / 100 for p in position])
+        positions.append(extract(vertex, 'pos', apply_scale))
         normals.append(extract(vertex, 'norm', float))
         # col = extract(vert, 'color', float)
         uv = extract(vertex, 'texcoord', float)
