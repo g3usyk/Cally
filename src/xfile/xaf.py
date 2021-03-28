@@ -101,25 +101,26 @@ def get_offset(original, default):
                        -difference.x, difference.z))
 
 
-def parse_rotation(keyframe):
+def parse_rotation(keyframe: et.Element) -> Quaternion:
     rotation = keyframe.find('rotation').text
     rotation = [float(r) for r in rotation.split()]
     return Quaternion((rotation[3], rotation[0], rotation[1], rotation[2]))
 
 
-def parse_translation(keyframe):
+def parse_translation(keyframe: et.Element) -> Vector:
     translation = keyframe.find('translation').text
     translation = [float(t) for t in translation.split()]
     return Vector((translation[0], translation[1], translation[2]))
 
 
-def parse_track(obj, track, bone_id: int, scale: float, fps: int):
+def parse_track(obj: bpy.types.Object, track: et.Element, bone_id: int, scale: float, fps: int):
     bone_name = NameMap.lookup(bone_id)
     bone = obj.pose.bones[bone_name]
     default_rotation = RotationMap.lookup(bone_name)
     default = Quaternion((default_rotation[3], default_rotation[0],
                           default_rotation[1], default_rotation[2]))
     default.conjugate()
+    is_animation = int(track.attrib['numkeyframes']) > 1
     for keyframe in track.iter('keyframe'):
         frame = float(keyframe.attrib['time']) * fps
         rotation = parse_rotation(keyframe)
@@ -128,10 +129,12 @@ def parse_track(obj, track, bone_id: int, scale: float, fps: int):
             location = parse_translation(keyframe)
             default_location = Vector(PositionMap.lookup(bone_name)) * scale
             bone.location = (location - default_location) / scale
-            bone.keyframe_insert(data_path="location", frame=frame)
+            if is_animation:
+                bone.keyframe_insert(data_path="location", frame=frame)
         else:
             bone.rotation_quaternion = get_offset(rotation, default)
-        bone.keyframe_insert(data_path="rotation_quaternion", frame=frame)
+        if is_animation:
+            bone.keyframe_insert(data_path="rotation_quaternion", frame=frame)
 
 
 def import_xaf(context, obj, filepath: str, scale: float, fps: int):
