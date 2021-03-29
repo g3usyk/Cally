@@ -1,4 +1,7 @@
 import bpy
+
+from bpy.props import EnumProperty
+
 from ..node.pose import Pose
 
 
@@ -8,7 +11,17 @@ class StandingSpot(bpy.types.Operator):
     bl_label = "Stand"
     bl_options = {'REGISTER', 'PRESET', 'UNDO'}
 
-    def execute(self, context):
+    primitive: EnumProperty(
+        name="Display",
+        description="Object display type",
+        items=(
+            ('ARROWS', 'Arrows', 'Empty arrows'),
+            ('PLAIN_AXES', 'Axes', 'Empty axes')
+        ),
+        default="ARROWS",
+    )
+
+    def execute(self, context: bpy.types.Context):
         stand_pose = Pose('Stand', context)
-        stand_pose.to_scene()
+        stand_pose.to_scene(self.primitive)
         return {'FINISHED'}

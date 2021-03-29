@@ -15,9 +15,9 @@ class Pose:
             handle.name = "Handle"
             bpy.context.object.empty_display_size = 0.20
 
-    def to_scene(self):
+    def to_scene(self, primitive: str):
         layer_col = bpy.context.view_layer.layer_collection.children["Spots"]
         bpy.context.view_layer.active_layer_collection = layer_col
-        bpy.ops.object.empty_add(type='PLAIN_AXES')
+        bpy.ops.object.empty_add(type=primitive)
         spot = bpy.context.active_object
         spot.name = f'{self.pose_type}'
