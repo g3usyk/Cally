@@ -2,7 +2,8 @@ from xml.etree import ElementTree as et
 
 
 class XBone:
-    def __init__(self, name, b_id, translation, rotation, parent_id=0, children=None):
+    def __init__(self, name: str, b_id: int, translation: list, rotation: list,
+                 parent_id: int = 0, children: list = None):
         self.name = name
         self.b_id = b_id
         self.translation = translation
@@ -12,20 +13,20 @@ class XBone:
         if self.children is None:
             self.children = []
 
-    def local(self, values, transform):
+    def local(self, values: list, transform: str) -> list:
         if transform == 'TRANSLATION':
             return [values[0], -values[2], -values[1]]
         else:
             return [values[0], values[1], values[2], -values[3]]
 
-    def bone(self):
+    def bone(self) -> et.Element:
         bone_tag = et.Element('bone')
         bone_tag.attrib['name'] = self.name
         bone_tag.attrib['numchilds'] = str(len(self.children))
         bone_tag.attrib['id'] = str(self.b_id)
         return bone_tag
 
-    def tag(self, tag_name, tag_text: str):
+    def tag(self, tag_name: str, tag_text: str) -> et.Element:
         elem_tag = et.Element(tag_name)
         elem_tag.text = tag_text
         return elem_tag

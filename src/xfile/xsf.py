@@ -1,6 +1,11 @@
+import bpy
+
 from mathutils import Quaternion
 from xml.etree import ElementTree as et
+
 from .prettify import pretty_print
+from ..maps.bones.heads import HeadMap
+from ..maps.bones.rolls import RollMap
 from ..xskel.xbone import XBone
 
 
@@ -10,6 +15,15 @@ def generate_offset(posn, rotation):
     true_rot = offset @ rotation
     true_rot.invert()
     return true_posn, true_rot
+
+
+def generate_attachment(obj: bpy.types.Object) -> et.Element:
+    group = obj.vertex_groups.active
+    bone_name = group.name if group and group.name in HeadMap.mapping else 'Female03MasterRoot'
+    posn = HeadMap.lookup(bone_name)
+    rot = Quaternion((0.5, 0.5, 0.5, 0.5)) @ Quaternion((0.0, 1.0, 0.0), RollMap.lookup(bone_name))
+    attachment = XBone('AttachmentRoot', 0, posn[:], rot[:], -1)
+    return attachment.write()
 
 
 def generate_root(name: str, count: int, category: str) -> et.Element:
@@ -76,23 +90,26 @@ def generate_handle(handles, spots, ix: int, scale: float, category: str):
     return handle.write()
 
 
-def export_xsf(context, filepath: str, category: str, scale: float):
-    objs = [obj for obj in context.selected_objects if obj.type == 'EMPTY']
-    spots = [o for o in objs if o.empty_display_type != 'SPHERE']
-    handles = [o for o in objs if o.empty_display_type == 'SPHERE']
-
+def export_xsf(context: bpy.types.Context, filepath: str, category: str, scale: float):
     root = et.Element('skeleton')
     root.attrib['sceneambientcolor'] = '1 1 1'
 
-    if category == 'FURNITURE':
-        root.append(generate_root('Root', len(spots) + 1, category))
-        root.append(generate_handle(handles, spots, 1, scale, category))
-        root.extend(generate_children(spots, 2, 1, scale, category))
-    elif category == 'ROOM':
-        root.append(generate_root('Room', len(spots) + 3, category))
-        root.extend(generate_camera())
-        root.append(generate_handle(handles, spots, 3, scale, category))
-        root.extend(generate_children(spots, 4, 2, scale, category))
+    if category == 'ACCESSORY':
+        obj = context.active_object
+        root.extend(generate_attachment(obj))
+    else:
+        empty_objs = [obj for obj in context.selected_objects if obj.type == 'EMPTY']
+        spots = [obj for obj in empty_objs if obj.empty_display_type != 'SPHERE']
+        handles = [obj for obj in empty_objs if obj.empty_display_type == 'SPHERE']
+        if category == 'FURNITURE':
+            root.append(generate_root('Root', len(spots) + 1, category))
+            root.append(generate_handle(handles, spots, 1, scale, category))
+            root.extend(generate_children(spots, 2, 1, scale, category))
+        elif category == 'ROOM':
+            root.append(generate_root('Room', len(spots) + 3, category))
+            root.extend(generate_camera())
+            root.append(generate_handle(handles, spots, 3, scale, category))
+            root.extend(generate_children(spots, 4, 2, scale, category))
 
     root.attrib['numbones'] = str(len(root))
 
