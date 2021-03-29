@@ -71,6 +71,9 @@ class BaseMesh:
                     new_position = Vector()
                     new_position[:] = position if position else [0, 0, 0]
                     shape_key.data[vertex_id].co = new_position
+            if morph_name == 'Face.Average':
+                shape_key.value = 1.0
+                obj.active_shape_key_index = obj.data.shape_keys.key_blocks.find('Face.Average')
 
     def to_mesh(self, collection: bpy.types.Collection = None, smooth: bool = True, uvs: bool = True,
                 norms: bool = False, groups: bool = False, morphs: bool = False):

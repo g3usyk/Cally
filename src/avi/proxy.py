@@ -1,7 +1,9 @@
 import bpy
 import inspect
 import pickle
+
 from pathlib import Path
+
 from ..mesh.base import BaseMesh
 
 
@@ -16,6 +18,7 @@ class Proxy(BaseMesh):
         faces = []
         uvs = []
         groups = []
+        morphs = {}
         full_path = self.relative_path
         for fp in file_path:
             full_path = full_path / fp
@@ -27,13 +30,15 @@ class Proxy(BaseMesh):
             groups = mapping['groups']
             if 'uvs' in mapping:
                 uvs = mapping['uvs']
-        super().__init__(name, vertices, faces, uvs, [], groups)
+            if 'morphs' in mapping:
+                morphs = mapping['morphs']
+        super().__init__(name, vertices, faces, uvs, [], groups, morphs)
 
-    def add_uvs(self, obj):
-        """Generates uv coordinates to mesh object.
+    def add_uvs(self, obj: bpy.types.Object):
+        """Generates uv coordinates for mesh object.
 
         Args:
-            obj (): A bpy object without a uv map or uv coordinates.
+            obj (bpy.types.Object): The mesh object.
         """
         bpy.ops.mesh.uv_texture_add()
         if len(self.uvs) != 0:
