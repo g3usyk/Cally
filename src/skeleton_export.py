@@ -21,13 +21,17 @@ class CalSkeletonExporter(Operator, ExportHelper):
         maxlen=255,
     )
 
+    def category_items(self, context: bpy.types.Context) -> list:
+        items = []
+        items.extend((
+            ('FURNITURE', "Furniture", "Used with furniture meshes"),
+            ('ROOM', "Room", "Used with room meshes"),
+        ))
+        return items
+
     category: EnumProperty(
         name="Type",
-        items=(
-            ('ROOM', "Room", "Used with room meshes"),
-            ('FURNITURE', "Furniture", "Used with furniture meshes"),
-        ),
-        default='FURNITURE',
+        items=category_items,
     )
 
     scale: EnumProperty(
