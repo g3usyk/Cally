@@ -2,7 +2,6 @@ import bpy
 from mathutils import Quaternion, Vector
 from xml.etree import ElementTree as et
 from .prettify import pretty_print
-from ..maps.ids import IDMap
 from ..maps.names import NameMap
 from ..maps.positions import PositionMap
 from ..maps.rotations import RotationMap
@@ -56,8 +55,8 @@ def process_animation(obj, fps: int):
     return tracks
 
 
-def process_pose(obj):
-    bones = [bone for bone in obj.pose.bones if bone.name in IDMap.mapping]
+def process_pose(obj: bpy.types.Object) -> list:
+    bones = [bone for bone in obj.pose.bones if bone.name in RotationMap.mapping]
     tracks = []
     for bone in bones:
         rotation = [coord for coord in bone.rotation_quaternion]
@@ -78,7 +77,7 @@ def export_xaf(context, filepath: str, scale: float, fps: int, debug: bool):
     if obj.animation_data:
         tracks.extend(process_animation(obj, fps))
     else:
-        tracks.extend(process_pose(obj, scale))
+        tracks.extend(process_pose(obj))
 
     duration = context.scene.frame_end / fps
     root.attrib['numtracks'] = str(len(tracks))
