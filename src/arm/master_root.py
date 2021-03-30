@@ -1,5 +1,6 @@
 import bpy
 import random
+import re
 
 from ..maps.bones.heads import HeadMap
 from ..maps.bones.rolls import RollMap
@@ -38,6 +39,10 @@ def lock_bones(obj: bpy.types.Object):
                 bone.lock_rotation = [True, True, False]
 
 
+def rand(num: int = 1) -> float:
+    return random.uniform(-num, num)
+
+
 def randomize_pelvis(bone: bpy.types.PoseBone) -> str:
     height = random.choice(['STAND', 'SIT'])
     if height == 'STAND':
@@ -47,38 +52,100 @@ def randomize_pelvis(bone: bpy.types.PoseBone) -> str:
     return height
 
 
-def randomize_spine(bones: dict):
-    # conjugate = random.choice([1, -1])
-    bones['Spine01'].rotation_euler = [random.uniform(-11, -9), 0, 0]
-    bones['Spine02'].rotation_euler = [0, 0, random.uniform(-1, -0.5)]
-    bones['Spine03'].rotation_euler = [0, 0, random.uniform(-7.5, -5)]
-    bones['Spine04'].rotation_euler = [0, 0, random.uniform(-18, -16)]
+def randomize_spine(bones: dict, pose_type: str):
+
+    if pose_type == 'STRAIGHT':
+        bones['Spine01'].rotation_euler[:] = random.uniform(-11, -9), rand(), rand(5)
+        bones['Spine02'].rotation_euler[:] = rand(), rand(), random.uniform(-1, -0.5)
+        bones['Spine03'].rotation_euler[:] = rand(), rand(), random.uniform(-7.5, -5)
+        bones['Spine04'].rotation_euler[:] = rand(5), rand(), random.uniform(-18, -15)
+    elif pose_type == 'LEAN':
+        bones['Spine01'].rotation_euler[:] = random.uniform(-24, -16), rand(), rand(5)
+        bones['Spine02'].rotation_euler[:] = rand(), rand(), random.uniform(-20, -15)
+        bones['Spine03'].rotation_euler[:] = rand(), rand(), random.uniform(-20, -15)
+        bones['Spine04'].rotation_euler[:] = rand(5), rand(), random.uniform(-32, -27)
+    elif pose_type == 'SLOUCH':
+        bones['Spine01'].rotation_euler[:] = random.uniform(-60, -50), rand(), rand(5)
+        bones['Spine02'].rotation_euler[:] = rand(), rand(), random.uniform(-10, -5)
+        bones['Spine03'].rotation_euler[:] = rand(), rand(), random.uniform(-10, -5)
+        bones['Spine04'].rotation_euler[:] = rand(5), rand(), random.uniform(-30, -25)
+
+
+def randomize_leg(bones: dict, side_name: str, pose_type: str):
+    bones['Thigh'].rotation_euler.x = random.uniform(15, 25)
+    if pose_type == 'STAND':
+        bones['Thigh'].rotation_euler.y = random.uniform(10, 30) if side_name == 'rt' else random.uniform(-30, -10)
+        bones['Thigh'].rotation_euler.z = random.uniform(0, 10) if side_name == 'rt' else random.uniform(-10, 0)
+        bones['Calf'].rotation_euler[:] = random.uniform(4, 8), rand(), rand()
+    elif pose_type == 'SIT':
+        bones['Thigh'].rotation_euler.y = random.uniform(30, 60) if side_name == 'rt' else random.uniform(-60, -30)
+        bones['Thigh'].rotation_euler.z = random.uniform(20, 50) if side_name == 'rt' else random.uniform(-50, -20)
+        bones['Calf'].rotation_euler[:] = random.uniform(60, 120), rand(), rand()
+    bones['Foot'].rotation_euler[:] = random.uniform(0, 4), random.uniform(-8, 8), random.uniform(-8, 8)
 
 
 def randomize_head(bones: dict):
-    bones['Neck01'].rotation_euler = [0, 0, random.uniform(0, 5)]
-    bones['Neck02'].rotation_euler = [0, 0, random.uniform(-10, -5)]
-    bones['Neck03'].rotation_euler = [0, 0, random.uniform(0, 2)]
-    bones['Neck04'].rotation_euler = [0, 0, random.uniform(5, 10)]
-    bones['Head'].rotation_euler = [random.uniform(-10, 10), random.uniform(-45, 45), random.uniform(-10, 0)]
+    bones['Neck01'].rotation_euler[:] = 0, 0, random.uniform(0, 5)
+    bones['Neck02'].rotation_euler[:] = 0, 0, random.uniform(-10, -5)
+    bones['Neck03'].rotation_euler[:] = 0, 0, random.uniform(0, 2)
+    bones['Neck04'].rotation_euler[:] = 0, 0, random.uniform(5, 10)
+    bones['Head'].rotation_euler[:] = random.uniform(-10, 10), random.uniform(-45, 45), random.uniform(-10, 0)
 
 
-def randomize_arm(bones: dict, conjugate: int):
-    bones['Clavicle'].rotation_euler = [0, 0, random.uniform(0, 10)]
+def randomize_arm(bones: dict, side_name: str):
+    bones['Clavicle'].rotation_euler[:] = rand(), rand(), random.uniform(0, 10)
     bones['Shoulder'].rotation_euler = [random.uniform(20, 50), random.uniform(7, 10), random.uniform(10, 40)]
-    bones['Wrist'].rotation_euler = [random.uniform(-1, 1), random.uniform(-1, 1), random.uniform(-1, 1)]
-    bones['Elbow'].rotation_euler = [0, 0, random.uniform(20, 100)]
+    bones['Wrist'].rotation_euler[:] = rand(), rand(), rand()
+    bones['Elbow'].rotation_euler[:2] = rand(), rand()
+    bones['Elbow'].rotation_euler.z = random.uniform(20, 100) if side_name == 'lf' else random.uniform(-100, -20)
+
+
+def clench_finger(bones: dict, finger_name: str):
+    bones['01'].rotation_euler.x = random.uniform(70, 90)
+    bones['01'].rotation_euler[1:] = rand(), rand()
+    bones['02'].rotatation_euler.x = random.uniform(80, 100) if finger_name != 'Index' else random.uniform(-100, -80)
+    bones['02'].rotation_euler[1:] = rand(), rand()
+    bones['03'].rotation_euler.x = random.uniform(-10, 0) if finger_name != 'Pinky' else random.uniform(0, 10)
+    bones['03'].rotatation_euler[1:] = rand(), rand()
+
+
+def curve_finger(bones: dict, finger_name: str):
+    bones['01'].rotation_euler.x = random.uniform(5, 45)
+    bones['01'].rotation_euler[1:] = rand(), rand()
+    bones['02'].rotatation_euler.x = random.uniform(30, 40) if finger_name != 'Index' else random.uniform(-40, -30)
+    bones['02'].rotation_euler[1:] = rand(), rand()
+    bones['03'].rotation_euler.x = random.uniform(-15, -5) if finger_name != 'Pinky' else random.uniform(5, 15)
+    bones['03'].rotatation_euler[1:] = rand(), rand()
+
+
+def point_finger(bones: dict, finger_name: str):
+    bones['01'].rotation_euler.x = random.uniform(-10, -5)
+    bones['01'].rotation_euler[1:] = rand(), rand()
+    bones['02'].rotatation_euler.x = random.uniform(-15, -10) if finger_name != 'Index' else -random.uniform(20, 30)
+    bones['02'].rotation_euler[1:] = rand(), rand()
+    bones['03'].rotation_euler.x = random.uniform(7, 12) if finger_name != 'Pinky' else random.uniform(-17, -12)
+    bones['03'].rotatation_euler[1:] = rand(), rand()
+
+
+def randomize_finger(bones: dict, finger_name: str):
+    random.choice([clench_finger, curve_finger, point_finger])(bones, finger_name)
+
+
+def isolate_fingers(bones: dict, finger_name: str) -> dict:
+    fingers = {}
+    for bone_name, bone in bones.items():
+        if finger_name in bone_name:
+            bone_num = re.findall('\d+', bone_name)[0]
+            fingers[bone_num] = bone
+    return fingers
 
 
 def randomize_hand(bones: dict):
-    bones['Hand'].rotation_euler = [0, 0, 0]
-
-
-def randomize_leg(bones: dict, conjugate: int):
-    bones['Thigh'].rotation_euler = [random.uniform(15, 25), conjugate * random.uniform(10, 30),
-                                     conjugate * random.uniform(10, 15)]
-    bones['Calf'].rotation_euler = [random.uniform(4, 6), 0, 0]
-    bones['Foot'].rotation_euler = [random.uniform(0, 4), random.uniform(-8, 8), random.uniform(-8, 8)]
+    index = isolate_fingers(bones, 'Index')
+    middle = isolate_fingers(bones, 'Middle')
+    ring = isolate_fingers(bones, 'Ring')
+    pinky = isolate_fingers(bones, 'Pinky')
+    # thumb = isolate_fingers(bones, 'Thumb')
 
 
 def randomize_bones(obj: bpy.types.Object):
