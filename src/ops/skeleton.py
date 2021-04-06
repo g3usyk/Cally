@@ -1,8 +1,9 @@
 import bpy
+import random
 
-from bpy.props import BoolProperty
+from bpy.props import BoolProperty, FloatProperty
 
-from ..arm.master_root import add_master_root, lock_bones
+from ..arm.master_root import add_master_root, lock_bones, randomize_bones
 
 
 class DefaultSkeleton(bpy.types.Operator):
@@ -10,11 +11,17 @@ class DefaultSkeleton(bpy.types.Operator):
     bl_idname = "object.armature_imvu_bones_add"
     bl_label = "Bones"
     bl_options = {'REGISTER', 'UNDO'}
+    current_offset = random.random()
 
     lock: BoolProperty(
         name="Lock",
         description="Use default transformation locks on each bone",
         default=True,
+    )
+
+    seed: FloatProperty(
+        name="Seed",
+        description="Random seed value",
     )
 
     def execute(self, context: bpy.types.Context):
@@ -28,6 +35,8 @@ class DefaultSkeleton(bpy.types.Operator):
 
         """
         bones = add_master_root()
+        if self.seed != 0:
+            randomize_bones(bones)
         if self.lock:
             lock_bones(bones)
         return {'FINISHED'}
