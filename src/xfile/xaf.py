@@ -9,7 +9,12 @@ from ..xanim.xtrack import XTrack
 from ..xanim.xframe import XFrame
 
 
-def get_data_path(data_string: str):
+def set_mode(obj: bpy.types.Object):
+    for bone in obj.pose.bones:
+        bone.rotation_mode = 'QUATERNION'
+
+
+def get_data_path(data_string: str) -> tuple:
     parts = data_string.split('.')
     bone_name = parts[1].split('"')[1]
     data_path = parts[-1]
@@ -25,7 +30,7 @@ def get_keyframe_point(f_curve, data_path, keyframes):
     pass
 
 
-def get_curves(obj):
+def get_curves(obj: bpy.types.Object) -> dict:
     f_curves = {}
     for curve in obj.animation_data.action.fcurves:
         bone_name, data_path = get_data_path(curve.data_path)
@@ -35,7 +40,7 @@ def get_curves(obj):
     return f_curves
 
 
-def process_animation(obj, fps: int):
+def process_animation(obj: bpy.types.Object, fps: int) -> list:
     f_curves = get_curves(obj)
     tracks = []
     for bone_name, keyframes in f_curves.items():
@@ -71,6 +76,7 @@ def process_pose(obj: bpy.types.Object) -> list:
 
 def export_xaf(context, filepath: str, scale: float, fps: int, debug: bool):
     obj = context.active_object
+    set_mode(obj)
     root = et.Element('animation')
 
     tracks = []
@@ -94,7 +100,7 @@ def export_xaf(context, filepath: str, scale: float, fps: int, debug: bool):
         f.write("%s" % xtext)
 
 
-def get_offset(original, default):
+def get_offset(original, default) -> Quaternion:
     difference = original @ default
     return Quaternion((difference.w, -difference.y,
                        -difference.x, difference.z))
