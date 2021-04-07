@@ -54,8 +54,8 @@ def randq(coord: int, angle: float = 1, bound: float = None) -> Quaternion:
         return Quaternion(axis, rand(angle))
 
 
-def randomize_pelvis(bone: bpy.types.PoseBone, pose_type: str, gender: str) -> bpy.types.PoseBone:
-    if pose_type == 'STAND':
+def randomize_pelvis(bone: bpy.types.PoseBone, pose: str, gender: str) -> bpy.types.PoseBone:
+    if pose == 'STAND':
         bone.location[:2] = random.uniform(-0.3, 0.3), random.uniform(-0.3, 0.3)
         bone.rotation_quaternion = randq(2, 10)
         if gender == 'MALE':
@@ -63,15 +63,15 @@ def randomize_pelvis(bone: bpy.types.PoseBone, pose_type: str, gender: str) -> b
         else:
             bone.rotation_quaternion @= randq(0, -10, 0) @ random.choice([randq(1, 7.5, 12.5), randq(1, -12.5, -7.5)])
     else:
-        bone.location[:] = rand(0.5), rand(0.1), random.uniform(-3.5, -2.5)
+        bone.location[:] = rand(0.75), rand(0.1), random.uniform(-3.5, -2.5)
         if gender == 'MALE':
-            bone.rotation_quaternion = randq(0, -100, -80) @ randq(1, 5) @ randq(1, 10)
+            bone.rotation_quaternion = randq(0, -100, -80) @ randq(1, 5) @ randq(2, 10)
         else:
-            bone.rotation_quaternion = randq(0, -35, -15) @ randq(1, 5) @ randq(1, 10)
+            bone.rotation_quaternion = randq(0, -50, -15) @ randq(1, 5) @ randq(2, 20)
     return bone
 
 
-def randomize_head(bones: dict):
+def randomize_head(bones: dict, gender: str, spine: str):
     conjugate = random.choice([True, False])
     if conjugate:
         x_rotations = [randq(0, 0, 5).conjugated() for _ in range(4)]
@@ -81,7 +81,11 @@ def randomize_head(bones: dict):
     bones['Neck02'].rotation_quaternion = x_rotations[1] @ randq(1) @ randq(2, -10, -5)
     bones['Neck03'].rotation_quaternion = x_rotations[2] @ randq(1) @ randq(2, 0, 2)
     bones['Neck04'].rotation_quaternion = x_rotations[3] @ randq(1) @ randq(2, 5, 10)
-    bones['Head'].rotation_quaternion = randq(0, 10) @ randq(1, 45) @ randq(2, -10, 0)
+    bones['Head'].rotation_quaternion = randq(0, 10) @ randq(1, 45)
+    if gender == 'MALE' or spine != 'SLOUCH':
+        bones['Head'].rotation_quaternion @= randq(2, -10, 0)
+    else:
+        bones['Head'].rotation_quaternion @= randq(2, 20, 30)
 
 
 def randomize_male_spine(bones: dict, spine_type: str):
@@ -116,19 +120,37 @@ def randomize_female_spine(bones: dict, spine_type: str, pelvis: float):
         bones['Spine02'].rotation_quaternion @= randq(1) @ randq(2)
         bones['Spine03'].rotation_quaternion @= randq(1) @ randq(2)
         bones['Spine04'].rotation_quaternion = randq(0) @ randq(1) @ randq(2, -20, -15)
-    else:
+    elif spine_type == 'LEAN':
         bones['Spine01'].rotation_quaternion = randq(0) @ randq(1) @ randq(2)
         bones['Spine02'].rotation_quaternion = randq(0) @ randq(1) @ randq(2, -27.5, -22.5)
         bones['Spine03'].rotation_quaternion = randq(0) @ randq(1) @ randq(2, -15, -10)
         bones['Spine04'].rotation_quaternion = randq(0, 7.5) @ randq(1, 15) @ randq(2, 10, 20)
+    elif spine_type == 'SLOUCH':
+        bones['Spine01'].rotation_quaternion = randq(0, -30, -25) @ randq(1) @ randq(2)
+        bones['Spine02'].rotation_quaternion = randq(0) @ randq(1) @ randq(2, -15, -10)
+        bones['Spine03'].rotation_quaternion = randq(0) @ randq(1) @ randq(2, -15, -10)
+        bones['Spine04'].rotation_quaternion = randq(0) @ randq(1) @ randq(2, -30, -25)
+    else:
+        pass
 
 
-def randomize_spine(bones: dict, pose_type: str, gender: str, pelvis: float):
-    spine_type = 'STRAIGHT' if pose_type == 'STAND' else random.choice(['LEAN', 'SLOUCH'])
+def randomize_spine(bones: dict, pose: str, gender: str, pelvis: Quaternion) -> str:
     if gender == 'MALE':
+        if pose == 'STAND':
+            spine_type = 'STRAIGHT'
+        else:
+            spine_type = random.choice(['LEAN', 'SLOUCH'])
         randomize_male_spine(bones, spine_type)
     else:
-        randomize_female_spine(bones, spine_type, pelvis)
+        if pose == 'STAND':
+            spine_type = 'STRAIGHT'
+        else:
+            if pelvis.x > -0.3:
+                spine_type = 'LEAN'
+            else:
+                spine_type = 'SLOUCH'
+        randomize_female_spine(bones, spine_type, pelvis.y)
+    return spine_type
 
 
 def randomize_male_leg(bones: dict, side_name: str):
@@ -150,15 +172,15 @@ def randomize_female_leg(bones: dict, side_name: str, pelvis: float, leg_order: 
     bones['Thigh'].rotation_quaternion @= randq(0, -15, -5) if leg_order == 'FORWARD' else randq(0, 5, 15)
 
 
-def randomize_leg(bones: dict, side_name: str, pose_type: str, gender: str, pelvis: float, leg_order: str = None):
+def randomize_leg(bones: dict, side_name: str, pose: str, gender: str, pelvis: float, leg_order: str = None):
     bones['Foot'].rotation_quaternion = randq(0, 0, 4) @ randq(1, 8) @ randq(2, 8)
-    if pose_type == 'STAND':
+    if pose == 'STAND':
         bones['Calf'].rotation_quaternion = randq(1) @ randq(2)
         if gender == 'MALE':
             randomize_male_leg(bones, side_name)
         else:
             randomize_female_leg(bones, side_name, pelvis, leg_order)
-    elif pose_type == 'SIT':
+    elif pose == 'SIT':
         bones['Calf'].rotation_quaternion = randq(0, 30, 120) @ randq(1) @ randq(2)
         if gender == 'MALE':
             bones['Thigh'].rotation_quaternion = randq(0, 25)
@@ -174,8 +196,9 @@ def randomize_leg(bones: dict, side_name: str, pose_type: str, gender: str, pelv
                 bones['Thigh'].rotation_quaternion @= randq(1, -60, 0) @ randq(2, 0, 30)
 
 
-def randomize_arm(bones: dict, side_name: str):
-    bones['Clavicle'].rotation_quaternion = randq(0) @ randq(1)
+def randomize_arm(bones: dict, pose: str, side_name: str):
+    bones['Clavicle'].rotation_quaternion = randq(0, -20, 0)
+    bones['Clavicle'].rotation_quaternion @= randq(1) if pose == 'STAND' else randq(1, 15)
     bones['Shoulder'].rotation_quaternion = randq(0, 10, 60) @ randq(1, 40)
     bones['Bicep'].rotation_quaternion = randq(0) @ randq(1) @ randq(2)
     bones['Elbow'].rotation_quaternion = randq(0) @ randq(1)
@@ -186,8 +209,8 @@ def randomize_arm(bones: dict, side_name: str):
         bones['Shoulder'].rotation_quaternion @= randq(2, 0, 100)
         bones['Elbow'].rotation_quaternion @= randq(2, 0, 100)
     else:
-        bones['Shoulder'].rotation_quaternion @= randq(2, -100, 0)
         bones['Clavicle'].rotation_quaternion @= randq(2, -10, 0)
+        bones['Shoulder'].rotation_quaternion @= randq(2, -100, 0)
         bones['Elbow'].rotation_quaternion = randq(2, -100, 0)
     pass
 
@@ -274,22 +297,20 @@ def get_bones(bones: dict, bone_names: set, side_name: str = None, finger_name: 
         return {bone_name: bones[bone_name] for bone_name in bone_names.intersection(bones)}
 
 
-def randomize_bones(obj: bpy.types.Object):
+def randomize_bones(obj: bpy.types.Object, gender: str, pose: str):
     bpy.ops.object.mode_set(mode='POSE')
     bones = {bone.name: bone for bone in obj.pose.bones}
-    pose_type = 'SIT'
-    gender = 'FEMALE'
-    pelvis = randomize_pelvis(bones['PelvisNode'], pose_type, gender)
-    randomize_head(get_bones(bones, {'Neck01', 'Neck02', 'Neck03', 'Neck04', 'Head'}))
-    randomize_spine(get_bones(bones, {'Spine01', 'Spine02', 'Spine03', 'Spine04'}), pose_type, gender,
-                    pelvis.rotation_quaternion.y)
+    pelvis = randomize_pelvis(bones['PelvisNode'], pose, gender)
+    spine = randomize_spine(get_bones(bones, {'Spine01', 'Spine02', 'Spine03', 'Spine04'}), pose, gender,
+                            pelvis.rotation_quaternion)
+    randomize_head(get_bones(bones, {'Neck01', 'Neck02', 'Neck03', 'Neck04', 'Head'}), gender, spine)
     leg_order = random.choice([('FORWARD', 'BACKWARD'), ('BACKWARD', 'FORWARD')])
-    randomize_leg(get_bones(bones, {'Thigh', 'Calf', 'Foot'}, 'lf'), 'lf', pose_type, gender,
+    randomize_leg(get_bones(bones, {'Thigh', 'Calf', 'Foot'}, 'lf'), 'lf', pose, gender,
                   pelvis.rotation_quaternion.y, leg_order[0])
-    randomize_leg(get_bones(bones, {'Thigh', 'Calf', 'Foot'}, 'rt'), 'rt', pose_type, gender,
+    randomize_leg(get_bones(bones, {'Thigh', 'Calf', 'Foot'}, 'rt'), 'rt', pose, gender,
                   pelvis.rotation_quaternion.y, leg_order[1])
-    randomize_arm(get_bones(bones, {'Clavicle', 'Shoulder', 'Bicep', 'Elbow', 'Wrist', 'Hand'}, 'lf'), 'lf')
-    randomize_arm(get_bones(bones, {'Clavicle', 'Shoulder', 'Bicep', 'Elbow', 'Wrist', 'Hand'}, 'rt'), 'rt')
+    randomize_arm(get_bones(bones, {'Clavicle', 'Shoulder', 'Bicep', 'Elbow', 'Wrist', 'Hand'}, 'lf'), pose, 'lf')
+    randomize_arm(get_bones(bones, {'Clavicle', 'Shoulder', 'Bicep', 'Elbow', 'Wrist', 'Hand'}, 'rt'), pose, 'rt')
     fingers = {'Index', 'Middle', 'Ring', 'Pinky', 'Thumb'}
     for finger in fingers:
         randomize_finger(get_bones(bones, {'01', '02', '03'}, 'lf', finger), finger)

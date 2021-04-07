@@ -1,7 +1,7 @@
 import bpy
 import random
 
-from bpy.props import BoolProperty, FloatProperty
+from bpy.props import BoolProperty, EnumProperty, FloatProperty
 
 from ..arm.master_root import add_master_root, lock_bones, randomize_bones
 
@@ -19,9 +19,29 @@ class DefaultSkeleton(bpy.types.Operator):
         default=True,
     )
 
-    seed: FloatProperty(
-        name="Seed",
+    randomize: FloatProperty(
+        name="Random",
         description="Random seed value",
+    )
+
+    gender: EnumProperty(
+        name="Gender",
+        description="Gender type for randomizer",
+        items=(
+            ('MALE', 'Male', 'Male skeleton'),
+            ('FEMALE', 'Female', 'Female Skeleton')
+        ),
+        default='MALE'
+    )
+
+    pose: EnumProperty(
+        name="Pose",
+        description="Pose type for randomizer",
+        items=(
+            ('STAND', 'Stand', 'Standing pose'),
+            ('SIT', 'Sit', 'Sitting pose')
+        ),
+        default='STAND'
     )
 
     def execute(self, context: bpy.types.Context):
@@ -35,8 +55,8 @@ class DefaultSkeleton(bpy.types.Operator):
 
         """
         bones = add_master_root()
-        if self.seed != 0:
-            randomize_bones(bones)
+        if self.randomize != 0:
+            randomize_bones(bones, self.gender, self.pose)
         if self.lock:
             lock_bones(bones)
         return {'FINISHED'}
