@@ -45,13 +45,13 @@ class CalSkeletonExporter(Operator, ExportHelper):
     )
 
     @classmethod
-    def poll(cls, context: bpy.types.Context):
+    def poll(cls, context: bpy.types.Context) -> bool:
         for obj in context.selected_objects:
             if obj.type == 'EMPTY':
                 if obj.empty_display_type != 'SPHERE':
                     return True
         return False
 
-    def execute(self, context: bpy.types.Context):
+    def execute(self, context: bpy.types.Context) -> set:
         export_xsf(context, self.filepath, self.category, float(self.scale))
         return {'FINISHED'}
