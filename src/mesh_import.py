@@ -20,7 +20,7 @@ class CalMeshImporter(Operator, ImportHelper):
 
     norms: BoolProperty(
         name="Include Normals",
-        description="Include vertex normals in mesh",
+        description="Include custom vertex normals in mesh",
         default=True,
     )
 
@@ -42,8 +42,14 @@ class CalMeshImporter(Operator, ImportHelper):
         default=True,
     )
 
-    def execute(self, context):
+    smooth: BoolProperty(
+        name="Smooth Shading",
+        description="Apply smooth shading to mesh",
+        default=False,
+    )
+
+    def execute(self, context) -> set:
         submeshes = import_xmf(self.filepath)
         for b in submeshes:
-            b.to_mesh(smooth=False, uvs=self.uvs, norms=self.norms, groups=self.weights, morphs=self.morphs)
+            b.to_mesh(smooth=self.smooth, uvs=self.uvs, norms=self.norms, groups=self.weights, morphs=self.morphs)
         return {'FINISHED'}
