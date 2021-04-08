@@ -189,7 +189,9 @@ def skip_material(mtl: int) -> int:
 
 def default_options(objs: list) -> tuple:
     body_part_ids = {'F.Feet': 7, 'F.Hands': 7, 'F.Head': 2, 'F.Legs': 7, 'F.Thighs': 7, 'F.Torso': 7,
-                     'M.Feet': 7, 'M.Hands': 7, 'M.Head': 2, 'M.Legs': 7, 'M.Calfs': 7, 'M.Torso': 7}
+                     'F.Eyes': 3, 'F.Lashes': 5, 'F.Brows': 8,
+                     'M.Feet': 7, 'M.Hands': 7, 'M.Head': 2, 'M.Legs': 7, 'M.Calfs': 7, 'M.Torso': 7,
+                     'M.Eyes': 3, 'M.Lashes': 5, 'M.Brows': 6}
     submap = {}
     material = 0
     scale = 100.0
