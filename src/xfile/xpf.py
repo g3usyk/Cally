@@ -29,13 +29,14 @@ def generate_tracks(obj: bpy.types.Object, fps: int):
 
 
 def export_xpf(context: bpy.types.Context, filepath: str, fps: int, frames: int):
-    objs = []
+    animated_objs = []
     for obj in context.selected_objects:
-        if obj.type == 'MESH' and obj.data.shape_keys and obj.data.shape_keys.animation_data:
-            objs.append(obj)
+        if obj.type == 'MESH' and obj.data.shape_keys and obj.data.shape_keys.animation_data \
+                and obj.data.shape_keys.animation_data.action:
+            animated_objs.append(obj)
 
     root = et.Element('animation')
-    for obj in objs:
+    for obj in animated_objs:
         root.extend(generate_tracks(obj, fps))
 
     root.attrib['numtracks'] = str(len(root))

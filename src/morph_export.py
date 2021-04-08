@@ -24,7 +24,8 @@ class CalMorphExporter(Operator, ExportHelper):
     @classmethod
     def poll(cls, context: bpy.types.Context) -> bool:
         for obj in context.selected_objects:
-            if obj.type == 'MESH' and obj.data.shape_keys and obj.data.shape_keys.animation_data:
+            if obj.type == 'MESH' and obj.data.shape_keys and obj.data.shape_keys.animation_data \
+                    and obj.data.shape_keys.animation_data.action:
                 return True
         return False
 
