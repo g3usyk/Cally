@@ -77,4 +77,12 @@ class MaleBody(bpy.types.Operator):
         """
         self.group.uvs = self.uv
         self.group.weights = self.weight
-        return self.group.execute([self.head, self.torso, self.hands, self.legs, self.calfs, self.feet])
+        objs = self.group.execute([self.head, self.torso, self.hands, self.legs, self.calfs, self.feet])
+        if self.head:
+            head = objs['M.Head']
+            head_group = {'M.Eyes', 'M.Brows', 'M.Lashes'}
+            for body_part in head_group:
+                obj = objs[body_part]
+                obj.parent = head
+                obj.matrix_parent_inverse = head.matrix_world.inverted()
+        return {'FINISHED'}

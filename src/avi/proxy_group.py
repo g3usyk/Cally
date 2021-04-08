@@ -12,7 +12,7 @@ class ProxyGroup:
             prox = Proxy(name, fpath)
             self.proxies.append(prox)
 
-    def to_mesh(self, collection_name: str, uvs: bool, weights: bool, morphs: bool):
+    def to_mesh(self, collection_name: str, uvs: bool, weights: bool, morphs: bool) -> dict:
         """Generates each mesh contained in the group.
 
         Args:
@@ -23,6 +23,8 @@ class ProxyGroup:
         """
         col = bpy.data.collections.new(collection_name)
         bpy.context.scene.collection.children.link(col)
+        objs = {}
         for prox in self.proxies:
-            prox.to_mesh(collection=col, uvs=uvs, groups=weights, morphs=morphs)
+            objs[prox.name] = prox.to_mesh(collection=col, uvs=uvs, groups=weights, morphs=morphs)
         bpy.ops.object.select_all(action='DESELECT')
+        return objs

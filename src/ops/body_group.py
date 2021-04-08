@@ -21,14 +21,11 @@ class BodyGroup:
         file_path = ["assets", self.gender, f'{part}.pickle']
         return label, file_path
 
-    def execute(self, selected_parts):
+    def execute(self, selected_parts) -> dict:
         """Specifies the behaviour for the operator method called by Blender.
 
         Args:
             selected_parts ():
-
-        Returns:
-            A set containing the success state of the method.
 
         """
         proxies = []
@@ -41,5 +38,5 @@ class BodyGroup:
                 else:
                     proxies.append(self.add_part(prefix, part))
         mesh_group = ProxyGroup(proxies)
-        mesh_group.to_mesh(f'{prefix}_Body', self.uvs, self.weights, self.morphs)
-        return {'FINISHED'}
+        objs = mesh_group.to_mesh(f'{prefix}_Body', self.uvs, self.weights, self.morphs)
+        return objs

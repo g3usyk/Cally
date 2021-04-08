@@ -76,7 +76,7 @@ class BaseMesh:
                 obj.active_shape_key_index = obj.data.shape_keys.key_blocks.find('Face.Average')
 
     def to_mesh(self, collection: bpy.types.Collection = None, smooth: bool = True, uvs: bool = True,
-                norms: bool = False, groups: bool = False, morphs: bool = False):
+                norms: bool = False, groups: bool = False, morphs: bool = False) -> bpy.types.Object:
         """Generates a mesh using raw geometric data.
 
         Args:
@@ -110,3 +110,5 @@ class BaseMesh:
             self.add_groups(obj)
         if morphs:
             self.add_morphs(obj)
+
+        return obj
