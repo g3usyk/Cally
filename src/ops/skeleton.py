@@ -2,7 +2,8 @@ import bpy
 import random
 
 from bpy.props import BoolProperty, EnumProperty, FloatProperty
-
+from itertools import repeat
+from .body_group import BodyGroup
 from ..arm.master_root import add_master_root, lock_bones, randomize_bones
 
 
@@ -17,6 +18,12 @@ class DefaultSkeleton(bpy.types.Operator):
         name="Lock",
         description="Use default transformation locks on each bone",
         default=True,
+    )
+
+    link: BoolProperty(
+        name="Link",
+        description="Include linked avatar mesh",
+        default=False
     )
 
     display: EnumProperty(
@@ -57,7 +64,7 @@ class DefaultSkeleton(bpy.types.Operator):
         default='STAND'
     )
 
-    def execute(self, context: bpy.types.Context):
+    def execute(self, context: bpy.types.Context) -> set:
         """Calls armature generation method.
 
         Args:
@@ -67,10 +74,37 @@ class DefaultSkeleton(bpy.types.Operator):
             A set containing the success state of the method.
 
         """
+        objs = {}
+        if self.link:
+            if self.gender == 'MALE':
+                group = BodyGroup("male", [("head", "eyes", "brows", "lashes"),
+                                           "torso", "hands", "legs", "calfs", "feet"])
+            else:
+                group = BodyGroup("female", [("head", "eyes", "brows", "lashes"),
+                                             "torso", "hands", "thighs", "legs", "feet"])
+            objs = group.execute(repeat(True))
         bones = add_master_root()
         bones.data.display_type = self.display
         if self.randomize != 0:
             randomize_bones(bones, self.gender, self.pose)
+        if self.link:
+            for obj in objs.values():
+                modifier = obj.modifiers.new(name="Armature", type="ARMATURE")
+                modifier.object = bones
+                obj.parent = bones
         if self.lock:
             lock_bones(bones)
         return {'FINISHED'}
+
+    def draw(self, context: bpy.types.Context):
+        layout = self.layout
+        layout.use_property_split = True
+        layout.use_property_decorate = False
+
+        row = layout.row()
+        row.prop(self, 'lock')
+        row.prop(self, 'link')
+        layout.prop(self, 'display')
+        layout.prop(self, 'randomize')
+        layout.prop(self, 'gender')
+        layout.prop(self, 'pose')
