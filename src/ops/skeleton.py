@@ -19,6 +19,19 @@ class DefaultSkeleton(bpy.types.Operator):
         default=True,
     )
 
+    display: EnumProperty(
+        name="Display As",
+        description="Display bones as specified shape",
+        items=(
+            ('OCTAHEDRAL', 'Octahedral', 'Display bones as octahedral shape'),
+            ('STICK', 'Stick', 'Display bones as simple 2D lines with dots'),
+            ('BBONE', 'B-Bone', 'Display bones as boxes, showing subdivision and B-Splines'),
+            ('ENVELOPE', 'Envelope', 'Display bones as extruded spheres, showing deformation influence volume'),
+            ('WIRE', 'Wire', 'Display bones as thin wires, showing subdivision and B-Splines'),
+        ),
+        default="OCTAHEDRAL"
+    )
+
     randomize: FloatProperty(
         name="Random",
         description="Random seed value",
@@ -55,6 +68,7 @@ class DefaultSkeleton(bpy.types.Operator):
 
         """
         bones = add_master_root()
+        bones.data.display_type = self.display
         if self.randomize != 0:
             randomize_bones(bones, self.gender, self.pose)
         if self.lock:
