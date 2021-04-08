@@ -223,10 +223,8 @@ def write_xmf(filepath: str, objs: list, submap: dict, scale: float, weight: str
         sub = create_submesh(submap[obj.name]['material'], len(faces), len(morphs))
         fill_submesh(sub, vertices, morphs, faces, scale)
         root.append(sub)
-
     xtext = et.tostring(root).decode('utf8')
     xtext = pretty_print(xtext)
-
     with open(filepath, 'w', encoding='utf-8') as f:
         f.write("<HEADER MAGIC=\"XMF\" VERSION=\"919\"/>")
         f.write("%s" % xtext)

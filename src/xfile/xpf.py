@@ -1,14 +1,14 @@
 import bpy
 
 from xml.etree import ElementTree as et
-
 from .prettify import pretty_print
+from ..xmesh.xmorph import XMorph
 
 
 def generate_track(curve: bpy.types.FCurve, fps: int) -> et.Element:
     track = et.Element('track')
     name = curve.data_path.split('"')[1]
-    track.attrib['morphname'] = name
+    track.attrib['morphname'] = XMorph.check_name(name)
     track.attrib['numkeyframes'] = str(len(curve.keyframe_points))
     for keyframe_point in curve.keyframe_points:
         frame, value = keyframe_point.co[:]

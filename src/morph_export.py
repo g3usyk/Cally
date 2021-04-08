@@ -22,12 +22,12 @@ class CalMorphExporter(Operator, ExportHelper):
     )
 
     @classmethod
-    def poll(cls, context: bpy.types.Context):
+    def poll(cls, context: bpy.types.Context) -> bool:
         for obj in context.selected_objects:
             if obj.type == 'MESH' and obj.data.shape_keys and obj.data.shape_keys.animation_data:
                 return True
         return False
 
-    def execute(self, context: bpy.types.Context):
+    def execute(self, context: bpy.types.Context) -> set:
         export_xpf(context, self.filepath, context.scene.render.fps, context.scene.frame_end)
         return {'FINISHED'}
