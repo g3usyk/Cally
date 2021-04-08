@@ -484,6 +484,4 @@ def add_master_root():
     obj.pose.bones['Female03MasterRoot'].bone.select = True
     bpy.ops.pose.hide()
     bpy.ops.object.mode_set(mode='OBJECT')
-    bpy.ops.object.select_all(action='DESELECT')
-
     return obj

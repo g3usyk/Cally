@@ -39,12 +39,10 @@ class CalAnimationImporter(Operator, ImportHelper):
     )
 
     def execute(self, context):
-        obj = context.active_object
         if context.active_object and context.active_object.type == 'ARMATURE':
             bpy.ops.object.mode_set(mode='OBJECT')
             bpy.ops.object.delete()
         obj = add_master_root()
-        obj.select_set(True)
         obj.animation_data_clear()
         bpy.ops.object.mode_set(mode='POSE')
         import_xaf(context, obj, self.filepath, float(self.scale),
