@@ -6,6 +6,7 @@ from bpy_extras.io_utils import ExportHelper
 from .maps.ids import IDMap
 from .maps.names import NameMap
 from .xfile.xmf import export_xmf
+from .xfile.utils import check_format
 
 
 def get_bone(obj) -> str:
@@ -117,6 +118,9 @@ class CalMeshExporter(Operator, ExportHelper):
         Returns:
             set: The success state of the execution.
         """
+        if check_format(self.filepath) != 'ASCII':
+            self.report({'ERROR'}, 'Binary file unsupported. Check .xaf file contents.')
+            return {'CANCELLED'}
         submap = {obj.name: {'bone': IDMap.lookup(get_bone(obj.name)), 'material': get_material(obj.name)}
                   for obj in context.selected_objects if obj.type == 'MESH'}
         export_xmf(context, self.filepath, submap, float(self.scale), self.weight, self.auto)

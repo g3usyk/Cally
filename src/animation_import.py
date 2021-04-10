@@ -1,10 +1,9 @@
 import bpy
-
 from bpy.props import BoolProperty, EnumProperty, StringProperty
 from bpy.types import Operator
 from bpy_extras.io_utils import ImportHelper
-
 from .arm.master_root import add_master_root, lock_bones
+from .xfile.utils import check_format
 from .xfile.xaf import import_xaf
 
 
@@ -38,7 +37,10 @@ class CalAnimationImporter(Operator, ImportHelper):
         default='100',
     )
 
-    def execute(self, context):
+    def execute(self, context: bpy.types.Context) -> set:
+        if check_format(self.filepath) != 'ASCII':
+            self.report({'ERROR'}, 'Binary file unsupported. Check .xaf file contents.')
+            return {'CANCELLED'}
         if context.active_object and context.active_object.type == 'ARMATURE':
             bpy.ops.object.mode_set(mode='OBJECT')
             bpy.ops.object.delete()
