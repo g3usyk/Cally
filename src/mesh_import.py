@@ -50,6 +50,7 @@ class CalMeshImporter(Operator, ImportHelper):
 
     def execute(self, context) -> set:
         submeshes = import_xmf(self.filepath)
-        for b in submeshes:
-            b.to_mesh(smooth=self.smooth, uvs=self.uvs, norms=self.norms, groups=self.weights, morphs=self.morphs)
+        for base_mesh in submeshes:
+            base_mesh.to_mesh(smooth=self.smooth, uvs=self.uvs, norms=self.norms,
+                              groups=self.weights, morphs=self.morphs)
         return {'FINISHED'}
