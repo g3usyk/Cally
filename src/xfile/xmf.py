@@ -311,7 +311,7 @@ def extract_submesh(sub: et.Element, mesh_name: str, morph_names: dict) -> BaseM
     return BaseMesh(mesh_name, positions, loops, uvs, normals, influences, morphs)
 
 
-def import_xmf(filepath: str):
+def import_xmf(filepath: str) -> list:
     """Parses submeshes from an xmf file.
 
     Args:
