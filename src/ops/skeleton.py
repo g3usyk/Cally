@@ -4,7 +4,7 @@ import random
 from bpy.props import BoolProperty, EnumProperty, FloatProperty
 from itertools import repeat
 from .body_group import BodyGroup
-from ..arm.master_root import add_master_root, lock_bones, randomize_bones
+from ..arm.master_root import add_master_root, lock_bones, link_bones, randomize_bones
 
 
 class DefaultSkeleton(bpy.types.Operator):
@@ -74,7 +74,7 @@ class DefaultSkeleton(bpy.types.Operator):
             A set containing the success state of the method.
 
         """
-        objs = {}
+        objs = []
         if self.link:
             if self.gender == 'MALE':
                 group = BodyGroup("male", [("head", "eyes", "brows", "lashes"),
@@ -82,16 +82,13 @@ class DefaultSkeleton(bpy.types.Operator):
             else:
                 group = BodyGroup("female", [("head", "eyes", "brows", "lashes"),
                                              "torso", "hands", "thighs", "legs", "feet"])
-            objs = group.execute(repeat(True))
+            objs.extend(group.execute(repeat(True)).values())
         bones = add_master_root()
         bones.data.display_type = self.display
         if self.randomize != 0:
             randomize_bones(bones, self.gender, self.pose)
         if self.link:
-            for obj in objs.values():
-                modifier = obj.modifiers.new(name="Armature", type="ARMATURE")
-                modifier.object = bones
-                obj.parent = bones
+            link_bones(objs, bones)
         if self.lock:
             lock_bones(bones)
         return {'FINISHED'}

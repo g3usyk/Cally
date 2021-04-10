@@ -41,6 +41,13 @@ def lock_bones(obj: bpy.types.Object):
                 bone.lock_rotation = [True, True, False]
 
 
+def link_bones(objs: list, armature: bpy.types.Object):
+    for obj in objs:
+        modifier = obj.modifiers.new(name="Armature", type="ARMATURE")
+        modifier.object = armature
+        obj.parent = armature
+
+
 def rand(num: float = 1) -> float:
     return random.uniform(radians(-num), radians(num))
 
