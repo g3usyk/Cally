@@ -75,6 +75,15 @@ class BaseMesh:
                 shape_key.value = 1.0
                 obj.active_shape_key_index = obj.data.shape_keys.key_blocks.find('Face.Average')
 
+    def add_mesh(self, collection: bpy.types.Collection) -> bpy.types.Object:
+        mesh = bpy.data.meshes.new(self.name)
+        obj = bpy.data.objects.new(mesh.name, mesh)
+        collection.objects.link(obj)
+        bpy.context.view_layer.objects.active = obj
+        mesh.from_pydata(self.vertices, [], self.faces)
+        bpy.ops.object.select_all(action='DESELECT')
+        return obj
+
     def to_mesh(self, collection: bpy.types.Collection = None, smooth: bool = True, uvs: bool = True,
                 norms: bool = False, groups: bool = False, morphs: bool = False) -> bpy.types.Object:
         """Generates a mesh using raw geometric data.
@@ -89,18 +98,9 @@ class BaseMesh:
         """
         if collection is None:
             collection = bpy.data.collections.get("Collection")
-
-        mesh = bpy.data.meshes.new(self.name)
-        obj = bpy.data.objects.new(mesh.name, mesh)
-
-        collection.objects.link(obj)
-        bpy.context.view_layer.objects.active = obj
-
-        mesh.from_pydata(self.vertices, [], self.faces)
-        bpy.ops.object.select_all(action='DESELECT')
-
+        obj = self.add_mesh(collection)
         if smooth:
-            bpy.data.objects[mesh.name].select_set(True)
+            bpy.data.objects[obj.name].select_set(True)
             bpy.ops.object.shade_smooth()
         if uvs:
             self.add_uvs(obj)
@@ -110,5 +110,4 @@ class BaseMesh:
             self.add_groups(obj)
         if morphs:
             self.add_morphs(obj)
-
         return obj
