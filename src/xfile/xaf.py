@@ -2,7 +2,7 @@ from typing import Dict, List, Mapping, Tuple
 from bpy.types import Context, FCurve, Object, PoseBone
 from mathutils import Quaternion, Vector
 from xml.etree import ElementTree as et
-from .prettify import pretty_print
+from .utils import pretty_print
 from ..maps.names import NameMap
 from ..maps.positions import PositionMap
 from ..maps.rotations import RotationMap
@@ -10,25 +10,26 @@ from ..xanim.xtrack import XTrack
 from ..xanim.xframe import XFrame
 
 
-def set_mode(obj: Object):
+def set_rotation_mode(obj: Object) -> Object:
     for bone in obj.pose.bones:
         bone.rotation_mode = 'QUATERNION'
+    return obj
 
 
 def get_data_path(data_string: str) -> Tuple[str, str]:
-    parts = data_string.split('.')
-    bone_name = parts[1].split('"')[1]
-    data_path = parts[-1]
+    data_elements = data_string.split('.')
+    bone_name = data_elements[1].split('"')[1]
+    data_path = data_elements[-1]
     return bone_name, data_path
 
 
 def get_keyframe_point(f_curve: FCurve, data_path: str,
                        keyframes: Mapping[str, Dict[float, List[float]]]) -> Mapping[str, Dict[float, List[float]]]:
-    for key_points in f_curve.keyframe_points:
-        frame, coord = key_points.co
+    for keyframe_points in f_curve.keyframe_points:
+        frame, value = keyframe_points.co
         if frame not in keyframes[data_path]:
             keyframes[data_path][frame] = []
-        keyframes[data_path][frame].append(coord)
+        keyframes[data_path][frame].append(value)
     return keyframes
 
 
@@ -52,10 +53,10 @@ def process_animation(obj: Object, fps: int) -> List[XTrack]:
                 keyframe = XFrame(frame / fps, bone_name, coords)
                 frames.append(keyframe)
         else:
-            for loc, rot in zip(keyframes['location'].items(), keyframes['rotation_quaternion'].items()):
-                frame, loc_coords = loc
-                _, rot_coords = rot
-                keyframe = XFrame(frame / fps, bone_name, rot_coords, loc_coords)
+            for location, rotation in zip(keyframes['location'].items(), keyframes['rotation_quaternion'].items()):
+                frame, location_coordinates = location
+                _, rotation_coordinates = rotation
+                keyframe = XFrame(frame / fps, bone_name, rotation_coordinates, location_coordinates)
                 frames.append(keyframe)
         track = XTrack(bone_name, frames)
         tracks.append(track)
@@ -78,34 +79,29 @@ def process_pose(obj: Object) -> List[XTrack]:
 
 def export_xaf(context: Context, filepath: str, scale: float, fps: int, debug: bool):
     obj = context.active_object
-    set_mode(obj)
+    set_rotation_mode(obj)
     root = et.Element('animation')
-
     tracks = []
     if obj.animation_data:
         tracks.extend(process_animation(obj, fps))
     else:
         tracks.extend(process_pose(obj))
-
     duration = context.scene.frame_end / fps
     root.attrib['numtracks'] = str(len(tracks))
     root.attrib['duration'] = str(duration)
-
     for track in tracks:
         root.append(track.parse(scale))
-
-    xtext = et.tostring(root).decode('utf8')
-    xtext = pretty_print(xtext).upper() if debug else pretty_print(xtext)
-
+    xml_text = et.tostring(root).decode('utf8')
+    xml_text = pretty_print(xml_text).upper() if debug else pretty_print(xml_text)
     with open(filepath, 'w', encoding='utf-8') as f:
         f.write('<HEADER MAGIC="XAF" VERSION="919" />')
-        f.write("%s" % xtext)
+        f.write("%s" % xml_text)
 
 
-def get_offset(original: Quaternion, default: Quaternion) -> Quaternion:
-    difference = original @ default
-    return Quaternion((difference.w, -difference.y,
-                       -difference.x, difference.z))
+def get_rotation_offset(raw_rotation: Quaternion, default_rotation: Quaternion) -> Quaternion:
+    rotation_difference = raw_rotation @ default_rotation
+    return Quaternion((rotation_difference.w, -rotation_difference.y,
+                       -rotation_difference.x, rotation_difference.z))
 
 
 def reset_bone(bone: PoseBone) -> PoseBone:
@@ -134,28 +130,28 @@ def parse_track(obj: Object, track: et.Element, bone_id: int, scale: float, fps:
     bone = obj.pose.bones[bone_name]
     reset_bone(bone)
     default_rotation = RotationMap.lookup(bone_name)
-    default = Quaternion((default_rotation[3], default_rotation[0],
-                          default_rotation[1], default_rotation[2]))
-    default.conjugate()
+    default_quaternion = Quaternion((default_rotation[3], default_rotation[0],
+                                     default_rotation[1], default_rotation[2]))
+    default_quaternion.conjugate()
     is_animation = int(track.attrib['numkeyframes']) > 1
     for keyframe in track.iter('keyframe'):
         frame = float(keyframe.attrib['time']) * fps
-        rotation = parse_rotation(keyframe)
+        raw_rotation = parse_rotation(keyframe)
         if bone_id == 1:
-            bone.rotation_quaternion = Quaternion((rotation.w, -rotation.x, -rotation.y, -rotation.z))
-            location = parse_translation(keyframe)
+            bone.rotation_quaternion = Quaternion((raw_rotation.w, -raw_rotation.x,
+                                                   -raw_rotation.y, -raw_rotation.z))
+            raw_location = parse_translation(keyframe)
             default_location = Vector(PositionMap.lookup(bone_name)) * scale
-            bone.location = (location - default_location) / scale
+            bone.location = (raw_location - default_location) / scale
             if is_animation:
                 bone.keyframe_insert(data_path="location", frame=frame)
         else:
-            bone.rotation_quaternion = get_offset(rotation, default)
+            bone.rotation_quaternion = get_rotation_offset(raw_rotation, default_quaternion)
         if is_animation:
             bone.keyframe_insert(data_path="rotation_quaternion", frame=frame)
 
 
 def import_xaf(context: Context, obj: Object, filepath: str, scale: float, fps: int):
-    data = ''
     with open(filepath, 'r') as f:
         data = f.read()
     data = data.lower()

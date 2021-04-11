@@ -1,7 +1,7 @@
 from typing import List
 from bpy.types import Context, FCurve, Object
 from xml.etree import ElementTree as et
-from .prettify import pretty_print
+from .utils import pretty_print
 from ..xmesh.xmorph import XMorph
 
 

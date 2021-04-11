@@ -1,9 +1,8 @@
-import bpy
 from bpy.types import Context, Object
 from mathutils import Quaternion, Vector
 from typing import List, Sequence, Tuple
 from xml.etree import ElementTree as et
-from .prettify import pretty_print
+from .utils import pretty_print
 from ..maps.bones.heads import HeadMap
 from ..maps.bones.rolls import RollMap
 from ..xskel.xbone import XBone
@@ -11,30 +10,30 @@ from ..xskel.xbone import XBone
 
 def generate_offset(posn: Vector, rotation: Quaternion) -> Tuple[Vector, Quaternion]:
     offset = Quaternion((-0.5, 0.5, 0.5, 0.5))
-    true_posn = offset @ posn
-    true_rot = offset @ rotation
-    true_rot.invert()
-    return true_posn, true_rot
+    true_position = offset @ posn
+    true_rotation = offset @ rotation
+    true_rotation.invert()
+    return true_position, true_rotation
 
 
 def generate_attachment(obj: Object) -> et.Element:
-    group = obj.vertex_groups.active
-    bone_name = group.name if group and group.name in HeadMap.mapping else 'Female03MasterRoot'
+    current_group = obj.vertex_groups.active
+    bone_name = current_group.name if current_group and current_group.name in HeadMap.mapping else 'Female03MasterRoot'
     posn = HeadMap.lookup(bone_name)
     rot = Quaternion((0.5, 0.5, 0.5, 0.5)) @ Quaternion((0.0, 1.0, 0.0), RollMap.lookup(bone_name))
     attachment = XBone('AttachmentRoot', 0, posn[:], rot[:], -1)
-    return attachment.write()
+    return attachment.write_bone()
 
 
 def generate_root(name: str, count: int, category: str) -> et.Element:
-    rot = []
-    childs = [c for c in range(1, count + 1)]
+    rotation = []
+    children = [c for c in range(1, count + 1)]
     if category == 'FURNITURE':
-        rot = [0, 0, 0, 1]
+        rotation = [0, 0, 0, 1]
     elif category == 'ROOM':
-        rot = [0.5, 0.5, 0.5, -0.5]
-    root = XBone(name, 0, [0, 0, 0], rot, -1, childs)
-    return root.write()
+        rotation = [0.5, 0.5, 0.5, -0.5]
+    root = XBone(name, 0, [0, 0, 0], rotation, -1, children)
+    return root.write_bone()
 
 
 def generate_child(bone_ix: int, name: Sequence[str], name_ix: int, posn: Vector,
@@ -46,7 +45,7 @@ def generate_child(bone_ix: int, name: Sequence[str], name_ix: int, posn: Vector
     else:
         b_name = f'{name[0]}{name_ix:02d}.{name[1]}'
     child = XBone(b_name, bone_ix, posn, rot)
-    return child.write()
+    return child.write_bone()
 
 
 def generate_children(objs, id_offset: int, name_offset: int, scale: float, category: str) -> List[et.Element]:
@@ -73,7 +72,7 @@ def generate_camera() -> List[et.Element]:
                         [-2500, 750, 0], [0, 0.70707, 0, 0.70707])
     camera_target = XBone('camera.01.01.Target', 2,
                           [-500, 750, 0], [0.5, 0.5, 0.5, 0.5])
-    return [camera_root.write(), camera_target.write()]
+    return [camera_root.write_bone(), camera_target.write_bone()]
 
 
 def generate_handle(handles: Sequence[Object], spots: Sequence[Object], ix: int, scale: float,
@@ -89,7 +88,7 @@ def generate_handle(handles: Sequence[Object], spots: Sequence[Object], ix: int,
         posn, rot = generate_offset(posn, rot)
         name = 'Seat01'
     handle = XBone(name, ix, [(p * scale) for p in posn], [rot.x, rot.y, rot.z, rot.w])
-    return handle.write()
+    return handle.write_bone()
 
 
 def export_xsf(context: Context, filepath: str, category: str, scale: float):

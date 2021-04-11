@@ -4,7 +4,7 @@ import os
 from bpy.types import Context, MeshVertex, Object
 from typing import Callable, Collection, Dict, Iterable, List, Mapping, Set, Sequence, Tuple
 from xml.etree import ElementTree as et
-from .prettify import pretty_print
+from .utils import pretty_print
 from ..maps.ids import IDMap
 from ..maps.positions import PositionMap
 from ..mesh.base import BaseMesh
@@ -256,18 +256,18 @@ def apply_scale(value: str) -> float:
     return float(value) / 100
 
 
-def extract(elem: et.Element, tag: str, conversion: Callable[[str], float]) -> List[float]:
-    child = elem.find(tag).text.split()
-    return [conversion(x) for x in child]
+def extract(tag: et.Element, tag_name: str, conversion: Callable[[str], float]) -> List[float]:
+    elements = tag.find(tag_name).text.split()
+    return [conversion(element) for element in elements]
 
 
 def extract_influences(elem: et.Element, tag: str, conversion: Callable[[str], float]) -> Set[Tuple[int, float]]:
     children = elem.findall(tag)
-    seen = set()
+    seen_influences = set()
     for influence in children:
         bone_id, weight = int(influence.attrib['id']), conversion(influence.text)
-        seen.add((bone_id, weight))
-    return seen
+        seen_influences.add((bone_id, weight))
+    return seen_influences
 
 
 def extract_morph_names(root: et.Element) -> Dict[str, str]:

@@ -35,7 +35,7 @@ class XVertex:
         tag = et.Element('vertex')
         tag.attrib['numinfluences'] = str(len(self.influences))
         tag.attrib['id'] = str(vertex_id)
-        
+
         xposn = et.Element('pos')
         xnorm = et.Element('norm')
         xcol = et.Element('color')
@@ -46,7 +46,6 @@ class XVertex:
         xcol.text = ' '.join([(str(c)) for c in self.color])
         xuv.text = f'{self.uv[uv_id][0]} {abs(1 - self.uv[uv_id][1])}'
         # xuv.text = str(self.uv[uv_id][0]) + ' ' + str(abs(1 - self.uv[uv_id][1]))
-
         tag.append(xposn)
         tag.append(xnorm)
         tag.append(xcol)
