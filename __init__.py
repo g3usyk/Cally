@@ -11,7 +11,8 @@ bl_info = {
 }
 
 import bpy
-
+from bpy.types import Context
+from typing import Tuple
 from .src.animation_export import CalAnimationExporter
 from .src.animation_import import CalAnimationImporter
 from .src.mesh_export import CalMeshExporter
@@ -24,77 +25,77 @@ from .src.ops import f_body, m_body
 from .src.imvu_add import VIEW3D_MT_imvu
 
 
-def animation_export_button(self, context: bpy.types.Context):
+def animation_export_button(self, context: Context):
     """Targets animation exporter class on menu button press.
 
     Args:
         self (): A reference to this bpy dynamic draw function.
-        context (bpy.types.Context): The context containing data for the current 3d view.
+        context (Context): The context containing data for the current 3d view.
     """
     self.layout.operator(CalAnimationExporter.bl_idname, text="Cal3D Animation (.xaf)")
 
 
-def animation_import_button(self, context: bpy.types.Context):
+def animation_import_button(self, context: Context):
     """Targets animation importer class on menu button press.
 
     Args:
         self (): A reference to this bpy dynamic draw function.
-        context (bpy.types.Context): The context containing data for the current 3d view.
+        context (Context): The context containing data for the current 3d view.
     """
     self.layout.operator(CalAnimationImporter.bl_idname, text="Cal3D Animation (.xaf)")
 
 
-def mesh_export_button(self, context: bpy.types.Context):
+def mesh_export_button(self, context: Context):
     """Targets mesh exporter class on menu button press.
 
     Args:
         self (): A reference to this bpy dynamic draw function.
-        context (bpy.types.Context): The context containing data for the current 3d view.
+        context (Context): The context containing data for the current 3d view.
     """
     self.layout.operator(CalMeshExporter.bl_idname, text="Cal3D Mesh (.xmf)")
 
 
-def mesh_import_button(self, context: bpy.types.Context):
+def mesh_import_button(self, context: Context):
     """Targets mesh importer class on menu button press.
 
     Args:
         self (): A reference to this bpy dynamic draw function.
-        context (bpy.types.Context): The context containing data for the current 3d view.
+        context (Context): The context containing data for the current 3d view.
     """
     self.layout.operator(CalMeshImporter.bl_idname, text="Cal3D Mesh (.xmf)")
 
 
-def morph_export_button(self, context: bpy.types.Context):
+def morph_export_button(self, context: Context):
     """Targets morph exporter class on menu button press.
 
     Args:
         self (): A reference to this bpy dynamic draw function.
-        context (bpy.types.Context): The context containing data for the current 3d view.
+        context (Context): The context containing data for the current 3d view.
     """
     self.layout.operator(CalMorphExporter.bl_idname, text="Cal3D Morph (.xpf)")
 
 
-def skeleton_export_button(self, context: bpy.types.Context):
+def skeleton_export_button(self, context: Context):
     """Targets skeleton exporter class on menu button press.
 
     Args:
         self (): A reference to this bpy dynamic draw function.
-        context (bpy.types.Context): The context containing data for the current 3d view.
+        context (Context): The context containing data for the current 3d view.
     """
     self.layout.operator(CalSkeletonExporter.bl_idname, text="Cal3D Skeleton (.xsf)")
 
 
-def imvu_add_menu(self, context: bpy.types.Context):
+def imvu_add_menu(self, context: Context):
     """Targets object add menu for imvu primitives.
 
     Args:
         self (): A reference to this bpy dynamic draw function.
-        context (bpy.types.Context): The context containing data for the current 3d view.
+        context (Context): The context containing data for the current 3d view.
     """
     self.layout.menu(VIEW3D_MT_imvu.bl_idname, icon="INFO")
 
 
-def manual_map() -> tuple:
+def manual_map() -> Tuple[str, Tuple[Tuple[str, str]]]:
     """Defines documentation for addon.
 
     Returns:

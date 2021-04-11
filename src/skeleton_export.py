@@ -1,6 +1,7 @@
 from bpy.props import EnumProperty, StringProperty
 from bpy.types import Context, Operator
 from bpy_extras.io_utils import ExportHelper
+from typing import List, Tuple, Set
 from .xfile.xsf import export_xsf
 
 
@@ -18,7 +19,7 @@ class CalSkeletonExporter(Operator, ExportHelper):
         maxlen=255,
     )
 
-    def category_items(self, context: Context) -> list:
+    def category_items(self, context: Context) -> List[Tuple[str, ...]]:
         items = []
         items.extend((
             ('FURNITURE', "Furniture", "Used with furniture meshes"),
@@ -49,6 +50,6 @@ class CalSkeletonExporter(Operator, ExportHelper):
                     return True
         return False
 
-    def execute(self, context: Context) -> set:
+    def execute(self, context: Context) -> Set[str]:
         export_xsf(context, self.filepath, self.category, float(self.scale))
         return {'FINISHED'}

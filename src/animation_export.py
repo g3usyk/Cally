@@ -1,6 +1,7 @@
 from bpy.props import BoolProperty, EnumProperty, StringProperty
 from bpy.types import Context, Operator
 from bpy_extras.io_utils import ExportHelper
+from typing import Set
 from .xfile.xaf import export_xaf
 
 
@@ -38,6 +39,6 @@ class CalAnimationExporter(Operator, ExportHelper):
     def poll(cls, context: Context) -> bool:
         return context.active_object.type == 'ARMATURE'
 
-    def execute(self, context: Context):
+    def execute(self, context: Context) -> Set[str]:
         export_xaf(context, self.filepath, float(self.scale), context.scene.render.fps, self.debug)
         return {'FINISHED'}

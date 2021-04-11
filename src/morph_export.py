@@ -1,6 +1,7 @@
 from bpy.props import StringProperty
 from bpy.types import Context, Operator
 from bpy_extras.io_utils import ExportHelper
+from typing import Set
 from .xfile.xpf import export_xpf
 
 
@@ -26,6 +27,6 @@ class CalMorphExporter(Operator, ExportHelper):
                 return True
         return False
 
-    def execute(self, context: Context) -> set:
+    def execute(self, context: Context) -> Set[str]:
         export_xpf(context, self.filepath, context.scene.render.fps, context.scene.frame_end)
         return {'FINISHED'}

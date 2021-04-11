@@ -1,6 +1,7 @@
 import random
 from bpy.types import Context, Operator
 from bpy.props import BoolProperty, EnumProperty, FloatProperty
+from typing import Set
 from .body_group import BodyGroup
 from ..arm.master_root import add_master_root, lock_bones, link_bones, randomize_bones
 
@@ -62,7 +63,7 @@ class DefaultSkeleton(Operator):
         default='STAND'
     )
 
-    def execute(self, context: Context) -> set:
+    def execute(self, context: Context) -> Set[str]:
         """Calls armature generation method.
 
         Args:

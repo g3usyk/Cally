@@ -3,20 +3,21 @@ import re
 from bpy.props import BoolProperty, EnumProperty, IntProperty, StringProperty
 from bpy.types import Context, Object, Operator
 from bpy_extras.io_utils import ExportHelper
+from typing import List, Set, Tuple
 from .maps.ids import IDMap
 from .maps.names import NameMap
 from .xfile.xmf import export_xmf
 from .xfile.utils import check_format
 
 
-def get_bone(obj: Object) -> str:
-    group = bpy.data.objects[obj].vertex_groups.active
+def get_bone(obj_name: str) -> str:
+    group = bpy.data.objects[obj_name].vertex_groups.active
     bone = group.name if group and group.name in IDMap.mapping else NameMap.lookup(0)
     return bone
 
 
-def get_material(obj: Object) -> int:
-    mtl = bpy.data.objects[obj].active_material
+def get_material(obj_name: str) -> int:
+    mtl = bpy.data.objects[obj_name].active_material
     material = 0
     if mtl:
         mtl_id = re.findall('\d+', mtl.name)
@@ -66,7 +67,7 @@ class CalMeshExporter(Operator, ExportHelper):
         self.bone = get_bone(self.subs)
         self.mtl = get_material(self.subs)
 
-    def sub_items(self, context: Context):
+    def sub_items(self, context: Context) -> List[Tuple[str, ...]]:
         objs = [obj for obj in context.selected_objects if obj.type == 'MESH']
         if self.bone == '':
             self.bone = get_bone(objs[0].name)
@@ -109,7 +110,7 @@ class CalMeshExporter(Operator, ExportHelper):
     def poll(cls, context: Context) -> bool:
         return any(((obj.type == 'MESH') for obj in context.selected_objects))
 
-    def execute(self, context: Context) -> set:
+    def execute(self, context: Context) -> Set[str]:
         """Calls xmf file generation method.
 
         Args:
@@ -135,7 +136,6 @@ class CalMeshExporter(Operator, ExportHelper):
         layout = self.layout
         layout.use_property_split = True
         layout.use_property_decorate = False
-
         layout.prop(self, 'auto')
         layout.prop(self, 'subs')
         if not self.auto:

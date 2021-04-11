@@ -2,6 +2,7 @@ import bpy
 from bpy.props import BoolProperty, EnumProperty, StringProperty
 from bpy.types import Context, Operator
 from bpy_extras.io_utils import ImportHelper
+from typing import Set
 from .arm.master_root import add_master_root, link_bones, lock_bones
 from .ops.body_group import BodyGroup
 from .xfile.utils import check_format
@@ -54,7 +55,7 @@ class CalAnimationImporter(Operator, ImportHelper):
         default='100',
     )
 
-    def execute(self, context: Context) -> set:
+    def execute(self, context: Context) -> Set[str]:
         if check_format(self.filepath) != 'ASCII':
             self.report({'ERROR'}, 'Binary file unsupported. Check .xaf file contents.')
             return {'CANCELLED'}

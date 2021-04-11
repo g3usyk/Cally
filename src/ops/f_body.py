@@ -1,5 +1,6 @@
 from bpy.types import Context, Operator
 from bpy.props import BoolProperty
+from typing import Set
 from .body_group import BodyGroup
 
 
@@ -64,7 +65,7 @@ class FemaleBody(Operator):
         default=True
     )
 
-    def execute(self, context: Context):
+    def execute(self, context: Context) -> Set[str]:
         """Specifies the behaviour for the operator method called by Blender.
 
         Args:

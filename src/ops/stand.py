@@ -1,5 +1,6 @@
 from bpy.types import Context, Operator
 from bpy.props import EnumProperty
+from typing import Set
 from ..node.pose import Pose
 
 
@@ -19,7 +20,7 @@ class StandingSpot(Operator):
         default="ARROWS",
     )
 
-    def execute(self, context: Context):
+    def execute(self, context: Context) -> Set[str]:
         stand_pose = Pose('Stand', context)
         stand_pose.to_scene(self.primitive)
         return {'FINISHED'}

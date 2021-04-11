@@ -38,7 +38,7 @@ class BodyGroup:
             obj.matrix_parent_inverse = parent_obj.matrix_world.inverted()
 
     @staticmethod
-    def default_parts(gender: str) -> list:
+    def default_parts(gender: str) -> List[Object]:
         if gender == 'MALE':
             group = BodyGroup("male", [("head", "eyes", "brows", "lashes"),
                                        "torso", "hands", "legs", "calfs", "feet"])
