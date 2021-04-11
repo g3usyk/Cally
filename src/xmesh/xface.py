@@ -1,3 +1,4 @@
+from typing import Iterable, Sequence, Tuple
 from xml.etree import ElementTree as et
 
 
@@ -6,10 +7,12 @@ class XFace:
 
     """
 
-    def __init__(self):
-        self.vertices = []
+    def __init__(self, vertices: Iterable[Tuple[int, int]] = None):
+        self.vertices = vertices
+        if vertices is None:
+            self.vertices = []
 
-    def parse(self, vertex_ids: list) -> et.Element:
+    def parse(self, vertex_ids: Sequence[Sequence[int]]) -> et.Element:
         """Concatenates a group of vertex index assignments into an xmf face tag.
 
         Args:

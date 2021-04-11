@@ -1,3 +1,4 @@
+from typing import Dict, Iterable
 from xml.etree import ElementTree as et
 
 
@@ -6,7 +7,8 @@ class XVertex:
 
     """
 
-    def __init__(self, position: list, normal: list, color: list, influences: dict):
+    def __init__(self, position: Iterable[float], normal: Iterable[float], color: Iterable[str],
+                 influences: Dict[str, int]):
         self.position = position
         self.normal = normal
         self.color = color
@@ -14,7 +16,7 @@ class XVertex:
         self.uv = []
         self.blends = {}
 
-    def add_blend(self, name: str, position: list, normal: list):
+    def add_blend(self, name: str, position: Iterable[float], normal: Iterable[float]):
         if position != self.position:
             self.blends[name] = position, normal
 
@@ -33,7 +35,7 @@ class XVertex:
         tag = et.Element('vertex')
         tag.attrib['numinfluences'] = str(len(self.influences))
         tag.attrib['id'] = str(vertex_id)
-
+        
         xposn = et.Element('pos')
         xnorm = et.Element('norm')
         xcol = et.Element('color')

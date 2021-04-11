@@ -1,9 +1,10 @@
 import bpy
+from bpy.types import Context
 
 
 class Pose:
 
-    def __init__(self, pose_type: str, context: bpy.types.Context):
+    def __init__(self, pose_type: str, context: Context):
         self.pose_type = pose_type
         if "Spots" not in bpy.data.collections:
             spots = bpy.data.collections.new("Spots")

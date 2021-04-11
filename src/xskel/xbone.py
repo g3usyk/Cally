@@ -1,19 +1,18 @@
+from typing import Iterable, List, Sequence
 from xml.etree import ElementTree as et
 
 
 class XBone:
-    def __init__(self, name: str, b_id: int, translation: list, rotation: list,
-                 parent_id: int = 0, children: list = None):
+    def __init__(self, name: str, b_id: int, translation: Sequence[float], rotation: Sequence[float],
+                 parent_id: int = 0, children: Iterable[int] = None):
         self.name = name
         self.b_id = b_id
         self.translation = translation
         self.rotation = rotation
         self.parent_id = parent_id
-        self.children = children
-        if self.children is None:
-            self.children = []
+        self.children = children if children is not None else []
 
-    def local(self, values: list, transform: str) -> list:
+    def local(self, values: Sequence[float], transform: str) -> List[float]:
         if transform == 'TRANSLATION':
             return [values[0], -values[2], -values[1]]
         else:

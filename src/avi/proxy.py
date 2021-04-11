@@ -1,9 +1,9 @@
 import bpy
 import inspect
 import pickle
-
+from bpy.types import Object
+from typing import Iterable
 from pathlib import Path
-
 from ..mesh.base import BaseMesh
 
 
@@ -13,7 +13,7 @@ class Proxy(BaseMesh):
     """
     relative_path = Path(inspect.getmodule(BaseMesh).__file__).parent
 
-    def __init__(self, name: str, file_path):
+    def __init__(self, name: str, file_path: Iterable[str]):
         vertices = []
         faces = []
         uvs = []
@@ -35,7 +35,7 @@ class Proxy(BaseMesh):
         super().__init__(name=name, vertices=vertices, faces=faces, uvs=uvs, norms=[], groups=groups,
                          morphs=morphs)
 
-    def add_uvs(self, obj: bpy.types.Object):
+    def add_uvs(self, obj: Object):
         """Generates uv coordinates for mesh object.
 
         Args:

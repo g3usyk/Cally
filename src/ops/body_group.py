@@ -1,3 +1,5 @@
+from bpy.types import Object
+from typing import Dict, Iterable, List, Tuple, Union
 from itertools import repeat
 from ..avi.proxy_group import ProxyGroup
 
@@ -7,7 +9,8 @@ class BodyGroup:
 
     """
 
-    def __init__(self, gender: str, parts: list, uvs: bool = True, weights: bool = True, morphs: bool = True):
+    def __init__(self, gender: str, parts: Iterable[Union[str, Iterable[str]]],
+                 uvs: bool = True, weights: bool = True, morphs: bool = True):
         self.gender = gender.lower()
         self.parts = parts
         self.bl_idname = f'mesh.primitive_imvu_{self.gender}_body_add'
@@ -20,7 +23,7 @@ class BodyGroup:
     def get_label(self, prefix: str, part: str) -> str:
         return f'{prefix}.{part.capitalize()}'
 
-    def add_part(self, prefix: str, part: str) -> tuple:
+    def add_part(self, prefix: str, part: str) -> Tuple[str, List[str]]:
         label = self.get_label(prefix, part)
         file_path = ["assets", self.gender, f'{part}.pickle']
         return label, file_path
@@ -44,7 +47,7 @@ class BodyGroup:
                                          "torso", "hands", "thighs", "legs", "feet"])
         return list(group.execute(repeat(True)).values())
 
-    def execute(self, selected_parts) -> dict:
+    def execute(self, selected_parts: Iterable[bool]) -> Dict[str, Object]:
         """Specifies the behaviour for the operator method called by Blender.
 
         Args:

@@ -2,7 +2,7 @@ from xml.etree import ElementTree as et
 
 
 class XMorph:
-    def __init__(self, name: str, morph_id=None):
+    def __init__(self, name: str, morph_id: str = None):
         self.name = name
         self.morph_id = morph_id
         if not morph_id:

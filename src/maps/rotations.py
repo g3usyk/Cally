@@ -1,3 +1,6 @@
+from typing import List
+
+
 class RotationMap:
     """Default rotations for imvu base avatar.
 
@@ -91,5 +94,5 @@ class RotationMap:
                "rtFingerRing03": [0.9969375, -0.0074213, -0.0741999, 0.0235577]}
 
     @classmethod
-    def lookup(cls, bone: str):
+    def lookup(cls, bone: str) -> List[float]:
         return cls.mapping[bone]

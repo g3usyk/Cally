@@ -1,3 +1,4 @@
+from typing import Sequence
 from mathutils import Quaternion, Vector
 from xml.etree import ElementTree as et
 from ..maps.positions import PositionMap
@@ -5,22 +6,22 @@ from ..maps.rotations import RotationMap
 
 
 class XFrame:
-    def __init__(self, f_time: float, bone_name: str, rotation, translation=None):
+    def __init__(self, f_time: float, bone_name: str, rotation: Sequence[float],
+                 translation: Sequence[float] = None):
         self.f_time = f_time
         self.bone_name = bone_name
         self.rotation = rotation
         self.translation = translation
 
     @staticmethod
-    def compute_actual(default, difference):
+    def compute_actual(default: Quaternion, difference: Quaternion) -> Quaternion:
         offset = Quaternion((difference.w, -difference.y, difference.z, -difference.x))
         actual = default @ offset
         return actual
 
-    def compute_rotation(self):
+    def compute_rotation(self) -> str:
         bone_quaternion = Quaternion((self.rotation[0], self.rotation[1],
                                       self.rotation[2], self.rotation[3]))
-        text = ''
         if self.bone_name == 'PelvisNode':
             text = f'{-bone_quaternion.x} {-bone_quaternion.y} {-bone_quaternion.z} {bone_quaternion.w}'
         else:
@@ -31,13 +32,13 @@ class XFrame:
             text = f'{true_rotation.x} {true_rotation.z} {true_rotation.y} {true_rotation.w}'
         return text
 
-    def compute_translation(self, scale: float):
+    def compute_translation(self, scale: float) -> str:
         bone_vector = Vector((self.translation[0], self.translation[1], self.translation[2]))
         default_translation = Vector(PositionMap.lookup(self.bone_name))
         true_translation = (default_translation + bone_vector) * scale
         return f'{true_translation.x} {true_translation.y} {true_translation.z}'
 
-    def parse(self, scale: float):
+    def parse(self, scale: float) -> et.Element:
         tag = et.Element('keyframe')
         tag.attrib['time'] = str(self.f_time)
         if self.translation:

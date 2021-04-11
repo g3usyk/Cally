@@ -1,15 +1,15 @@
 import bpy
-
-from mathutils import Quaternion
+from bpy.types import Context, Object
+from mathutils import Quaternion, Vector
+from typing import List, Sequence, Tuple
 from xml.etree import ElementTree as et
-
 from .prettify import pretty_print
 from ..maps.bones.heads import HeadMap
 from ..maps.bones.rolls import RollMap
 from ..xskel.xbone import XBone
 
 
-def generate_offset(posn, rotation):
+def generate_offset(posn: Vector, rotation: Quaternion) -> Tuple[Vector, Quaternion]:
     offset = Quaternion((-0.5, 0.5, 0.5, 0.5))
     true_posn = offset @ posn
     true_rot = offset @ rotation
@@ -17,7 +17,7 @@ def generate_offset(posn, rotation):
     return true_posn, true_rot
 
 
-def generate_attachment(obj: bpy.types.Object) -> et.Element:
+def generate_attachment(obj: Object) -> et.Element:
     group = obj.vertex_groups.active
     bone_name = group.name if group and group.name in HeadMap.mapping else 'Female03MasterRoot'
     posn = HeadMap.lookup(bone_name)
@@ -37,7 +37,8 @@ def generate_root(name: str, count: int, category: str) -> et.Element:
     return root.write()
 
 
-def generate_child(bone_ix: int, name: list, name_ix: int, posn, rotation, scale: float):
+def generate_child(bone_ix: int, name: Sequence[str], name_ix: int, posn: Vector,
+                   rotation: Quaternion, scale: float) -> et.Element:
     posn = [(p * scale) for p in posn]
     rot = [rotation.x, rotation.y, rotation.z, rotation.w]
     if len(name) == 1:
@@ -48,7 +49,7 @@ def generate_child(bone_ix: int, name: list, name_ix: int, posn, rotation, scale
     return child.write()
 
 
-def generate_children(objs, id_offset: int, name_offset: int, scale: float, category: str):
+def generate_children(objs, id_offset: int, name_offset: int, scale: float, category: str) -> List[et.Element]:
     seats = []
     use_offset = False
     if category == 'ROOM':
@@ -67,7 +68,7 @@ def generate_children(objs, id_offset: int, name_offset: int, scale: float, cate
     return seats
 
 
-def generate_camera():
+def generate_camera() -> List[et.Element]:
     camera_root = XBone('camera.01.01.root', 1,
                         [-2500, 750, 0], [0, 0.70707, 0, 0.70707])
     camera_target = XBone('camera.01.01.Target', 2,
@@ -75,7 +76,8 @@ def generate_camera():
     return [camera_root.write(), camera_target.write()]
 
 
-def generate_handle(handles, spots, ix: int, scale: float, category: str):
+def generate_handle(handles: Sequence[Object], spots: Sequence[Object], ix: int, scale: float,
+                    category: str) -> et.Element:
     if len(handles) > 0:
         node = handles[0]
     else:
@@ -90,7 +92,7 @@ def generate_handle(handles, spots, ix: int, scale: float, category: str):
     return handle.write()
 
 
-def export_xsf(context: bpy.types.Context, filepath: str, category: str, scale: float):
+def export_xsf(context: Context, filepath: str, category: str, scale: float):
     root = et.Element('skeleton')
     root.attrib['sceneambientcolor'] = '1 1 1'
 

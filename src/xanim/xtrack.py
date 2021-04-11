@@ -1,13 +1,13 @@
+from typing import Collection
 from xml.etree import ElementTree as et
 from ..maps.ids import IDMap
+from .xframe import XFrame
 
 
 class XTrack:
-    def __init__(self, bone_name: str, keyframes=None):
+    def __init__(self, bone_name: str, keyframes: Collection[XFrame] = None):
         self.bone_name = bone_name
-        self.keyframes = keyframes
-        if keyframes is None:
-            self.keyframes = []
+        self.keyframes = keyframes if keyframes is not None else []
 
     def parse(self, scale: float):
         tag = et.Element('track')

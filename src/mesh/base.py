@@ -1,4 +1,6 @@
 import bpy
+from bpy.types import Collection, Object
+from typing import Iterable, Mapping, Sequence, Tuple
 from mathutils import Vector
 from ..maps.names import NameMap
 
@@ -8,8 +10,10 @@ class BaseMesh:
 
     """
 
-    def __init__(self, name: str, vertices: list, faces: list, uvs: list, norms: list, groups: list,
-                 morphs: dict = None, material_id: int = None):
+    def __init__(self, name: str, vertices: Sequence[Iterable[float]], faces: Iterable[Sequence[int]],
+                 uvs: Sequence[Sequence[float]], norms: Sequence[Sequence[float]],
+                 groups: Sequence[Iterable[Tuple[int, float]]],
+                 morphs: Mapping[str, Iterable[Tuple[int, Iterable[float]]]] = None, material_id: int = None):
         """
 
         Args:
@@ -31,7 +35,7 @@ class BaseMesh:
         self.morphs = morphs if morphs else {}
         self.material_id = abs(material_id) if material_id is not None else -1
 
-    def add_material(self, obj: bpy.types.Object):
+    def add_material(self, obj: Object):
         mtl = bpy.data.materials.get(f'Material.{self.material_id}')
         if mtl is None:
             mtl = bpy.data.materials.new(name=f'Material.{self.material_id}')
@@ -41,13 +45,13 @@ class BaseMesh:
         else:
             obj.data.materials.append(mtl)
 
-    def add_normals(self, obj: bpy.types.Object):
+    def add_normals(self, obj: Object):
         if len(self.norms) > 0:
             obj.data.use_auto_smooth = True
             obj.data.normals_split_custom_set([(0, 0, 0) for _ in obj.data.loops])
             obj.data.normals_split_custom_set_from_vertices(self.norms)
 
-    def add_uvs(self, obj: bpy.types.Object):
+    def add_uvs(self, obj: Object):
         """Generates uv coordinates for mesh object.
 
         Args:
@@ -62,7 +66,7 @@ class BaseMesh:
                     uvl.data[l_idx].uv.x = uv_x
                     uvl.data[l_idx].uv.y = uv_y
 
-    def add_groups(self, obj: bpy.types.Object):
+    def add_groups(self, obj: Object):
         if len(self.groups) > 0:
             for vertex_id, group in enumerate(self.groups):
                 for influence in group:
@@ -73,7 +77,7 @@ class BaseMesh:
                             obj.vertex_groups.new(name=bone_name)
                         obj.vertex_groups[bone_name].add([vertex_id], influence[1], 'ADD')
 
-    def add_morphs(self, obj: bpy.types.Object):
+    def add_morphs(self, obj: Object):
         obj.shape_key_add(name='Basis')
         num_vertices = len(obj.data.vertices)
         for morph_name, blend_vertices in self.morphs.items():
@@ -87,7 +91,7 @@ class BaseMesh:
                 shape_key.value = 1.0
                 obj.active_shape_key_index = obj.data.shape_keys.key_blocks.find('Face.Average')
 
-    def add_mesh(self, collection: bpy.types.Collection) -> bpy.types.Object:
+    def add_mesh(self, collection: Collection) -> Object:
         mesh = bpy.data.meshes.new(self.name)
         obj = bpy.data.objects.new(mesh.name, mesh)
         collection.objects.link(obj)
@@ -96,9 +100,9 @@ class BaseMesh:
         bpy.ops.object.select_all(action='DESELECT')
         return obj
 
-    def to_mesh(self, collection: bpy.types.Collection = None, smooth: bool = True, material: bool = False,
+    def to_mesh(self, collection: Collection = None, smooth: bool = True, material: bool = False,
                 uvs: bool = True, norms: bool = False, groups: bool = False,
-                morphs: bool = False) -> bpy.types.Object:
+                morphs: bool = False) -> Object:
         """Generates a mesh using raw geometric data.
 
         Args:

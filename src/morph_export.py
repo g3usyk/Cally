@@ -1,9 +1,6 @@
-import bpy
-
 from bpy.props import StringProperty
-from bpy.types import Operator
+from bpy.types import Context, Operator
 from bpy_extras.io_utils import ExportHelper
-
 from .xfile.xpf import export_xpf
 
 
@@ -22,13 +19,13 @@ class CalMorphExporter(Operator, ExportHelper):
     )
 
     @classmethod
-    def poll(cls, context: bpy.types.Context) -> bool:
+    def poll(cls, context: Context) -> bool:
         for obj in context.selected_objects:
             if obj.type == 'MESH' and obj.data.shape_keys and obj.data.shape_keys.animation_data \
                     and obj.data.shape_keys.animation_data.action:
                 return True
         return False
 
-    def execute(self, context: bpy.types.Context) -> set:
+    def execute(self, context: Context) -> set:
         export_xpf(context, self.filepath, context.scene.render.fps, context.scene.frame_end)
         return {'FINISHED'}

@@ -1,8 +1,7 @@
 import bpy
 from bpy.props import BoolProperty, EnumProperty, StringProperty
-from bpy.types import Operator
+from bpy.types import Context, Operator
 from bpy_extras.io_utils import ImportHelper
-from itertools import repeat
 from .arm.master_root import add_master_root, link_bones, lock_bones
 from .ops.body_group import BodyGroup
 from .xfile.utils import check_format
@@ -55,7 +54,7 @@ class CalAnimationImporter(Operator, ImportHelper):
         default='100',
     )
 
-    def execute(self, context: bpy.types.Context) -> set:
+    def execute(self, context: Context) -> set:
         if check_format(self.filepath) != 'ASCII':
             self.report({'ERROR'}, 'Binary file unsupported. Check .xaf file contents.')
             return {'CANCELLED'}
@@ -78,7 +77,7 @@ class CalAnimationImporter(Operator, ImportHelper):
             lock_bones(obj)
         return {'FINISHED'}
 
-    def draw(self, context: bpy.types.Context):
+    def draw(self, context: Context):
         layout = self.layout
         layout.use_property_split = True
         layout.use_property_decorate = False

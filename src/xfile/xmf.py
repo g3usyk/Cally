@@ -1,9 +1,9 @@
 import bpy
 import bmesh
 import os
-
+from bpy.types import Context, MeshVertex, Object
+from typing import Callable, Collection, Dict, Generator, Iterable, List, Mapping, Set, Sequence, Tuple
 from xml.etree import ElementTree as et
-
 from .prettify import pretty_print
 from ..maps.ids import IDMap
 from ..maps.positions import PositionMap
@@ -14,12 +14,13 @@ from ..xmesh.xmorph import XMorph
 from ..xmesh.xvert import XVertex
 
 
-def generate_vertex(obj, vertex, colors: list, influences: dict) -> XVertex:
+def generate_vertex(obj: Object, vertex: MeshVertex, color: Tuple[str, str, str],
+                    influences: Dict[str, int]) -> XVertex:
     location = obj.matrix_world @ vertex.co
-    return XVertex(location[:], vertex.normal[:], colors, influences)
+    return XVertex(location[:], vertex.normal[:], color, influences)
 
 
-def generate_vertices(obj, bone_id: int, weight: str) -> list:
+def generate_vertices(obj, bone_id: int, weight: str) -> List[XVertex]:
     """Construct xmf vertex objects from the given blender object.
 
     Args:
@@ -32,9 +33,8 @@ def generate_vertices(obj, bone_id: int, weight: str) -> list:
 
     """
     xverts = []
-    color = ['1', '1', '1']
+    color = ('1', '1', '1')
     influences = {str(bone_id): 1}
-
     if weight == 'OBJECT':
         for vertex in obj.data.vertices:
             next_vertex = generate_vertex(obj, vertex, color, influences)
@@ -51,7 +51,7 @@ def generate_vertices(obj, bone_id: int, weight: str) -> list:
     return xverts
 
 
-def generate_blend_vertices(obj, vertices: list):
+def generate_blend_vertices(obj, vertices: Sequence[XVertex]):
     if obj.data.shape_keys:
         key_blocks = obj.data.shape_keys.key_blocks
         for key_block in key_blocks[1:]:
@@ -82,7 +82,7 @@ def generate_triangulation(obj) -> bmesh.types.BMesh:
     return bm
 
 
-def generate_faces(obj, vertices: list) -> list:
+def generate_faces(obj, vertices: Sequence[XVertex]) -> List[XFace]:
     """Constructs xmf format faces from the given object.
 
     Args:
@@ -112,7 +112,7 @@ def generate_faces(obj, vertices: list) -> list:
     return xfaces
 
 
-def generate_morphs(obj) -> dict:
+def generate_morphs(obj: Object) -> Dict[str, XMorph]:
     morphs = {}
     if obj.data.shape_keys:
         morphs = {key_block.name: XMorph(key_block.name) for key_block in obj.data.shape_keys.key_blocks[1:]}
@@ -141,7 +141,8 @@ def create_submesh(material: int, faces: int, morphs: int) -> et.Element:
     return sub
 
 
-def fill_submesh(submesh: et.Element, vertices: list, morphs: dict, faces: list, scale: float):
+def fill_submesh(submesh: et.Element, vertices: Sequence[XVertex],
+                 morphs: Mapping[str, XMorph], faces: Iterable[XFace], scale: float):
     """Places xmf tags for vertices and faces into a submesh xmf tag.
 
     Args:
@@ -187,7 +188,7 @@ def skip_material(mtl: int) -> int:
     return mtl + 1
 
 
-def default_options(objs: list) -> tuple:
+def default_options(objs: List[Object]) -> Tuple[Dict[str, Dict[str, int]], float, str]:
     body_part_ids = {'F.Feet': 7, 'F.Hands': 7, 'F.Head': 2, 'F.Legs': 7, 'F.Thighs': 7, 'F.Torso': 7,
                      'F.Eyes': 3, 'F.Lashes': 5, 'F.Brows': 8,
                      'M.Feet': 7, 'M.Hands': 7, 'M.Head': 2, 'M.Legs': 7, 'M.Calfs': 7, 'M.Torso': 7,
@@ -211,7 +212,8 @@ def default_options(objs: list) -> tuple:
     return submap, scale, weight
 
 
-def write_xmf(filepath: str, objs: list, submap: dict, scale: float, weight: str):
+def write_xmf(filepath: str, objs: Collection[Object], submap: Mapping[str, Mapping[str, int]],
+              scale: float, weight: str):
     root = et.Element('mesh')
     root.attrib['numsubmesh'] = str(len(objs))
     for obj in objs:
@@ -230,7 +232,7 @@ def write_xmf(filepath: str, objs: list, submap: dict, scale: float, weight: str
         f.write("%s" % xtext)
 
 
-def export_xmf(context: bpy.types.Context, filepath: str, submap: dict,
+def export_xmf(context: Context, filepath: str, submap: Mapping[str, Mapping[str, int]],
                scale: float, weight: str, auto: bool):
     """Exports a new xmf file containing the selected submeshes' data.
 
@@ -252,22 +254,21 @@ def apply_scale(value: str) -> float:
     return float(value) / 100
 
 
-def extract(elem: et.Element, tag: str, conversion) -> list:
+def extract(elem: et.Element, tag: str, conversion: Callable[[str], float]) -> List[float]:
     child = elem.find(tag).text.split()
-    values = [conversion(x) for x in child]
-    return values
+    return [conversion(x) for x in child]
 
 
-def extract_influences(elem: et.Element, tag: str, conversion) -> list:
+def extract_influences(elem: et.Element, tag: str, conversion: Callable[[str], float]) -> Set[Tuple[int, float]]:
     children = elem.findall(tag)
     seen = set()
     for influence in children:
         bone_id, weight = int(influence.attrib['id']), conversion(influence.text)
         seen.add((bone_id, weight))
-    return list(seen)
+    return seen
 
 
-def extract_morph_names(root: et.Element) -> dict:
+def extract_morph_names(root: et.Element) -> Dict[str, str]:
     morphs = {}
     for morph in root.iter('morph'):
         morph_name = morph.attrib['name']
@@ -278,7 +279,7 @@ def extract_morph_names(root: et.Element) -> dict:
     return morphs
 
 
-def extract_morphs(sub: et.Element, morph_names: dict) -> dict:
+def extract_morphs(sub: et.Element, morph_names: Mapping[str, str]) -> Dict[str, List[Tuple[int, Iterable[float]]]]:
     morphs = {}
     for morph in sub.iter('morph'):
         blend_vertices = []
@@ -291,7 +292,7 @@ def extract_morphs(sub: et.Element, morph_names: dict) -> dict:
     return morphs
 
 
-def extract_submesh(sub: et.Element, mesh_name: str, morph_names: dict) -> BaseMesh:
+def extract_submesh(sub: et.Element, mesh_name: str, morph_names: Mapping[str, str]) -> BaseMesh:
     material = int(sub.attrib['material'])
     positions = []
     uvs = []
@@ -313,7 +314,7 @@ def extract_submesh(sub: et.Element, mesh_name: str, morph_names: dict) -> BaseM
                     groups=influences, morphs=morphs, material_id=material)
 
 
-def import_xmf(filepath: str) -> list:
+def import_xmf(filepath: str) -> Iterable[BaseMesh]:
     """Parses submeshes from an xmf file.
 
     Args:

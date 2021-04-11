@@ -1,13 +1,11 @@
-import bpy
 import random
-
+from bpy.types import Context, Operator
 from bpy.props import BoolProperty, EnumProperty, FloatProperty
-from itertools import repeat
 from .body_group import BodyGroup
 from ..arm.master_root import add_master_root, lock_bones, link_bones, randomize_bones
 
 
-class DefaultSkeleton(bpy.types.Operator):
+class DefaultSkeleton(Operator):
     """Add default imvu armature to the scene"""
     bl_idname = "object.armature_imvu_bones_add"
     bl_label = "Bones"
@@ -64,7 +62,7 @@ class DefaultSkeleton(bpy.types.Operator):
         default='STAND'
     )
 
-    def execute(self, context: bpy.types.Context) -> set:
+    def execute(self, context: Context) -> set:
         """Calls armature generation method.
 
         Args:
@@ -87,11 +85,10 @@ class DefaultSkeleton(bpy.types.Operator):
             lock_bones(bones)
         return {'FINISHED'}
 
-    def draw(self, context: bpy.types.Context):
+    def draw(self, context: Context):
         layout = self.layout
         layout.use_property_split = True
         layout.use_property_decorate = False
-
         row = layout.row()
         row.prop(self, 'lock')
         row.prop(self, 'link')

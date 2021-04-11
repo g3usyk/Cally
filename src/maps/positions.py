@@ -1,4 +1,5 @@
 import math
+from typing import List, Sequence
 from .ids import IDMap
 
 
@@ -92,11 +93,11 @@ class PositionMap:
                'rtFingerRing03': [-5.050625324249268, -0.17158883810043335, 7.283175468444824]}
 
     @classmethod
-    def lookup(cls, bone_name: str) -> list:
+    def lookup(cls, bone_name: str) -> List[float]:
         return cls.mapping[bone_name]
 
     @classmethod
-    def get_closest_bone(cls, loc) -> int:
+    def get_closest_bone(cls, loc: Sequence[float]) -> int:
         curr_bone = 0
         curr_dist = float("inf")
         for bone_name, posn in cls.mapping.items():

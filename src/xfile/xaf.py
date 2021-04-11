@@ -1,4 +1,5 @@
-import bpy
+from typing import Dict, List, Mapping, Tuple
+from bpy.types import Context, FCurve, Object, PoseBone
 from mathutils import Quaternion, Vector
 from xml.etree import ElementTree as et
 from .prettify import pretty_print
@@ -9,28 +10,27 @@ from ..xanim.xtrack import XTrack
 from ..xanim.xframe import XFrame
 
 
-def set_mode(obj: bpy.types.Object):
+def set_mode(obj: Object):
     for bone in obj.pose.bones:
         bone.rotation_mode = 'QUATERNION'
 
 
-def get_data_path(data_string: str) -> tuple:
+def get_data_path(data_string: str) -> Tuple[str, str]:
     parts = data_string.split('.')
     bone_name = parts[1].split('"')[1]
     data_path = parts[-1]
     return bone_name, data_path
 
 
-def get_keyframe_point(f_curve, data_path, keyframes):
+def get_keyframe_point(f_curve: FCurve, data_path: str, keyframes: Mapping[str, Dict[float, List[float]]]):
     for key_points in f_curve.keyframe_points:
         frame, coord = key_points.co
         if frame not in keyframes[data_path]:
             keyframes[data_path][frame] = []
         keyframes[data_path][frame].append(coord)
-    pass
 
 
-def get_curves(obj: bpy.types.Object) -> dict:
+def get_curves(obj: Object) -> Dict[str, Dict[str, Dict[float, List[float]]]]:
     f_curves = {}
     for curve in obj.animation_data.action.fcurves:
         bone_name, data_path = get_data_path(curve.data_path)
@@ -40,7 +40,7 @@ def get_curves(obj: bpy.types.Object) -> dict:
     return f_curves
 
 
-def process_animation(obj: bpy.types.Object, fps: int) -> list:
+def process_animation(obj: Object, fps: int) -> List[XTrack]:
     f_curves = get_curves(obj)
     tracks = []
     for bone_name, keyframes in f_curves.items():
@@ -60,7 +60,7 @@ def process_animation(obj: bpy.types.Object, fps: int) -> list:
     return tracks
 
 
-def process_pose(obj: bpy.types.Object) -> list:
+def process_pose(obj: Object) -> List[XTrack]:
     bones = [bone for bone in obj.pose.bones if bone.name in RotationMap.mapping]
     tracks = []
     for bone in bones:
@@ -74,7 +74,7 @@ def process_pose(obj: bpy.types.Object) -> list:
     return tracks
 
 
-def export_xaf(context, filepath: str, scale: float, fps: int, debug: bool):
+def export_xaf(context: Context, filepath: str, scale: float, fps: int, debug: bool):
     obj = context.active_object
     set_mode(obj)
     root = et.Element('animation')
@@ -100,13 +100,13 @@ def export_xaf(context, filepath: str, scale: float, fps: int, debug: bool):
         f.write("%s" % xtext)
 
 
-def get_offset(original, default) -> Quaternion:
+def get_offset(original: Quaternion, default: Quaternion) -> Quaternion:
     difference = original @ default
     return Quaternion((difference.w, -difference.y,
                        -difference.x, difference.z))
 
 
-def reset_bone(bone: bpy.types.PoseBone):
+def reset_bone(bone: PoseBone):
     bone.lock_location[:] = False, False, False
     bone.location.zero()
     bone.rotation_mode = 'QUATERNION'
@@ -126,7 +126,7 @@ def parse_translation(keyframe: et.Element) -> Vector:
     return Vector((translation[0], translation[1], translation[2]))
 
 
-def parse_track(obj: bpy.types.Object, track: et.Element, bone_id: int, scale: float, fps: int):
+def parse_track(obj: Object, track: et.Element, bone_id: int, scale: float, fps: int):
     bone_name = NameMap.lookup(bone_id)
     bone = obj.pose.bones[bone_name]
     reset_bone(bone)
@@ -151,7 +151,7 @@ def parse_track(obj: bpy.types.Object, track: et.Element, bone_id: int, scale: f
             bone.keyframe_insert(data_path="rotation_quaternion", frame=frame)
 
 
-def import_xaf(context, obj, filepath: str, scale: float, fps: int):
+def import_xaf(context: Context, obj: Object, filepath: str, scale: float, fps: int):
     data = ''
     with open(filepath, 'r') as f:
         data = f.read()

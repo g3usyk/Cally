@@ -1,9 +1,6 @@
-import bpy
-
 from bpy.props import EnumProperty, StringProperty
-from bpy.types import Operator
+from bpy.types import Context, Operator
 from bpy_extras.io_utils import ExportHelper
-
 from .xfile.xsf import export_xsf
 
 
@@ -21,7 +18,7 @@ class CalSkeletonExporter(Operator, ExportHelper):
         maxlen=255,
     )
 
-    def category_items(self, context: bpy.types.Context) -> list:
+    def category_items(self, context: Context) -> list:
         items = []
         items.extend((
             ('FURNITURE', "Furniture", "Used with furniture meshes"),
@@ -45,13 +42,13 @@ class CalSkeletonExporter(Operator, ExportHelper):
     )
 
     @classmethod
-    def poll(cls, context: bpy.types.Context) -> bool:
+    def poll(cls, context: Context) -> bool:
         for obj in context.selected_objects:
             if obj.type == 'EMPTY':
                 if obj.empty_display_type != 'SPHERE':
                     return True
         return False
 
-    def execute(self, context: bpy.types.Context) -> set:
+    def execute(self, context: Context) -> set:
         export_xsf(context, self.filepath, self.category, float(self.scale))
         return {'FINISHED'}

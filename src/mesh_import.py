@@ -1,3 +1,4 @@
+import bpy
 from bpy.props import BoolProperty, StringProperty
 from bpy.types import Operator
 from bpy_extras.io_utils import ImportHelper
@@ -54,7 +55,7 @@ class CalMeshImporter(Operator, ImportHelper):
         default=False,
     )
 
-    def execute(self, context) -> set:
+    def execute(self, context: bpy.types.Context):
         submeshes = import_xmf(self.filepath)
         for base_mesh in submeshes:
             base_mesh.to_mesh(smooth=self.smooth, material=self.material, uvs=self.uvs, norms=self.norms,

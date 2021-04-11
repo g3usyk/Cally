@@ -1,8 +1,10 @@
+from typing import Iterable, Tuple
 from xml.etree import ElementTree as et
 
 
 class XBlendVertex:
-    def __init__(self, vertex_id: int, position: list, normal: list, uv: list):
+    def __init__(self, vertex_id: int, position: Iterable[float], normal: Iterable[float],
+                 uv: Tuple[float, float]):
         self.vertex_id = vertex_id
         self.position = position
         self.normal = normal

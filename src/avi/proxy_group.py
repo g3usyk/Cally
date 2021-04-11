@@ -1,4 +1,6 @@
 import bpy
+from bpy.types import Object
+from typing import Dict, Iterable, Tuple
 from .proxy import Proxy
 
 
@@ -6,13 +8,13 @@ class ProxyGroup:
     """Constructs multiple meshes under a single collection.
 
     """
-    def __init__(self, proxies):
+    def __init__(self, proxies: Iterable[Tuple[str, Iterable[str]]]):
         self.proxies = []
         for name, fpath in proxies:
             prox = Proxy(name, fpath)
             self.proxies.append(prox)
 
-    def to_mesh(self, collection_name: str, uvs: bool, weights: bool, morphs: bool) -> dict:
+    def to_mesh(self, collection_name: str, uvs: bool, weights: bool, morphs: bool) -> Dict[str, Object]:
         """Generates each mesh contained in the group.
 
         Args:

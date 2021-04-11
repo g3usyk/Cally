@@ -1,11 +1,9 @@
-import bpy
-
+from bpy.types import Context, Operator
 from bpy.props import BoolProperty
-
 from .body_group import BodyGroup
 
 
-class MaleBody(bpy.types.Operator):
+class MaleBody(Operator):
     """Add imvu mesh primitive male body parts to scene"""
     group = BodyGroup("male", [("head", "eyes", "brows", "lashes"), "torso", "hands", "legs", "calfs", "feet"])
     bl_idname = group.bl_idname
@@ -66,7 +64,7 @@ class MaleBody(bpy.types.Operator):
         default=True
     )
 
-    def execute(self, context: bpy.types.Context):
+    def execute(self, context: Context):
         """Specifies the behaviour for the operator method called by Blender.
 
         Args:

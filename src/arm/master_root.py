@@ -1,16 +1,16 @@
 import bpy
 import random
-import re
-
+from bpy.types import Armature, EditBone, Object, PoseBone
 from math import radians
 from mathutils import Quaternion
+from typing import Dict, Iterable, Mapping, Set
 from ..maps.bones.heads import HeadMap
 from ..maps.bones.rolls import RollMap
 from ..maps.bones.tails import TailMap
 
 
-def add_bone(armature: bpy.types.Armature, bone_name: str, head: list, tail: list,
-             roll: float, connect: bool, parent=None) -> bpy.types.EditBone:
+def add_bone(armature: Armature, bone_name: str, head: list, tail: list,
+             roll: float, connect: bool, parent=None) -> EditBone:
     bone = armature.edit_bones.new(bone_name)
     bone.head[:] = head[0], head[1], head[2]
     bone.tail[:] = tail[0], tail[1], tail[2]
@@ -21,7 +21,7 @@ def add_bone(armature: bpy.types.Armature, bone_name: str, head: list, tail: lis
     return bone
 
 
-def lock_bones(obj: bpy.types.Object):
+def lock_bones(obj: Object):
     for bone in obj.pose.bones:
         bone.lock_scale = [True, True, True]
         name = bone.name
@@ -41,7 +41,7 @@ def lock_bones(obj: bpy.types.Object):
                 bone.lock_rotation = [True, True, False]
 
 
-def link_bones(objs: list, armature: bpy.types.Object):
+def link_bones(objs: Iterable[Object], armature: Object):
     for obj in objs:
         modifier = obj.modifiers.new(name="Armature", type="ARMATURE")
         modifier.object = armature
@@ -61,7 +61,7 @@ def randq(coord: int, angle: float = 1, bound: float = None) -> Quaternion:
         return Quaternion(axis, rand(angle))
 
 
-def randomize_pelvis(bone: bpy.types.PoseBone, pose: str, gender: str) -> bpy.types.PoseBone:
+def randomize_pelvis(bone: PoseBone, pose: str, gender: str) -> PoseBone:
     if pose == 'STAND':
         bone.location[:2] = random.uniform(-0.3, 0.3), random.uniform(-0.3, 0.3)
         bone.rotation_quaternion = randq(2, 10)
@@ -78,7 +78,7 @@ def randomize_pelvis(bone: bpy.types.PoseBone, pose: str, gender: str) -> bpy.ty
     return bone
 
 
-def randomize_head(bones: dict, gender: str, spine: str):
+def randomize_head(bones: Mapping[str, PoseBone], gender: str, spine: str):
     conjugate = random.choice([True, False])
     if conjugate:
         x_rotations = [randq(0, 0, 5).conjugated() for _ in range(4)]
@@ -95,7 +95,7 @@ def randomize_head(bones: dict, gender: str, spine: str):
         bones['Head'].rotation_quaternion @= randq(2, 20, 30)
 
 
-def randomize_male_spine(bones: dict, spine_type: str):
+def randomize_male_spine(bones: Mapping[str, PoseBone], spine_type: str):
     if spine_type == 'STRAIGHT':
         bones['Spine01'].rotation_quaternion = randq(0, -11, -9) @ randq(1) @ randq(2, 5)
         bones['Spine02'].rotation_quaternion = randq(0) @ randq(1) @ randq(2, -1, -0.5)
@@ -115,7 +115,7 @@ def randomize_male_spine(bones: dict, spine_type: str):
         pass
 
 
-def randomize_female_spine(bones: dict, spine_type: str, pelvis: float):
+def randomize_female_spine(bones: Mapping[str, PoseBone], spine_type: str, pelvis: float):
     if spine_type == 'STRAIGHT':
         if pelvis < 0:
             bones['Spine02'].rotation_quaternion = randq(0, -17, -12)
@@ -141,7 +141,7 @@ def randomize_female_spine(bones: dict, spine_type: str, pelvis: float):
         pass
 
 
-def randomize_spine(bones: dict, pose: str, gender: str, pelvis: Quaternion) -> str:
+def randomize_spine(bones: Mapping[str, PoseBone], pose: str, gender: str, pelvis: Quaternion) -> str:
     if gender == 'MALE':
         if pose == 'STAND':
             spine_type = 'STRAIGHT'
@@ -160,7 +160,7 @@ def randomize_spine(bones: dict, pose: str, gender: str, pelvis: Quaternion) -> 
     return spine_type
 
 
-def randomize_male_leg(bones: dict, side_name: str):
+def randomize_male_leg(bones: Mapping[str, PoseBone], side_name: str):
     bones['Calf'].rotation_quaternion @= randq(0, 4, 8)
     bones['Thigh'].rotation_quaternion = randq(0, 5, 25)
     if side_name == 'rt':
@@ -169,7 +169,7 @@ def randomize_male_leg(bones: dict, side_name: str):
         bones['Thigh'].rotation_quaternion @= randq(1, -30, -10) @ randq(2, -20, 5)
 
 
-def randomize_female_leg(bones: dict, side_name: str, pelvis: float, leg_order: str):
+def randomize_female_leg(bones: Mapping[str, PoseBone], side_name: str, pelvis: float, leg_order: str):
     bones['Calf'].rotation_quaternion @= randq(0, 20, 24) if leg_order == 'FORWARD' else randq(0, 4, 8)
     if pelvis < 0:
         bones['Thigh'].rotation_quaternion = randq(2, -5, 0) if side_name == 'rt' else randq(2, 5, 15)
@@ -179,7 +179,8 @@ def randomize_female_leg(bones: dict, side_name: str, pelvis: float, leg_order: 
     bones['Thigh'].rotation_quaternion @= randq(0, -15, -5) if leg_order == 'FORWARD' else randq(0, 5, 15)
 
 
-def randomize_leg(bones: dict, side_name: str, pose: str, gender: str, pelvis: float, leg_order: str = None):
+def randomize_leg(bones: Mapping[str, PoseBone], side_name: str, pose: str, gender: str, pelvis: float,
+                  leg_order: str = None):
     bones['Foot'].rotation_quaternion = randq(0, 0, 4) @ randq(1, 8) @ randq(2, 8)
     if pose == 'STAND':
         bones['Calf'].rotation_quaternion = randq(1) @ randq(2)
@@ -203,7 +204,7 @@ def randomize_leg(bones: dict, side_name: str, pose: str, gender: str, pelvis: f
                 bones['Thigh'].rotation_quaternion @= randq(1, -60, 0) @ randq(2, 0, 30)
 
 
-def randomize_arm(bones: dict, pose: str, side_name: str):
+def randomize_arm(bones: Mapping[str, PoseBone], pose: str, side_name: str):
     bones['Clavicle'].rotation_quaternion = randq(0, -20, 0)
     bones['Clavicle'].rotation_quaternion @= randq(1) if pose == 'STAND' else randq(1, 15)
     bones['Shoulder'].rotation_quaternion = randq(0, 10, 60) @ randq(1, 40)
@@ -222,7 +223,7 @@ def randomize_arm(bones: dict, pose: str, side_name: str):
     pass
 
 
-def clench_finger(bones: dict, finger_name: str):
+def clench_finger(bones: Mapping[str, PoseBone], finger_name: str):
     bones['01'].rotation_quaternion = randq(1) @ randq(2)
     bones['02'].rotation_quaternion = randq(1) @ randq(2)
     bones['03'].rotation_quaternion = randq(1) @ randq(2)
@@ -244,7 +245,7 @@ def clench_finger(bones: dict, finger_name: str):
         bones['03'].rotation_quaternion @= randq(0, -10, 0)
 
 
-def curve_finger(bones: dict, finger_name: str):
+def curve_finger(bones: Mapping[str, PoseBone], finger_name: str):
     bones['01'].rotation_quaternion = randq(1) @ randq(2)
     bones['02'].rotation_quaternion = randq(1) @ randq(2)
     bones['03'].rotation_quaternion = randq(1) @ randq(2)
@@ -266,7 +267,7 @@ def curve_finger(bones: dict, finger_name: str):
         bones['03'].rotation_quaternion @= randq(0, -15, -5)
 
 
-def point_finger(bones: dict, finger_name: str):
+def point_finger(bones: Mapping[str, PoseBone], finger_name: str):
     bones['01'].rotation_quaternion = randq(0, -10, -5) @ randq(1) @ randq(2)
     bones['02'].rotation_quaternion = randq(1) @ randq(2)
     bones['03'].rotation_quaternion = randq(1) @ randq(2)
@@ -285,11 +286,12 @@ def point_finger(bones: dict, finger_name: str):
         bones['03'].rotation_quaternion @= randq(0, 7, 12)
 
 
-def randomize_finger(bones: dict, finger_name: str):
+def randomize_finger(bones: Mapping[str, PoseBone], finger_name: str):
     random.choice([clench_finger, curve_finger, point_finger])(bones, finger_name)
 
 
-def get_bones(bones: dict, bone_names: set, side_name: str = None, finger_name: str = None) -> dict:
+def get_bones(bones: Mapping[str, PoseBone], bone_names: Set[str], side_name: str = None,
+              finger_name: str = None) -> Dict[str, PoseBone]:
     if side_name:
         if finger_name:
             if finger_name != 'Thumb':
@@ -304,7 +306,7 @@ def get_bones(bones: dict, bone_names: set, side_name: str = None, finger_name: 
         return {bone_name: bones[bone_name] for bone_name in bone_names.intersection(bones)}
 
 
-def randomize_bones(obj: bpy.types.Object, gender: str, pose: str):
+def randomize_bones(obj: Object, gender: str, pose: str):
     bpy.ops.object.mode_set(mode='POSE')
     bones = {bone.name: bone for bone in obj.pose.bones}
     pelvis = randomize_pelvis(bones['PelvisNode'], pose, gender)
@@ -322,10 +324,9 @@ def randomize_bones(obj: bpy.types.Object, gender: str, pose: str):
     for finger in fingers:
         randomize_finger(get_bones(bones, {'01', '02', '03'}, 'lf', finger), finger)
         randomize_finger(get_bones(bones, {'01', '02', '03'}, 'rt', finger), finger)
-    pass
 
 
-def add_master_root():
+def add_master_root() -> Object:
     """Generates the default armature for imvu skeleton rig.
 
     """
@@ -334,10 +335,8 @@ def add_master_root():
     bpy.ops.object.editmode_toggle()
     bpy.ops.armature.select_all(action='SELECT')
     bpy.ops.armature.delete()
-
     obj = bpy.context.active_object
     arm = obj.data
-
     root = add_bone(arm, "Female03MasterRoot", HeadMap.lookup("Female03MasterRoot"),
                     TailMap.lookup("Female03MasterRoot"), RollMap.lookup("Female03MasterRoot"), False)
     root.use_deform = False
@@ -485,7 +484,6 @@ def add_master_root():
              RollMap.lookup("rtFingerRing02"), False, "rtFingerRing01")
     add_bone(arm, "rtFingerRing03", HeadMap.lookup("rtFingerRing03"), TailMap.lookup("rtFingerRing03"),
              RollMap.lookup("rtFingerRing03"), True, "rtFingerRing02")
-
     bpy.ops.object.editmode_toggle()
     bpy.ops.object.posemode_toggle()
     obj.pose.bones['Female03MasterRoot'].bone.select = True

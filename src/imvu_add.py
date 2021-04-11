@@ -1,14 +1,14 @@
-import bpy
+from bpy.types import Context, Menu
 
 
-class VIEW3D_MT_imvu(bpy.types.Menu):
+class VIEW3D_MT_imvu(Menu):
     """Outlines menu layout for imvu submenus.
 
     """
     bl_idname = "VIEW3D_MT_imvu"
     bl_label = "IMVU"
 
-    def draw(self, context):
+    def draw(self, context: Context):
         layout = self.layout
         layout.operator_context = 'INVOKE_REGION_WIN'
         layout.operator("object.armature_imvu_bones_add", icon="BONE_DATA")

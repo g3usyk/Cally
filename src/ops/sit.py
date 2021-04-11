@@ -1,11 +1,9 @@
-import bpy
-
+from bpy.types import Context, Operator
 from bpy.props import EnumProperty
-
 from ..node.pose import Pose
 
 
-class SittingSpot(bpy.types.Operator):
+class SittingSpot(Operator):
     """Add an imvu sitting spot to the scene"""
     bl_idname = "object.empty_imvu_sit_add"
     bl_label = "Sit"
@@ -21,7 +19,7 @@ class SittingSpot(bpy.types.Operator):
         default="ARROWS",
     )
 
-    def execute(self, context: bpy.types.Context):
+    def execute(self, context: Context):
         sit_pose = Pose('Sit', context)
         sit_pose.to_scene(self.primitive)
         return {'FINISHED'}

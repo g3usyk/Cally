@@ -1,7 +1,7 @@
 import bpy
 import re
-from bpy.props import (StringProperty, BoolProperty, EnumProperty, IntProperty)
-from bpy.types import Operator
+from bpy.props import BoolProperty, EnumProperty, IntProperty, StringProperty
+from bpy.types import Context, Object, Operator
 from bpy_extras.io_utils import ExportHelper
 from .maps.ids import IDMap
 from .maps.names import NameMap
@@ -9,13 +9,13 @@ from .xfile.xmf import export_xmf
 from .xfile.utils import check_format
 
 
-def get_bone(obj) -> str:
+def get_bone(obj: Object) -> str:
     group = bpy.data.objects[obj].vertex_groups.active
     bone = group.name if group and group.name in IDMap.mapping else NameMap.lookup(0)
     return bone
 
 
-def get_material(obj) -> int:
+def get_material(obj: Object) -> int:
     mtl = bpy.data.objects[obj].active_material
     material = 0
     if mtl:
@@ -57,7 +57,7 @@ class CalMeshExporter(Operator, ExportHelper):
         default='OBJECT',
     )
 
-    def update_subs(self, context):
+    def update_subs(self, context: Context):
         """Configures child menus to reflect changes in submesh menu.
 
         Args:
@@ -66,7 +66,7 @@ class CalMeshExporter(Operator, ExportHelper):
         self.bone = get_bone(self.subs)
         self.mtl = get_material(self.subs)
 
-    def sub_items(self, context):
+    def sub_items(self, context: Context):
         objs = [obj for obj in context.selected_objects if obj.type == 'MESH']
         if self.bone == '':
             self.bone = get_bone(objs[0].name)
@@ -106,14 +106,14 @@ class CalMeshExporter(Operator, ExportHelper):
     )
 
     @classmethod
-    def poll(cls, context):
-        return any([(obj.type == 'MESH') for obj in context.selected_objects])
+    def poll(cls, context: Context) -> bool:
+        return any(((obj.type == 'MESH') for obj in context.selected_objects))
 
-    def execute(self, context) -> set:
+    def execute(self, context: Context) -> set:
         """Calls xmf file generation method.
 
         Args:
-            context (): A bpy context containing data in the current 3d view.
+            context (bpy.types.Context): A bpy context containing data in the current 3d view.
 
         Returns:
             set: The success state of the execution.
@@ -126,11 +126,11 @@ class CalMeshExporter(Operator, ExportHelper):
         export_xmf(context, self.filepath, submap, float(self.scale), self.weight, self.auto)
         return {'FINISHED'}
 
-    def draw(self, context):
+    def draw(self, context: Context):
         """Determines the format for showing options in the file export dialog menu.
 
         Args:
-            context (): A bpy context containing data in the current 3d view.
+            context (bpy.types.Context): A bpy context containing data in the current 3d view.
         """
         layout = self.layout
         layout.use_property_split = True
