@@ -18,6 +18,12 @@ class CalMeshImporter(Operator, ImportHelper):
         maxlen=255,
     )
 
+    material: BoolProperty(
+        name="Include Material ID",
+        description="Include linked material ID in mesh",
+        default=True,
+    )
+
     norms: BoolProperty(
         name="Include Normals",
         description="Include custom vertex normals in mesh",
@@ -51,6 +57,6 @@ class CalMeshImporter(Operator, ImportHelper):
     def execute(self, context) -> set:
         submeshes = import_xmf(self.filepath)
         for base_mesh in submeshes:
-            base_mesh.to_mesh(smooth=self.smooth, uvs=self.uvs, norms=self.norms,
+            base_mesh.to_mesh(smooth=self.smooth, material=self.material, uvs=self.uvs, norms=self.norms,
                               groups=self.weights, morphs=self.morphs)
         return {'FINISHED'}

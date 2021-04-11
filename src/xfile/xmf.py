@@ -292,6 +292,7 @@ def extract_morphs(sub: et.Element, morph_names: dict) -> dict:
 
 
 def extract_submesh(sub: et.Element, mesh_name: str, morph_names: dict) -> BaseMesh:
+    material = int(sub.attrib['material'])
     positions = []
     uvs = []
     normals = []
@@ -308,7 +309,8 @@ def extract_submesh(sub: et.Element, mesh_name: str, morph_names: dict) -> BaseM
     for face in sub.iter('face'):
         vertex_ids = [int(vertex_id) for vertex_id in face.attrib['vertexid'].split()]
         loops.append(vertex_ids)
-    return BaseMesh(mesh_name, positions, loops, uvs, normals, influences, morphs)
+    return BaseMesh(name=mesh_name, vertices=positions, faces=loops, uvs=uvs, norms=normals,
+                    groups=influences, morphs=morphs, material_id=material)
 
 
 def import_xmf(filepath: str) -> list:

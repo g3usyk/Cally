@@ -8,8 +8,8 @@ class BaseMesh:
 
     """
 
-    def __init__(self, name: str, vertices: list, faces: list,
-                 uvs: list, norms: list, groups: list, morphs: dict = None):
+    def __init__(self, name: str, vertices: list, faces: list, uvs: list, norms: list, groups: list,
+                 morphs: dict = None, material_id: int = None):
         """
 
         Args:
@@ -20,6 +20,7 @@ class BaseMesh:
             norms (list): The normal coordinates for each vertex.
             groups (list): The weights for each vertex.
             morphs (dict): The shape key morphs.
+            material_id (int): The material slot number for the mesh.
         """
         self.name = name
         self.vertices = vertices
@@ -28,6 +29,17 @@ class BaseMesh:
         self.norms = norms
         self.groups = groups
         self.morphs = morphs if morphs else {}
+        self.material_id = abs(material_id) if material_id is not None else -1
+
+    def add_material(self, obj: bpy.types.Object):
+        mtl = bpy.data.materials.get(f'Material.{self.material_id}')
+        if mtl is None:
+            mtl = bpy.data.materials.new(name=f'Material.{self.material_id}')
+            mtl.use_nodes = True
+        if obj.data.materials:
+            obj.data.materials[0] = mtl
+        else:
+            obj.data.materials.append(mtl)
 
     def add_normals(self, obj: bpy.types.Object):
         if len(self.norms) > 0:
@@ -84,13 +96,15 @@ class BaseMesh:
         bpy.ops.object.select_all(action='DESELECT')
         return obj
 
-    def to_mesh(self, collection: bpy.types.Collection = None, smooth: bool = True, uvs: bool = True,
-                norms: bool = False, groups: bool = False, morphs: bool = False) -> bpy.types.Object:
+    def to_mesh(self, collection: bpy.types.Collection = None, smooth: bool = True, material: bool = False,
+                uvs: bool = True, norms: bool = False, groups: bool = False,
+                morphs: bool = False) -> bpy.types.Object:
         """Generates a mesh using raw geometric data.
 
         Args:
             collection (bpy.types.Collection): A collection to contain the mesh.
             smooth (bool): Whether or not to apply auto-smooth to the mesh.
+            material (bool): Whether or not to include material id for the mesh.
             uvs (bool): Whether or not to include uv coordinates for the mesh.
             norms (bool): Whether or not to include custom vertex normals for the mesh.
             groups (bool): Whether or not to include vertex weights for the mesh.
@@ -102,6 +116,8 @@ class BaseMesh:
         if smooth:
             bpy.data.objects[obj.name].select_set(True)
             bpy.ops.object.shade_smooth()
+        if material:
+            self.add_material(obj)
         if uvs:
             self.add_uvs(obj)
         if norms:

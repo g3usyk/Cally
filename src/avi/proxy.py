@@ -32,7 +32,8 @@ class Proxy(BaseMesh):
                 uvs = mapping['uvs']
             if 'morphs' in mapping:
                 morphs = mapping['morphs']
-        super().__init__(name, vertices, faces, uvs, [], groups, morphs)
+        super().__init__(name=name, vertices=vertices, faces=faces, uvs=uvs, norms=[], groups=groups,
+                         morphs=morphs)
 
     def add_uvs(self, obj: bpy.types.Object):
         """Generates uv coordinates for mesh object.
