@@ -22,12 +22,14 @@ def get_data_path(data_string: str) -> Tuple[str, str]:
     return bone_name, data_path
 
 
-def get_keyframe_point(f_curve: FCurve, data_path: str, keyframes: Mapping[str, Dict[float, List[float]]]):
+def get_keyframe_point(f_curve: FCurve, data_path: str,
+                       keyframes: Mapping[str, Dict[float, List[float]]]) -> Mapping[str, Dict[float, List[float]]]:
     for key_points in f_curve.keyframe_points:
         frame, coord = key_points.co
         if frame not in keyframes[data_path]:
             keyframes[data_path][frame] = []
         keyframes[data_path][frame].append(coord)
+    return keyframes
 
 
 def get_curves(obj: Object) -> Dict[str, Dict[str, Dict[float, List[float]]]]:
@@ -106,12 +108,13 @@ def get_offset(original: Quaternion, default: Quaternion) -> Quaternion:
                        -difference.x, difference.z))
 
 
-def reset_bone(bone: PoseBone):
+def reset_bone(bone: PoseBone) -> PoseBone:
     bone.lock_location[:] = False, False, False
     bone.location.zero()
     bone.rotation_mode = 'QUATERNION'
     bone.lock_rotation[:] = False, False, False
     bone.rotation_quaternion.identity()
+    return bone
 
 
 def parse_rotation(keyframe: et.Element) -> Quaternion:

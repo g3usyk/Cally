@@ -9,7 +9,7 @@ class XTrack:
         self.bone_name = bone_name
         self.keyframes = keyframes if keyframes is not None else []
 
-    def parse(self, scale: float):
+    def parse(self, scale: float) -> et.Element:
         tag = et.Element('track')
         tag.attrib['boneid'] = str(IDMap.lookup(self.bone_name))
         tag.attrib['numkeyframes'] = str(len(self.keyframes))

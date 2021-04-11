@@ -35,7 +35,7 @@ class BaseMesh:
         self.morphs = morphs if morphs else {}
         self.material_id = abs(material_id) if material_id is not None else -1
 
-    def add_material(self, obj: Object):
+    def add_material(self, obj: Object) -> Object:
         mtl = bpy.data.materials.get(f'Material.{self.material_id}')
         if mtl is None:
             mtl = bpy.data.materials.new(name=f'Material.{self.material_id}')
@@ -44,14 +44,16 @@ class BaseMesh:
             obj.data.materials[0] = mtl
         else:
             obj.data.materials.append(mtl)
+        return obj
 
-    def add_normals(self, obj: Object):
+    def add_normals(self, obj: Object) -> Object:
         if len(self.norms) > 0:
             obj.data.use_auto_smooth = True
             obj.data.normals_split_custom_set([(0, 0, 0) for _ in obj.data.loops])
             obj.data.normals_split_custom_set_from_vertices(self.norms)
+        return obj
 
-    def add_uvs(self, obj: Object):
+    def add_uvs(self, obj: Object) -> Object:
         """Generates uv coordinates for mesh object.
 
         Args:
@@ -65,8 +67,9 @@ class BaseMesh:
                     uv_x, uv_y = self.uvs[v_idx]
                     uvl.data[l_idx].uv.x = uv_x
                     uvl.data[l_idx].uv.y = uv_y
+        return obj
 
-    def add_groups(self, obj: Object):
+    def add_groups(self, obj: Object) -> Object:
         if len(self.groups) > 0:
             for vertex_id, group in enumerate(self.groups):
                 for influence in group:
@@ -76,8 +79,9 @@ class BaseMesh:
                         if bone_name not in obj.vertex_groups:
                             obj.vertex_groups.new(name=bone_name)
                         obj.vertex_groups[bone_name].add([vertex_id], influence[1], 'ADD')
+        return obj
 
-    def add_morphs(self, obj: Object):
+    def add_morphs(self, obj: Object) -> Object:
         obj.shape_key_add(name='Basis')
         num_vertices = len(obj.data.vertices)
         for morph_name, blend_vertices in self.morphs.items():
@@ -90,6 +94,7 @@ class BaseMesh:
             if morph_name == 'Face.Average':
                 shape_key.value = 1.0
                 obj.active_shape_key_index = obj.data.shape_keys.key_blocks.find('Face.Average')
+        return obj
 
     def add_mesh(self, collection: Collection) -> Object:
         mesh = bpy.data.meshes.new(self.name)

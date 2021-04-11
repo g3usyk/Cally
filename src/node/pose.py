@@ -1,5 +1,5 @@
 import bpy
-from bpy.types import Context
+from bpy.types import Context, Object
 
 
 class Pose:
@@ -18,9 +18,10 @@ class Pose:
             handle.name = "Handle"
             context.object.empty_display_size = 0.20
 
-    def to_scene(self, primitive: str):
+    def to_scene(self, primitive: str) -> Object:
         layer_col = bpy.context.view_layer.layer_collection.children["Spots"]
         bpy.context.view_layer.active_layer_collection = layer_col
         bpy.ops.object.empty_add(type=primitive)
         spot = bpy.context.active_object
         spot.name = self.pose_type
+        return spot

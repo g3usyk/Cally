@@ -35,7 +35,7 @@ class Proxy(BaseMesh):
         super().__init__(name=name, vertices=vertices, faces=faces, uvs=uvs, norms=[], groups=groups,
                          morphs=morphs)
 
-    def add_uvs(self, obj: Object):
+    def add_uvs(self, obj: Object) -> Object:
         """Generates uv coordinates for mesh object.
 
         Args:
@@ -51,3 +51,4 @@ class Proxy(BaseMesh):
                     uvl.data[l_idx].uv.x = uv_x
                     uvl.data[l_idx].uv.y = uv_y
                     uv_idx += 1
+        return Object

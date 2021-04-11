@@ -2,7 +2,7 @@ import bpy
 import bmesh
 import os
 from bpy.types import Context, MeshVertex, Object
-from typing import Callable, Collection, Dict, Generator, Iterable, List, Mapping, Set, Sequence, Tuple
+from typing import Callable, Collection, Dict, Iterable, List, Mapping, Set, Sequence, Tuple
 from xml.etree import ElementTree as et
 from .prettify import pretty_print
 from ..maps.ids import IDMap
@@ -51,7 +51,7 @@ def generate_vertices(obj, bone_id: int, weight: str) -> List[XVertex]:
     return xverts
 
 
-def generate_blend_vertices(obj, vertices: Sequence[XVertex]):
+def generate_blend_vertices(obj: Object, vertices: Sequence[XVertex]) -> Sequence[XVertex]:
     if obj.data.shape_keys:
         key_blocks = obj.data.shape_keys.key_blocks
         for key_block in key_blocks[1:]:
@@ -73,16 +73,17 @@ def generate_blend_vertices(obj, vertices: Sequence[XVertex]):
                 # normal = vertex.normal
                 vertices[i].add_blend(target_block_name, location[:], vertex.normal[:])
             bpy.data.objects.remove(obj_copy)
+    return vertices
 
 
-def generate_triangulation(obj) -> bmesh.types.BMesh:
+def generate_triangulation(obj: Object) -> bmesh.types.BMesh:
     bm = bmesh.new()
     bm.from_mesh(obj.data)
     bmesh.ops.triangulate(bm, faces=bm.faces[:], quad_method='BEAUTY', ngon_method='BEAUTY')
     return bm
 
 
-def generate_faces(obj, vertices: Sequence[XVertex]) -> List[XFace]:
+def generate_faces(obj: Object, vertices: Sequence[XVertex]) -> List[XFace]:
     """Constructs xmf format faces from the given object.
 
     Args:
@@ -142,7 +143,7 @@ def create_submesh(material: int, faces: int, morphs: int) -> et.Element:
 
 
 def fill_submesh(submesh: et.Element, vertices: Sequence[XVertex],
-                 morphs: Mapping[str, XMorph], faces: Iterable[XFace], scale: float):
+                 morphs: Mapping[str, XMorph], faces: Iterable[XFace], scale: float) -> et.Element:
     """Places xmf tags for vertices and faces into a submesh xmf tag.
 
     Args:
@@ -172,6 +173,7 @@ def fill_submesh(submesh: et.Element, vertices: Sequence[XVertex],
     for face in faces:
         face_tag = face.parse(vertex_ids)
         submesh.append(face_tag)
+    return submesh
 
 
 def skip_material(mtl: int) -> int:
@@ -188,7 +190,7 @@ def skip_material(mtl: int) -> int:
     return mtl + 1
 
 
-def default_options(objs: List[Object]) -> Tuple[Dict[str, Dict[str, int]], float, str]:
+def default_options(objs: Iterable[Object]) -> Tuple[Dict[str, Dict[str, int]], float, str]:
     body_part_ids = {'F.Feet': 7, 'F.Hands': 7, 'F.Head': 2, 'F.Legs': 7, 'F.Thighs': 7, 'F.Torso': 7,
                      'F.Eyes': 3, 'F.Lashes': 5, 'F.Brows': 8,
                      'M.Feet': 7, 'M.Hands': 7, 'M.Head': 2, 'M.Legs': 7, 'M.Calfs': 7, 'M.Torso': 7,
