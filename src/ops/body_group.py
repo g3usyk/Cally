@@ -1,3 +1,4 @@
+from itertools import repeat
 from ..avi.proxy_group import ProxyGroup
 
 
@@ -32,6 +33,16 @@ class BodyGroup:
             obj = objs[body_part]
             obj.parent = parent_obj
             obj.matrix_parent_inverse = parent_obj.matrix_world.inverted()
+
+    @staticmethod
+    def default_parts(gender: str) -> list:
+        if gender == 'MALE':
+            group = BodyGroup("male", [("head", "eyes", "brows", "lashes"),
+                                       "torso", "hands", "legs", "calfs", "feet"])
+        else:
+            group = BodyGroup("female", [("head", "eyes", "brows", "lashes"),
+                                         "torso", "hands", "thighs", "legs", "feet"])
+        return list(group.execute(repeat(True)).values())
 
     def execute(self, selected_parts) -> dict:
         """Specifies the behaviour for the operator method called by Blender.

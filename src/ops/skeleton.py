@@ -74,21 +74,15 @@ class DefaultSkeleton(bpy.types.Operator):
             A set containing the success state of the method.
 
         """
-        objs = []
+        body_parts = []
         if self.link:
-            if self.gender == 'MALE':
-                group = BodyGroup("male", [("head", "eyes", "brows", "lashes"),
-                                           "torso", "hands", "legs", "calfs", "feet"])
-            else:
-                group = BodyGroup("female", [("head", "eyes", "brows", "lashes"),
-                                             "torso", "hands", "thighs", "legs", "feet"])
-            objs.extend(group.execute(repeat(True)).values())
+            body_parts.extend(BodyGroup.default_parts(self.gender))
         bones = add_master_root()
         bones.data.display_type = self.display
+        if self.link:
+            link_bones(body_parts, bones)
         if self.randomize != 0:
             randomize_bones(bones, self.gender, self.pose)
-        if self.link:
-            link_bones(objs, bones)
         if self.lock:
             lock_bones(bones)
         return {'FINISHED'}
