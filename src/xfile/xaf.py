@@ -106,6 +106,14 @@ def get_offset(original, default) -> Quaternion:
                        -difference.x, difference.z))
 
 
+def reset_bone(bone: bpy.types.PoseBone):
+    bone.lock_location[:] = False, False, False
+    bone.location.zero()
+    bone.rotation_mode = 'QUATERNION'
+    bone.lock_rotation[:] = False, False, False
+    bone.rotation_quaternion.identity()
+
+
 def parse_rotation(keyframe: et.Element) -> Quaternion:
     rotation = keyframe.find('rotation').text
     rotation = [float(r) for r in rotation.split()]
@@ -121,6 +129,7 @@ def parse_translation(keyframe: et.Element) -> Vector:
 def parse_track(obj: bpy.types.Object, track: et.Element, bone_id: int, scale: float, fps: int):
     bone_name = NameMap.lookup(bone_id)
     bone = obj.pose.bones[bone_name]
+    reset_bone(bone)
     default_rotation = RotationMap.lookup(bone_name)
     default = Quaternion((default_rotation[3], default_rotation[0],
                           default_rotation[1], default_rotation[2]))
