@@ -106,19 +106,50 @@ def export_xaf(context: Context, filepath: str, scale: float, selection: bool, f
         f.write("%s" % xml_text)
 
 
-def get_rotation_offset(raw_rotation: Quaternion, default_rotation: Quaternion) -> Quaternion:
-    rotation_difference = raw_rotation @ default_rotation
-    return Quaternion((rotation_difference.w, -rotation_difference.y,
-                       -rotation_difference.x, rotation_difference.z))
+def set_timeline(context: Context, obj: Object, duration: float, fps: int, obj_animated: bool,
+                 import_animated: bool) -> int:
+    context.scene.frame_start = 0
+    if obj_animated and import_animated:
+        context.scene.frame_end = max(context.scene.frame_end, int(duration * fps))
+    elif not obj_animated:
+        context.scene.frame_end = int(duration * fps)
+    return context.scene.frame_end
 
 
-def reset_bone(bone: PoseBone) -> PoseBone:
+def get_selected_bones(selection: bool, selected_bone_groups: Iterable[str]):
+    selected_bones = NameMap.mapping
+    if selection:
+        selected_bone_names = set()
+        for bone_group in selected_bone_groups:
+            selected_bone_names.update(GroupMap.lookup(bone_group))
+        selected_bones = {IDMap.lookup(bone_name) for bone_name in selected_bone_names}
+    return selected_bones
+
+
+def reset_bone_keyframes(bone: PoseBone, rotation: Mapping[float, List[float]],
+                         location: Mapping[float, List[float]]) -> PoseBone:
+    for frame, _ in rotation.items():
+        bone.keyframe_delete('rotation_quaternion', frame=frame)
+    for frame, _ in location.items():
+        bone.keyframe_delete('location', frame=frame)
+    return bone
+
+
+def reset_bone(bone: PoseBone, keyframes: Mapping[str, Mapping[float, List[float]]] = None) -> PoseBone:
+    if keyframes is not None:
+        reset_bone_keyframes(bone, keyframes['rotation_quaternion'], keyframes['location'])
     bone.lock_location[:] = False, False, False
     bone.location.zero()
     bone.rotation_mode = 'QUATERNION'
     bone.lock_rotation[:] = False, False, False
     bone.rotation_quaternion.identity()
     return bone
+
+
+def get_rotation_offset(raw_rotation: Quaternion, default_rotation: Quaternion) -> Quaternion:
+    rotation_difference = raw_rotation @ default_rotation
+    return Quaternion((rotation_difference.w, -rotation_difference.y,
+                       -rotation_difference.x, rotation_difference.z))
 
 
 def parse_rotation(keyframe: et.Element) -> Quaternion:
@@ -133,17 +164,18 @@ def parse_translation(keyframe: et.Element) -> Vector:
     return Vector((translation[0], translation[1], translation[2]))
 
 
-def parse_track(obj: Object, track: et.Element, bone_id: int, scale: float, fps: int):
+def parse_track(obj: Object, f_curves: Mapping[str, Mapping[str, Mapping[float, List[float]]]], track: et.Element,
+                bone_id: int, scale: float, fps: int) -> Tuple[PoseBone, bool]:
     bone_name = NameMap.lookup(bone_id)
     bone = obj.pose.bones[bone_name]
-    reset_bone(bone)
+    reset_bone(bone) if bone_name not in f_curves else reset_bone(bone, f_curves[bone_name])
     default_rotation = RotationMap.lookup(bone_name)
     default_quaternion = Quaternion((default_rotation[3], default_rotation[0],
                                      default_rotation[1], default_rotation[2]))
     default_quaternion.conjugate()
     is_animation = int(track.attrib['numkeyframes']) > 1
     for keyframe in track.iter('keyframe'):
-        frame = float(keyframe.attrib['time']) * fps
+        frame = int(float(keyframe.attrib['time']) * fps)
         raw_rotation = parse_rotation(keyframe)
         if bone_id == 1:
             bone.rotation_quaternion = Quaternion((raw_rotation.w, -raw_rotation.x,
@@ -157,25 +189,24 @@ def parse_track(obj: Object, track: et.Element, bone_id: int, scale: float, fps:
             bone.rotation_quaternion = get_rotation_offset(raw_rotation, default_quaternion)
         if is_animation:
             bone.keyframe_insert(data_path="rotation_quaternion", frame=frame)
+    return bone, is_animation
 
 
 def import_xaf(context: Context, obj: Object, filepath: str, scale: float, selection: bool,
-               selected_bones: Iterable[str], fps: int):
-    all_bones = NameMap.mapping
-    if selection:
-        selected_bone_names = set()
-        for bone_group in selected_bones:
-            selected_bone_names.update(GroupMap.lookup(bone_group))
-        all_bones = {IDMap.lookup(bone_name) for bone_name in selected_bone_names}
+               selected_bone_groups: Iterable[str], fps: int):
+    selected_bones = get_selected_bones(selection, selected_bone_groups)
     with open(filepath, 'r') as f:
         data = f.read()
     data = data.lower()
     start = data.find('<animation')
     root = et.fromstring(data[start:])
     duration = float(root.attrib['duration'])
+    f_curves = get_curves(obj) if obj.animation_data else {}
+    obj_is_animated = True if obj.animation_data else False
+    import_is_animated = False
     for track in root.iter('track'):
         bone_id = int(track.attrib['boneid'])
-        if bone_id in all_bones:
-            parse_track(obj, track, bone_id, scale, fps)
-    context.scene.frame_start = 0
-    context.scene.frame_end = duration * fps
+        if bone_id in selected_bones:
+            bone, animated = parse_track(obj, f_curves, track, bone_id, scale, fps)
+            import_is_animated = import_is_animated or animated
+    set_timeline(context, obj, duration, fps, obj_is_animated, import_is_animated)

@@ -125,7 +125,6 @@ class CalAnimationImporter(Operator, ImportHelper):
         else:
             armature = add_master_root()
         bpy.ops.object.mode_set(mode='POSE')
-        armature.animation_data_clear()
         selected_bones = None
         if self.selection:
             selected_bones = compress(
