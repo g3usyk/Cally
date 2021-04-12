@@ -4,8 +4,7 @@ from bpy.types import Context, Operator
 from bpy_extras.io_utils import ImportHelper
 from itertools import compress
 from typing import Set
-from .arm.master_root import add_master_root, link_bones, lock_bones
-from .ops.body_group import BodyGroup
+from .arm.master_root import add_master_root, link_body, lock_bones, remove_body
 from .xfile.utils import check_format
 from .xfile.xaf import import_xaf
 
@@ -133,14 +132,13 @@ class CalAnimationImporter(Operator, ImportHelper):
                  self.pelvis, self.r_leg, self.l_leg])
         import_xaf(context, armature, self.filepath, float(self.scale), self.selection, selected_bones,
                    context.scene.render.fps)
-        body_parts = []
-        if self.link and len(armature.children) == 0:
-            bpy.ops.object.mode_set(mode='OBJECT')
-            body_parts.extend(BodyGroup.default_parts(self.gender))
-            link_bones(body_parts, armature)
-            context.view_layer.objects.active = armature
-            armature.select_set(True)
-            bpy.ops.object.mode_set(mode='POSE')
+        if self.link:
+            if len(armature.children) == 0:
+                link_body(context, armature, self.gender)
+            else:
+                if armature.children[0].name[0].lower() != self.gender[0].lower():
+                    remove_body(armature)
+                    link_body(context, armature, self.gender)
         lock_bones(armature) if self.lock else None
         return {'FINISHED'}
 

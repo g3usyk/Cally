@@ -1,9 +1,10 @@
 import bpy
-from bpy.types import Armature, EditBone, Object
+from bpy.types import Armature, Context, EditBone, Object
 from typing import Iterable
 from ..maps.bones.heads import HeadMap
 from ..maps.bones.rolls import RollMap
 from ..maps.bones.tails import TailMap
+from ..ops.body_group import BodyGroup
 
 
 def add_bone(armature: Armature, bone_name: str, head: list, tail: list,
@@ -45,6 +46,24 @@ def link_bones(objs: Iterable[Object], armature: Object) -> Iterable[Object]:
         modifier.object = armature
         obj.parent = armature
     return objs
+
+
+def link_body(context: Context, armature: Object, gender: str) -> Object:
+    bpy.ops.object.mode_set(mode='OBJECT')
+    body_parts = BodyGroup.default_parts(gender)
+    link_bones(body_parts, armature)
+    context.view_layer.objects.active = armature
+    armature.select_set(True)
+    bpy.ops.object.mode_set(mode='POSE')
+    return armature
+
+
+def remove_body(armature: Object) -> Object:
+    col = armature.children[0].users_collection[0]
+    while armature.children:
+        bpy.data.objects.remove(armature.children[0])
+    bpy.data.collections.remove(col)
+    return armature
 
 
 def add_master_root() -> Object:
