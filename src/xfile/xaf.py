@@ -106,8 +106,7 @@ def export_xaf(context: Context, filepath: str, scale: float, selection: bool, f
         f.write("%s" % xml_text)
 
 
-def set_timeline(context: Context, obj: Object, duration: float, fps: int, obj_animated: bool,
-                 import_animated: bool) -> int:
+def set_timeline(context: Context, duration: float, fps: int, obj_animated: bool, import_animated: bool) -> int:
     context.scene.frame_start = 0
     if obj_animated and import_animated:
         context.scene.frame_end = max(context.scene.frame_end, int(duration * fps))
@@ -209,4 +208,4 @@ def import_xaf(context: Context, obj: Object, filepath: str, scale: float, selec
         if bone_id in selected_bones:
             bone, animated = parse_track(obj, f_curves, track, bone_id, scale, fps)
             import_is_animated = import_is_animated or animated
-    set_timeline(context, obj, duration, fps, obj_is_animated, import_is_animated)
+    set_timeline(context, duration, fps, obj_is_animated, import_is_animated)
