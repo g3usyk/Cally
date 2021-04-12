@@ -3,7 +3,8 @@ from bpy.types import Context, Operator
 from bpy.props import BoolProperty, EnumProperty, FloatProperty
 from typing import Set
 from .body_group import BodyGroup
-from ..arm.master_root import add_master_root, lock_bones, link_bones, randomize_bones
+from ..arm.master_root import add_master_root, lock_bones, link_bones
+from ..arm.randomize import randomize_bones
 
 
 class DefaultSkeleton(Operator):
