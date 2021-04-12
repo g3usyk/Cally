@@ -19,10 +19,10 @@ class CalAnimationExporter(Operator, ExportHelper):
         maxlen=255,
     )
 
-    debug: BoolProperty(
-        name="Debug",
-        description="For debugging output only",
-        default=False,
+    selection: BoolProperty(
+        name="Selected bones",
+        description="Export selected pose bones only",
+        default=False
     )
 
     scale: EnumProperty(
@@ -35,10 +35,25 @@ class CalAnimationExporter(Operator, ExportHelper):
         default='100'
     )
 
+    debug: BoolProperty(
+        name="Debug",
+        description="For debugging output only",
+        default=False,
+    )
+
     @classmethod
     def poll(cls, context: Context) -> bool:
         return context.active_object.type == 'ARMATURE'
 
     def execute(self, context: Context) -> Set[str]:
-        export_xaf(context, self.filepath, float(self.scale), context.scene.render.fps, self.debug)
+        export_xaf(context, self.filepath, float(self.scale), self.selection, context.scene.render.fps, self.debug)
         return {'FINISHED'}
+
+    def draw(self, context: Context):
+        layout = self.layout
+        layout.use_property_split = True
+        layout.use_property_decorate = False
+        sublayout = layout.column(heading="Limit to")
+        sublayout.prop(self, "selection")
+        layout.prop(self, "scale")
+        layout.prop(self, "debug")

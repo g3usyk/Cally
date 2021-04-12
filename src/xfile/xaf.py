@@ -1,8 +1,10 @@
-from typing import Dict, List, Mapping, Tuple
+from typing import AbstractSet, Dict, Iterable, List, Mapping, Tuple
 from bpy.types import Context, FCurve, Object, PoseBone
 from mathutils import Quaternion, Vector
 from xml.etree import ElementTree as et
 from .utils import pretty_print
+from ..maps.groups import GroupMap
+from ..maps.ids import IDMap
 from ..maps.names import NameMap
 from ..maps.positions import PositionMap
 from ..maps.rotations import RotationMap
@@ -43,28 +45,30 @@ def get_curves(obj: Object) -> Dict[str, Dict[str, Dict[float, List[float]]]]:
     return f_curves
 
 
-def process_animation(obj: Object, fps: int) -> List[XTrack]:
+def process_animation(obj: Object, bones: AbstractSet[str], fps: int) -> List[XTrack]:
     f_curves = get_curves(obj)
     tracks = []
     for bone_name, keyframes in f_curves.items():
-        frames = []
-        if bone_name != 'PelvisNode':
-            for frame, coords in keyframes['rotation_quaternion'].items():
-                keyframe = XFrame(frame / fps, bone_name, coords)
-                frames.append(keyframe)
-        else:
-            for location, rotation in zip(keyframes['location'].items(), keyframes['rotation_quaternion'].items()):
-                frame, location_coordinates = location
-                _, rotation_coordinates = rotation
-                keyframe = XFrame(frame / fps, bone_name, rotation_coordinates, location_coordinates)
-                frames.append(keyframe)
-        track = XTrack(bone_name, frames)
-        tracks.append(track)
+        if bone_name in bones:
+            frames = []
+            if bone_name != 'PelvisNode':
+                for frame, coords in keyframes['rotation_quaternion'].items():
+                    keyframe = XFrame(frame / fps, bone_name, coords)
+                    frames.append(keyframe)
+            else:
+                for location, rotation in zip(keyframes['location'].items(),
+                                              keyframes['rotation_quaternion'].items()):
+                    frame, location_coordinates = location
+                    _, rotation_coordinates = rotation
+                    keyframe = XFrame(frame / fps, bone_name, rotation_coordinates, location_coordinates)
+                    frames.append(keyframe)
+            track = XTrack(bone_name, frames)
+            tracks.append(track)
     return tracks
 
 
-def process_pose(obj: Object) -> List[XTrack]:
-    bones = [bone for bone in obj.pose.bones if bone.name in RotationMap.mapping]
+def process_pose(obj: Object, bones: AbstractSet[str]) -> List[XTrack]:
+    bones = [bone for bone in obj.pose.bones if bone.name in bones]
     tracks = []
     for bone in bones:
         rotation = [coord for coord in bone.rotation_quaternion]
@@ -77,15 +81,19 @@ def process_pose(obj: Object) -> List[XTrack]:
     return tracks
 
 
-def export_xaf(context: Context, filepath: str, scale: float, fps: int, debug: bool):
+def export_xaf(context: Context, filepath: str, scale: float, selection: bool, fps: int, debug: bool):
     obj = context.active_object
+    all_bones = set(RotationMap.mapping.keys())
+    if selection:
+        selected_bones = {bone.name for bone in context.selected_pose_bones}
+        all_bones = all_bones.intersection(selected_bones)
     set_rotation_mode(obj)
     root = et.Element('animation')
     tracks = []
     if obj.animation_data:
-        tracks.extend(process_animation(obj, fps))
+        tracks.extend(process_animation(obj, all_bones, fps))
     else:
-        tracks.extend(process_pose(obj))
+        tracks.extend(process_pose(obj, all_bones))
     duration = context.scene.frame_end / fps
     root.attrib['numtracks'] = str(len(tracks))
     root.attrib['duration'] = str(duration)
@@ -151,7 +159,14 @@ def parse_track(obj: Object, track: et.Element, bone_id: int, scale: float, fps:
             bone.keyframe_insert(data_path="rotation_quaternion", frame=frame)
 
 
-def import_xaf(context: Context, obj: Object, filepath: str, scale: float, fps: int):
+def import_xaf(context: Context, obj: Object, filepath: str, scale: float, selection: bool,
+               selected_bones: Iterable[str], fps: int):
+    all_bones = NameMap.mapping
+    if selection:
+        selected_bone_names = set()
+        for bone_group in selected_bones:
+            selected_bone_names.update(GroupMap.lookup(bone_group))
+        all_bones = {IDMap.lookup(bone_name) for bone_name in selected_bone_names}
     with open(filepath, 'r') as f:
         data = f.read()
     data = data.lower()
@@ -160,7 +175,7 @@ def import_xaf(context: Context, obj: Object, filepath: str, scale: float, fps: 
     duration = float(root.attrib['duration'])
     for track in root.iter('track'):
         bone_id = int(track.attrib['boneid'])
-        if bone_id in NameMap.mapping:
+        if bone_id in all_bones:
             parse_track(obj, track, bone_id, scale, fps)
     context.scene.frame_start = 0
     context.scene.frame_end = duration * fps

@@ -59,7 +59,7 @@ class BaseMesh:
         Args:
             obj (bpy.types.Object): The blender object.
         """
-        bpy.ops.mesh.uv_texture_add()
+        obj.data.uv_layers.new()
         if len(self.uvs) > 0:
             uvl = obj.data.uv_layers.active
             for face in obj.data.polygons:
@@ -97,12 +97,13 @@ class BaseMesh:
         return obj
 
     def add_mesh(self, collection: Collection) -> Object:
+        bpy.ops.object.select_all(action='DESELECT')
         mesh = bpy.data.meshes.new(self.name)
         obj = bpy.data.objects.new(mesh.name, mesh)
         collection.objects.link(obj)
         bpy.context.view_layer.objects.active = obj
         mesh.from_pydata(self.vertices, [], self.faces)
-        bpy.ops.object.select_all(action='DESELECT')
+        bpy.context.view_layer.objects.active = None
         return obj
 
     def to_mesh(self, collection: Collection = None, smooth: bool = True, material: bool = False,
@@ -123,7 +124,7 @@ class BaseMesh:
             collection = bpy.data.collections.get("Collection")
         obj = self.add_mesh(collection)
         if smooth:
-            bpy.data.objects[obj.name].select_set(True)
+            obj.select_set(True)
             bpy.ops.object.shade_smooth()
         if material:
             self.add_material(obj)

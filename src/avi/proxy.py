@@ -41,7 +41,7 @@ class Proxy(BaseMesh):
         Args:
             obj (bpy.types.Object): The mesh object.
         """
-        bpy.ops.mesh.uv_texture_add()
+        obj.data.uv_layers.new()
         if len(self.uvs) != 0:
             uvl = obj.data.uv_layers.active
             uv_idx = 0
@@ -51,4 +51,4 @@ class Proxy(BaseMesh):
                     uvl.data[l_idx].uv.x = uv_x
                     uvl.data[l_idx].uv.y = uv_y
                     uv_idx += 1
-        return Object
+        return obj

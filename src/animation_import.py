@@ -2,6 +2,7 @@ import bpy
 from bpy.props import BoolProperty, EnumProperty, StringProperty
 from bpy.types import Context, Operator
 from bpy_extras.io_utils import ImportHelper
+from itertools import compress
 from typing import Set
 from .arm.master_root import add_master_root, link_bones, lock_bones
 from .ops.body_group import BodyGroup
@@ -45,6 +46,66 @@ class CalAnimationImporter(Operator, ImportHelper):
         default='MALE'
     )
 
+    selection: BoolProperty(
+        name="Selected bones",
+        description="Export selected pose bones only",
+        default=False
+    )
+
+    head: BoolProperty(
+        name="Head",
+        description="Include pose bones for head and neck",
+        default=False
+    )
+
+    spine: BoolProperty(
+        name="Spine",
+        description="Include pose bones for spine",
+        default=False
+    )
+
+    r_arm: BoolProperty(
+        name="R Arm",
+        description="Include pose bones for right arm",
+        default=False
+    )
+
+    l_arm: BoolProperty(
+        name="L Arm",
+        description="Include pose bones for left arm",
+        default=False
+    )
+
+    r_hand: BoolProperty(
+        name="R Hand",
+        description="Include pose bones for right hand",
+        default=False
+    )
+
+    l_hand: BoolProperty(
+        name="L Hand",
+        description="Include pose bones for left hand",
+        default=False
+    )
+
+    pelvis: BoolProperty(
+        name="Pelvis",
+        description="Include pelvis pose bone",
+        default=False
+    )
+
+    r_leg: BoolProperty(
+        name="R Leg",
+        description="Include pose bones for right leg",
+        default=False
+    )
+
+    l_leg: BoolProperty(
+        name="L Leg",
+        description="Include pose bones for left leg",
+        default=False
+    )
+
     scale: EnumProperty(
         name="Scale",
         description="Applies imvu's scaling factor",
@@ -59,23 +120,29 @@ class CalAnimationImporter(Operator, ImportHelper):
         if check_format(self.filepath) != 'ASCII':
             self.report({'ERROR'}, 'Binary file unsupported. Check .xaf file contents.')
             return {'CANCELLED'}
-        body_parts = []
         if context.active_object and context.active_object.type == 'ARMATURE':
-            obj = context.active_object
-            if self.link:
-                if len(obj.children) == 0:
-                    body_parts.extend(BodyGroup.default_parts(self.gender))
+            armature = context.active_object
         else:
-            if self.link:
-                body_parts.extend(BodyGroup.default_parts(self.gender))
-            obj = add_master_root()
-        obj.animation_data_clear()
+            armature = add_master_root()
         bpy.ops.object.mode_set(mode='POSE')
-        import_xaf(context, obj, self.filepath, float(self.scale), context.scene.render.fps)
-        if self.link:
-            link_bones(body_parts, obj)
-        if self.lock:
-            lock_bones(obj)
+        armature.animation_data_clear()
+        selected_bones = None
+        if self.selection:
+            selected_bones = compress(
+                ['head', 'spine', 'r_arm', 'l_arm', 'r_hand', 'l_hand', 'pelvis', 'r_leg', 'l_leg'],
+                [self.head, self.spine, self.r_arm, self.l_arm, self.r_hand, self.l_hand,
+                 self.pelvis, self.r_leg, self.l_leg])
+        import_xaf(context, armature, self.filepath, float(self.scale), self.selection, selected_bones,
+                   context.scene.render.fps)
+        body_parts = []
+        if self.link and len(armature.children) == 0:
+            bpy.ops.object.mode_set(mode='OBJECT')
+            body_parts.extend(BodyGroup.default_parts(self.gender))
+            link_bones(body_parts, armature)
+            context.view_layer.objects.active = armature
+            armature.select_set(True)
+            bpy.ops.object.mode_set(mode='POSE')
+        lock_bones(armature) if self.lock else None
         return {'FINISHED'}
 
     def draw(self, context: Context):
@@ -87,4 +154,17 @@ class CalAnimationImporter(Operator, ImportHelper):
         row.prop(self, 'link')
         if self.link:
             layout.prop(self, 'gender')
+        selection_sublayout = layout.column(heading="Limit to")
+        selection_sublayout.prop(self, 'selection')
+        if self.selection:
+            include_sublayout = layout.column(heading="Include")
+            include_sublayout.prop(self, 'head')
+            include_sublayout.prop(self, 'spine')
+            include_sublayout.prop(self, 'r_arm')
+            include_sublayout.prop(self, 'l_arm')
+            include_sublayout.prop(self, 'r_hand')
+            include_sublayout.prop(self, 'l_hand')
+            include_sublayout.prop(self, 'pelvis')
+            include_sublayout.prop(self, 'r_leg')
+            include_sublayout.prop(self, 'l_leg')
         layout.prop(self, 'scale')
