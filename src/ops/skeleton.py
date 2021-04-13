@@ -1,9 +1,11 @@
 import random
-from bpy.types import Context, Operator
-from bpy.props import BoolProperty, EnumProperty, FloatProperty
 from typing import Set
-from .body_group import BodyGroup
-from ..arm.master_root import add_master_root, lock_bones, link_bones
+
+import bpy
+from bpy.props import BoolProperty, EnumProperty, FloatProperty
+from bpy.types import Context, Operator
+
+from ..arm.master_root import add_master_root, link_body, lock_bones
 from ..arm.randomize import randomize_bones
 
 
@@ -74,17 +76,12 @@ class DefaultSkeleton(Operator):
             A set containing the success state of the method.
 
         """
-        body_parts = []
-        if self.link:
-            body_parts.extend(BodyGroup.default_parts(self.gender))
-        bones = add_master_root()
-        bones.data.display_type = self.display
-        if self.link:
-            link_bones(body_parts, bones)
+        armature = add_master_root()
+        armature.data.display_type = self.display
         if self.randomize != 0:
-            randomize_bones(bones, self.gender, self.pose)
-        if self.lock:
-            lock_bones(bones)
+            randomize_bones(armature, self.gender, self.pose)
+        link_body(context, armature, self.gender) if self.link else None
+        lock_bones(armature) if self.lock else None
         return {'FINISHED'}
 
     def draw(self, context: Context):
@@ -95,6 +92,6 @@ class DefaultSkeleton(Operator):
         row.prop(self, 'lock')
         row.prop(self, 'link')
         layout.prop(self, 'display')
-        layout.prop(self, 'randomize')
         layout.prop(self, 'gender')
+        layout.prop(self, 'randomize')
         layout.prop(self, 'pose')

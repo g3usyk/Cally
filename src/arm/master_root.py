@@ -1,6 +1,8 @@
+from typing import Iterable
+
 import bpy
 from bpy.types import Armature, Context, EditBone, Object
-from typing import Iterable
+
 from ..maps.bones.heads import HeadMap
 from ..maps.bones.rolls import RollMap
 from ..maps.bones.tails import TailMap
@@ -42,7 +44,9 @@ def lock_bones(obj: Object) -> Object:
 
 def link_bones(objs: Iterable[Object], armature: Object) -> Iterable[Object]:
     for obj in objs:
-        modifier = obj.modifiers.new(name="Armature", type="ARMATURE")
+        modifier = obj.modifiers.get('Armature')
+        if not modifier:
+            modifier = obj.modifiers.new(name="Armature", type="ARMATURE")
         modifier.object = armature
         obj.parent = armature
     return objs
@@ -50,7 +54,15 @@ def link_bones(objs: Iterable[Object], armature: Object) -> Iterable[Object]:
 
 def link_body(context: Context, armature: Object, gender: str) -> Object:
     bpy.ops.object.mode_set(mode='OBJECT')
-    body_parts = BodyGroup.default_parts(gender)
+    body_collection_name = f'{gender[0].upper()}_Body'
+    body_parts = []
+    for collection in bpy.data.collections:
+        if body_collection_name in collection.name and collection.objects and any([obj.parent is None
+                                                                                   for obj in collection.objects]):
+            body_parts = collection.objects[:]
+            break
+    if not body_parts:
+        body_parts = BodyGroup.default_parts(gender)
     link_bones(body_parts, armature)
     context.view_layer.objects.active = armature
     armature.select_set(True)
