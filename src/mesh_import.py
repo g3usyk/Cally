@@ -1,7 +1,10 @@
+from typing import Set
+
 from bpy.props import BoolProperty, StringProperty
 from bpy.types import Context, Operator
 from bpy_extras.io_utils import ImportHelper
-from typing import Set
+
+from .xfile.utils import check_format
 from .xfile.xmf import import_xmf
 
 
@@ -56,6 +59,9 @@ class CalMeshImporter(Operator, ImportHelper):
     )
 
     def execute(self, context: Context) -> Set[str]:
+        if check_format(self.filepath) != 'ASCII':
+            self.report({'ERROR'}, 'Binary file unsupported. Check .xaf file contents.')
+            return {'CANCELLED'}
         submeshes = import_xmf(self.filepath)
         for base_mesh in submeshes:
             base_mesh.to_mesh(smooth=self.smooth, material=self.material, uvs=self.uvs, norms=self.norms,
