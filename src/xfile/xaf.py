@@ -1,15 +1,18 @@
-from typing import AbstractSet, Dict, Iterable, List, Mapping, Tuple
+from itertools import zip_longest
+from typing import AbstractSet, Dict, Iterable, List, Mapping, Tuple, Set
+from xml.etree import ElementTree as et
+
 from bpy.types import Context, FCurve, Object, PoseBone
 from mathutils import Quaternion, Vector
-from xml.etree import ElementTree as et
+
 from .utils import pretty_print
 from ..maps.groups import GroupMap
 from ..maps.ids import IDMap
 from ..maps.names import NameMap
 from ..maps.positions import PositionMap
 from ..maps.rotations import RotationMap
-from ..xanim.xtrack import XTrack
 from ..xanim.xframe import XFrame
+from ..xanim.xtrack import XTrack
 
 
 def set_rotation_mode(obj: Object) -> Object:
@@ -28,10 +31,9 @@ def get_data_path(data_string: str) -> Tuple[str, str]:
 def get_keyframe_point(f_curve: FCurve, data_path: str,
                        keyframes: Mapping[str, Dict[float, List[float]]]) -> Mapping[str, Dict[float, List[float]]]:
     for keyframe_points in f_curve.keyframe_points:
-        frame, value = keyframe_points.co
+        frame, _ = keyframe_points.co
         if frame not in keyframes[data_path]:
             keyframes[data_path][frame] = []
-        keyframes[data_path][frame].append(value)
     return keyframes
 
 
@@ -39,36 +41,61 @@ def get_curves(obj: Object) -> Dict[str, Dict[str, Dict[float, List[float]]]]:
     f_curves = {}
     for curve in obj.animation_data.action.fcurves:
         bone_name, data_path = get_data_path(curve.data_path)
-        if bone_name not in f_curves:
-            f_curves[bone_name] = {'location': {}, 'rotation_quaternion': {}}
-        get_keyframe_point(curve, data_path, f_curves[bone_name])
+        if data_path in {'location', 'rotation_quaternion'}:
+            if bone_name not in f_curves:
+                if bone_name == 'PelvisNode':
+                    f_curves[bone_name] = {'location': {}, 'rotation_quaternion': {}}
+                else:
+                    f_curves[bone_name] = {'rotation_quaternion': {}}
+            get_keyframe_point(curve, data_path, f_curves[bone_name])
+    for curve in obj.animation_data.action.fcurves:
+        bone_name, data_path = get_data_path(curve.data_path)
+        if bone_name in f_curves:
+            if data_path in f_curves[bone_name]:
+                for frame in f_curves[bone_name][data_path]:
+                    f_curves[bone_name][data_path][frame].append(curve.evaluate(frame))
     return f_curves
 
 
-def process_animation(obj: Object, bones: AbstractSet[str], fps: int) -> List[XTrack]:
+def process_animated_bone(obj: Object, bone_name: str, keyframes: Mapping[str, Mapping[float, Iterable[float]]],
+                          fps: int) -> List[XFrame]:
+    x_frames = []
+    bone = obj.pose.bones[bone_name]
+    last_location = bone.location[:]
+    last_rotation = bone.rotation_quaternion[:]
+    for location, rotation in zip_longest(keyframes['location'].items(),
+                                          keyframes['rotation_quaternion'].items()):
+        frame = location[0] if location else rotation[0]
+        location_coordinates = location[1] if location else last_location
+        last_location = location_coordinates
+        rotation_coordinates = rotation[1] if rotation else last_rotation
+        last_rotation = rotation_coordinates
+        keyframe = XFrame(frame / fps, bone_name, rotation_coordinates, location_coordinates)
+        x_frames.append(keyframe)
+    return x_frames
+
+
+def process_animation(obj: Object, selected_bones: Set[str], fps: int) -> List[XTrack]:
     f_curves = get_curves(obj)
     tracks = []
     for bone_name, keyframes in f_curves.items():
-        if bone_name in bones:
+        if bone_name in selected_bones:
+            selected_bones.remove(bone_name)
             frames = []
             if bone_name != 'PelvisNode':
-                for frame, coords in keyframes['rotation_quaternion'].items():
-                    keyframe = XFrame(frame / fps, bone_name, coords)
+                for frame, rotation_coordinates in keyframes['rotation_quaternion'].items():
+                    keyframe = XFrame(frame / fps, bone_name, rotation_coordinates)
                     frames.append(keyframe)
             else:
-                for location, rotation in zip(keyframes['location'].items(),
-                                              keyframes['rotation_quaternion'].items()):
-                    frame, location_coordinates = location
-                    _, rotation_coordinates = rotation
-                    keyframe = XFrame(frame / fps, bone_name, rotation_coordinates, location_coordinates)
-                    frames.append(keyframe)
+                frames.extend(process_animated_bone(obj, bone_name, keyframes, fps))
             track = XTrack(bone_name, frames)
             tracks.append(track)
+    tracks.extend(process_pose(obj, selected_bones))
     return tracks
 
 
-def process_pose(obj: Object, bones: AbstractSet[str]) -> List[XTrack]:
-    bones = [bone for bone in obj.pose.bones if bone.name in bones]
+def process_pose(obj: Object, selected_bones: AbstractSet[str]) -> List[XTrack]:
+    bones = [bone for bone in obj.pose.bones if bone.name in selected_bones]
     tracks = []
     for bone in bones:
         rotation = [coord for coord in bone.rotation_quaternion]
