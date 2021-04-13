@@ -1,7 +1,9 @@
-from bpy.types import Object
-from typing import Dict, Iterable, List, Tuple, Union
 from itertools import repeat
-from ..avi.proxy_group import ProxyGroup
+from typing import Dict, Iterable, List, Tuple, Union
+
+from bpy.types import Object
+
+from ..mesh.proxy_group import ProxyGroup
 
 
 class BodyGroup:

@@ -1,10 +1,12 @@
-import bpy
 import inspect
 import pickle
-from bpy.types import Object
-from typing import Iterable
 from pathlib import Path
-from ..mesh.base import BaseMesh
+from typing import Iterable
+
+import bpy
+from bpy.types import Object
+
+from .base import BaseMesh
 
 
 class Proxy(BaseMesh):

@@ -1,6 +1,8 @@
+from typing import Dict, Iterable, Tuple
+
 import bpy
 from bpy.types import Object
-from typing import Dict, Iterable, Tuple
+
 from .proxy import Proxy
 
 
