@@ -1,13 +1,14 @@
-import bpy
 import re
-from bpy.props import BoolProperty, EnumProperty, IntProperty, StringProperty
-from bpy.types import Context, Object, Operator
-from bpy_extras.io_utils import ExportHelper
 from typing import List, Set, Tuple
+
+import bpy
+from bpy.props import BoolProperty, EnumProperty, IntProperty, StringProperty
+from bpy.types import Context, Operator
+from bpy_extras.io_utils import ExportHelper
+
 from .maps.ids import IDMap
 from .maps.names import NameMap
 from .xfile.xmf import export_xmf
-from .xfile.utils import check_format
 
 
 def get_bone(obj_name: str) -> str:
@@ -17,14 +18,12 @@ def get_bone(obj_name: str) -> str:
 
 
 def get_material(obj_name: str) -> int:
-    mtl = bpy.data.objects[obj_name].active_material
+    mtl = bpy.data.objects[obj_name].active_material.name
     material = 0
     if mtl:
-        mtl_id = re.findall('\d+', mtl.name)
-        if mtl_id:
-            material = int(mtl_id[0])
-        else:
-            material = bpy.data.materials.find(mtl.name)
+        mtl_id = re.sub(r'\D', '', mtl)
+        if mtl_id != '':
+            material = int(mtl_id)
     return material
 
 
@@ -92,7 +91,6 @@ class CalMeshExporter(Operator, ExportHelper):
         name="Material ID",
         description="Specifies the material id for the submesh",
         soft_min=0,
-        max=100,
         default=-1
     )
 
@@ -119,9 +117,6 @@ class CalMeshExporter(Operator, ExportHelper):
         Returns:
             set: The success state of the execution.
         """
-        if check_format(self.filepath) != 'ASCII':
-            self.report({'ERROR'}, 'Binary file unsupported. Check .xaf file contents.')
-            return {'CANCELLED'}
         submap = {obj.name: {'bone': IDMap.lookup(get_bone(obj.name)), 'material': get_material(obj.name)}
                   for obj in context.selected_objects if obj.type == 'MESH'}
         export_xmf(context, self.filepath, submap, float(self.scale), self.weight, self.auto)
