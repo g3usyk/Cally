@@ -28,10 +28,16 @@ class CalMeshImporter(Operator, ImportHelper):
         default=True,
     )
 
+    morphs: BoolProperty(
+        name="Include Morphs",
+        description="Include morphs for mesh",
+        default=True,
+    )
+
     norms: BoolProperty(
         name="Include Normals",
         description="Include custom vertex normals in mesh",
-        default=True,
+        default=False,
     )
 
     uvs: BoolProperty(
@@ -43,12 +49,6 @@ class CalMeshImporter(Operator, ImportHelper):
     weights: BoolProperty(
         name="Include Weights",
         description="Include bone weights for mesh",
-        default=True,
-    )
-
-    morphs: BoolProperty(
-        name="Include Morphs",
-        description="Include morphs for mesh",
         default=True,
     )
 
