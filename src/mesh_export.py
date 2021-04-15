@@ -12,13 +12,17 @@ from .xfile.xmf import export_xmf
 
 
 def get_bone(obj_name: str) -> str:
-    group = bpy.data.objects[obj_name].vertex_groups.active
-    bone = group.name if group and group.name in IDMap.mapping else NameMap.lookup(0)
+    obj = bpy.data.objects[obj_name]
+    group = obj.vertex_groups.active if obj.vertex_groups else None
+    bone = 'Female03MasterRoot'
+    if group:
+        bone = group.name if group.name in IDMap.mapping else NameMap.lookup(0)
     return bone
 
 
 def get_material(obj_name: str) -> int:
-    mtl = bpy.data.objects[obj_name].active_material.name
+    obj = bpy.data.objects[obj_name]
+    mtl = obj.active_material.name if obj.active_material else None
     material = 0
     if mtl:
         mtl_id = re.sub(r'\D', '', mtl)
