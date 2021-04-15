@@ -1,7 +1,7 @@
 bl_info = {
     "name": "Cally",
     "author": "hsoju",
-    "version": (4, 0, 3),
+    "version": (4, 1, 0),
     "blender": (2, 92, 0),
     "location": "File > Import-Export",
     "description": "Import-Export Cal3D objects",
