@@ -144,6 +144,7 @@ def set_timeline(context: Context, duration: float, fps: int, obj_animated: bool
 
 def get_selected_bones(selection: bool, selected_bone_groups: Iterable[str]):
     selected_bones = NameMap.mapping
+    selected_bones.pop(0)
     if selection:
         selected_bone_names = set()
         for bone_group in selected_bone_groups:
