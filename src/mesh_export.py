@@ -123,7 +123,11 @@ class CalMeshExporter(Operator, ExportHelper):
         """
         submap = {obj.name: {'bone': IDMap.lookup(get_bone(obj.name)), 'material': get_material(obj.name)}
                   for obj in context.selected_objects if obj.type == 'MESH'}
+        current_mode = context.object.mode
+        if current_mode != 'OBJECT':
+            bpy.ops.object.mode_set(mode='OBJECT')
         export_xmf(context, self.filepath, submap, float(self.scale), self.weight, self.auto)
+        bpy.ops.object.mode_set(mode=current_mode)
         return {'FINISHED'}
 
     def draw(self, context: Context):
