@@ -1,9 +1,11 @@
-import bpy
-import bmesh
 import os
-from bpy.types import Context, MeshVertex, Object
-from typing import Callable, Collection, Dict, Iterable, List, Mapping, Set, Sequence, Tuple
+from typing import Callable, Collection, Dict, Iterable, List, Mapping, Sequence, Set, Tuple
 from xml.etree import ElementTree as et
+
+import bmesh
+import bpy
+from bpy.types import Context, MeshVertex, Object
+
 from .utils import pretty_print
 from ..maps.ids import IDMap
 from ..maps.positions import PositionMap
@@ -40,12 +42,14 @@ def generate_vertices(obj, bone_id: int, weight: str) -> List[XVertex]:
             next_vertex = generate_vertex(obj, vertex, color, influences)
             xverts.append(next_vertex)
     else:
-        group_ids = {group.index: str(IDMap.lookup(group.name)) for group in obj.vertex_groups}
+        group_ids = {group.index: str(IDMap.lookup(group.name)) for group in obj.vertex_groups
+                     if group.name in IDMap.mapping}
         for vertex in obj.data.vertices:
             if len(vertex.groups) != 0:
                 influences = {}
                 for g in vertex.groups:
-                    influences[group_ids[g.group]] = g.weight
+                    if g.group in group_ids:
+                        influences[group_ids[g.group]] = g.weight
             next_vertex = generate_vertex(obj, vertex, color, influences)
             xverts.append(next_vertex)
     return xverts
@@ -202,7 +206,9 @@ def default_options(objs: Iterable[Object]) -> Tuple[Dict[str, Dict[str, int]], 
     for obj in objs:
         submap[obj.name] = {}
         if len(obj.vertex_groups) > 0:
-            weight = 'VERTEX'
+            group_names = {group.name for group in obj.vertex_groups}
+            if len(group_names.intersection(IDMap.mapping.keys())) > 0:
+                weight = 'VERTEX'
         location = obj.matrix_world.translation
         submap[obj.name]['bone'] = PositionMap.get_closest_bone(location)
         name = '.'.join(obj.name.split('.')[:2])
