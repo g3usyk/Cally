@@ -1,7 +1,9 @@
+from typing import Set
+
 from bpy.props import BoolProperty, EnumProperty, StringProperty
 from bpy.types import Context, Operator
 from bpy_extras.io_utils import ExportHelper
-from typing import Set
+
 from .xfile.xaf import export_xaf
 
 
