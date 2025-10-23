@@ -263,7 +263,12 @@ def apply_scale(value: str) -> float:
 
 
 def extract(tag: et.Element, tag_name: str, conversion: Callable[[str], float]) -> List[float]:
-    elements = tag.find(tag_name).text.split()
+    found = tag.find(tag_name)
+    if found is None or found.text is None:
+        return []
+    elements = found.text.split()
+    if not isinstance(elements, list):
+        return []
     return [conversion(element) for element in elements]
 
 
@@ -306,13 +311,39 @@ def extract_submesh(sub: et.Element, mesh_name: str, morph_names: Mapping[str, s
     uvs = []
     normals = []
     influences = []
+    missing_uv_ids = []
+    missing_norm_ids = []
+    missing_pos_ids = []
     for vertex in sub.iter('vertex'):
-        positions.append(extract(vertex, 'pos', apply_scale))
-        normals.append(extract(vertex, 'norm', float))
+        pos = extract(vertex, 'pos', apply_scale)
+        if isinstance(pos, list) and len(pos) >= 3:
+            positions.append(pos)
+        else:
+            vid = vertex.attrib.get('ID', None)
+            missing_pos_ids.append(vid)
+            positions.append([0.0, 0.0, 0.0])  # Valor por defecto si no hay POS
+        norm = extract(vertex, 'norm', float)
+        if isinstance(norm, list) and len(norm) >= 3:
+            normals.append(norm)
+        else:
+            vid = vertex.attrib.get('ID', None)
+            missing_norm_ids.append(vid)
+            normals.append([0.0, 0.0, 0.0])  # Valor por defecto si no hay NORM
         # col = extract(vert, 'color', float)
         uv = extract(vertex, 'texcoord', float)
-        uvs.append((uv[0], abs(1 - uv[1])))
+        if isinstance(uv, list) and len(uv) >= 2:
+            uvs.append((uv[0], abs(1 - uv[1])))
+        else:
+            vid = vertex.attrib.get('ID', None)
+            missing_uv_ids.append(vid)
+            uvs.append((0.0, 0.0))  # Valor por defecto si no hay UV
         influences.append(extract_influences(vertex, 'influence', float))
+    if missing_uv_ids:
+        print(f"Vértices sin TEXCOORD: {missing_uv_ids}")
+    if missing_norm_ids:
+        print(f"Vértices sin NORM: {missing_norm_ids}")
+    if missing_pos_ids:
+        print(f"Vértices sin POS: {missing_pos_ids}")
     morphs = extract_morphs(sub, morph_names)
     loops = []
     for face in sub.iter('face'):
