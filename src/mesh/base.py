@@ -82,18 +82,30 @@ class BaseMesh:
         return obj
 
     def add_morphs(self, obj: Object) -> Object:
-        obj.shape_key_add(name='Basis')
+        basis = obj.shape_key_add(name='Basis')
         num_vertices = len(obj.data.vertices)
+        
         for morph_name, blend_vertices in self.morphs.items():
+            # CRITICAL: Reset ALL shape keys to 0 and ensure Basis is active
+            # This prevents cascading deformations
+            if obj.data.shape_keys:
+                for kb in obj.data.shape_keys.key_blocks:
+                    kb.value = 0.0
+                obj.active_shape_key_index = 0
+            
             shape_key = obj.shape_key_add(name=morph_name)
             for vertex_id, position in blend_vertices:
                 if vertex_id < num_vertices:
                     new_position = Vector()
                     new_position[:] = position if position else [0, 0, 0]
                     shape_key.data[vertex_id].co = new_position
-            if morph_name == 'Face.Average':
-                shape_key.value = 1.0
-                obj.active_shape_key_index = obj.data.shape_keys.key_blocks.find('Face.Average')
+        
+        # Activate Face.Average AFTER all shape keys are created
+        if 'Face.Average' in self.morphs:
+            face_avg_idx = obj.data.shape_keys.key_blocks.find('Face.Average')
+            if face_avg_idx >= 0:
+                obj.data.shape_keys.key_blocks[face_avg_idx].value = 1.0
+                obj.active_shape_key_index = face_avg_idx
         return obj
 
     def add_mesh(self, collection: Collection) -> Object:

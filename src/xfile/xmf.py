@@ -262,8 +262,20 @@ def apply_scale(value: str) -> float:
     return float(value) / 100
 
 
+def get_attrib(elem: et.Element, name: str, default=None):
+    return elem.attrib.get(name) or elem.attrib.get(name.upper()) or default
+
+def iter_tags(elem: et.Element, *tags: str):
+    for child in elem:
+        if child.tag.lower() in tags:
+            yield child
+
 def extract(tag: et.Element, tag_name: str, conversion: Callable[[str], float]) -> List[float]:
+    # Search for tag_name (lower) or tag_name.upper()
     found = tag.find(tag_name)
+    if found is None:
+        found = tag.find(tag_name.upper())
+    
     if found is None or found.text is None:
         return []
     elements = found.text.split()
@@ -273,40 +285,46 @@ def extract(tag: et.Element, tag_name: str, conversion: Callable[[str], float]) 
 
 
 def extract_influences(elem: et.Element, tag: str, conversion: Callable[[str], float]) -> Set[Tuple[int, float]]:
-    children = elem.findall(tag)
+    # Handle tag case
+    children = list(elem.findall(tag)) + list(elem.findall(tag.upper()))
     seen_influences = set()
     for influence in children:
-        bone_id, weight = int(influence.attrib['id']), conversion(influence.text)
+        bone_id = int(get_attrib(influence, 'id'))
+        weight = conversion(influence.text)
         seen_influences.add((bone_id, weight))
     return seen_influences
 
 
 def extract_morph_names(root: et.Element) -> Dict[str, str]:
     morphs = {}
-    for morph in root.iter('morph'):
-        morph_name = morph.attrib['name']
-        morphs[morph_name.lower()] = morph_name
-    for morph in root.iter('MORPH'):
-        morph_name = morph.attrib['NAME']
-        morphs[morph_name.lower()] = morph_name
+    # Handle both cases
+    for morph in list(root.iter('morph')) + list(root.iter('MORPH')):
+        morph_name = get_attrib(morph, 'name')
+        if morph_name:
+            morphs[morph_name.lower()] = morph_name
     return morphs
 
 
 def extract_morphs(sub: et.Element, morph_names: Mapping[str, str]) -> Dict[str, List[Tuple[int, Iterable[float]]]]:
     morphs = {}
-    for morph in sub.iter('morph'):
+    for morph in list(sub.iter('morph')) + list(sub.iter('MORPH')):
         blend_vertices = []
-        for blend_vertex in morph.iter('blendvertex'):
-            vertex_id = int(blend_vertex.attrib['vertexid'])
+        for blend_vertex in list(morph.iter('blendvertex')) + list(morph.iter('BLENDVERTEX')):
+            vertex_id = int(get_attrib(blend_vertex, 'vertexid'))
             position = extract(blend_vertex, 'position', apply_scale)
-            blend_vertices.append((vertex_id, position))
-        alt_name = morph.attrib['name']
-        morphs[morph_names[alt_name]] = blend_vertices
+            if position and len(position) == 3:
+                blend_vertices.append((vertex_id, position))
+        
+        alt_name = get_attrib(morph, 'name')
+        if alt_name and alt_name.lower() in morph_names:
+             morphs[morph_names[alt_name.lower()]] = blend_vertices
+        elif alt_name:
+             morphs[alt_name] = blend_vertices # Fallback
     return morphs
 
 
 def extract_submesh(sub: et.Element, mesh_name: str, morph_names: Mapping[str, str]) -> BaseMesh:
-    material = int(sub.attrib['material'])
+    material = int(get_attrib(sub, 'material', '0'))
     positions = []
     uvs = []
     normals = []
@@ -314,41 +332,47 @@ def extract_submesh(sub: et.Element, mesh_name: str, morph_names: Mapping[str, s
     missing_uv_ids = []
     missing_norm_ids = []
     missing_pos_ids = []
-    for vertex in sub.iter('vertex'):
+    
+    for vertex in list(sub.iter('vertex')) + list(sub.iter('VERTEX')):
         pos = extract(vertex, 'pos', apply_scale)
         if isinstance(pos, list) and len(pos) >= 3:
             positions.append(pos)
         else:
-            vid = vertex.attrib.get('ID', None)
+            vid = get_attrib(vertex, 'id')
             missing_pos_ids.append(vid)
-            positions.append([0.0, 0.0, 0.0])  # Valor por defecto si no hay POS
+            positions.append([0.0, 0.0, 0.0])
+            
         norm = extract(vertex, 'norm', float)
         if isinstance(norm, list) and len(norm) >= 3:
             normals.append(norm)
         else:
-            vid = vertex.attrib.get('ID', None)
+            vid = get_attrib(vertex, 'id')
             missing_norm_ids.append(vid)
-            normals.append([0.0, 0.0, 0.0])  # Valor por defecto si no hay NORM
-        # col = extract(vert, 'color', float)
+            normals.append([0.0, 0.0, 0.0])
+            
         uv = extract(vertex, 'texcoord', float)
         if isinstance(uv, list) and len(uv) >= 2:
             uvs.append((uv[0], abs(1 - uv[1])))
         else:
-            vid = vertex.attrib.get('ID', None)
+            vid = get_attrib(vertex, 'id')
             missing_uv_ids.append(vid)
-            uvs.append((0.0, 0.0))  # Valor por defecto si no hay UV
+            uvs.append((0.0, 0.0))
+            
         influences.append(extract_influences(vertex, 'influence', float))
+        
     if missing_uv_ids:
         print(f"Vértices sin TEXCOORD: {missing_uv_ids}")
     if missing_norm_ids:
         print(f"Vértices sin NORM: {missing_norm_ids}")
     if missing_pos_ids:
         print(f"Vértices sin POS: {missing_pos_ids}")
+        
     morphs = extract_morphs(sub, morph_names)
     loops = []
-    for face in sub.iter('face'):
-        vertex_ids = [int(vertex_id) for vertex_id in face.attrib['vertexid'].split()]
+    for face in list(sub.iter('face')) + list(sub.iter('FACE')):
+        vertex_ids = [int(vertex_id) for vertex_id in get_attrib(face, 'vertexid').split()]
         loops.append(vertex_ids)
+        
     return BaseMesh(name=mesh_name, vertices=positions, faces=loops, uvs=uvs, norms=normals,
                     groups=influences, morphs=morphs, material_id=material)
 
@@ -362,14 +386,25 @@ def import_xmf(filepath: str) -> Iterable[BaseMesh]:
     data = ''
     with open(filepath, 'r') as f:
         data += f.read()
-    data_copy = data.lower()
-    start = data_copy.find('<mesh')
+    
+    # Do NOT lowercase data
+    # Find start of mesh tag case-insensitively
+    start = -1
+    lower_data = data.lower()
+    start = lower_data.find('<mesh')
+    
+    if start == -1:
+        # Try to parse anyway if no mesh tag found (unlikely)
+        start = 0
+        
     morph_names = extract_morph_names(et.fromstring(data[start:]))
-    root = et.fromstring(data_copy[start:])
+    root = et.fromstring(data[start:])
     objs = []
     filename = os.path.split(filepath)[1]
     mesh_name = os.path.splitext(filename)[0]
-    for submesh in root.iter('submesh'):
+    
+    for submesh in list(root.iter('submesh')) + list(root.iter('SUBMESH')):
         obj = extract_submesh(submesh, mesh_name, morph_names)
         objs.append(obj)
     return objs
+
